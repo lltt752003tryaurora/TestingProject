@@ -7,4 +7,4 @@ const controller = require("../controllers/indexController")
 // create table in database
 router.get("/createTables", controller.createTables);
 
-
+module.exports = router

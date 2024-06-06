@@ -7,7 +7,7 @@ const port = process.env.PORT || 3000;
 const expressHandlebars = require('express-handlebars');
 
 // config public static folder => express will return Free Template
-app.use(express.static(__dirname + '/'))
+app.use(express.static(__dirname + '/public'))
 
 app.engine("hbs", expressHandlebars.engine({
     layoutsDir: __dirname + "/views/layouts",
@@ -19,9 +19,9 @@ app.set("view engine", "hbs");
 
 
 // routes
-app.use("/", require('./routes/indexRouter'))
+app.use("/", require('./routes/indexRouter.js'))
 
 // Init web server
-router.listen(port, () => {
+app.listen(port, () => {
     console.log(`listening on port ${port}`);
 })

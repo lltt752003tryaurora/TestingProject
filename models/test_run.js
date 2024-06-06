@@ -11,11 +11,11 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      this.belongsTo(models.Project, { foreignKey: 'project_id', as: 'project' });
-      this.belongsTo(models.Release, { foreignKey: 'release_id', as: 'release' });
-      this.belongsTo(models.Test_Plan, { foreignKey: 'test_plan_id', as: 'testPlan' });
-      this.belongsTo(models.User, { foreignKey: 'assigned_user_id', as: 'assignedUser' });
-      this.belongsToMany(models.Test_Case, { through: models.Test_Run_Case, foreignKey: 'test_run_id', as: 'testCases' });
+      this.belongsTo(models.Project, { foreignKey: 'project_id' });
+      this.belongsTo(models.Release, { foreignKey: 'release_id' });
+      this.belongsTo(models.Test_Plan, { foreignKey: 'test_plan_id' });
+      this.belongsTo(models.User, { foreignKey: 'assigned_user_id' });
+      this.belongsToMany(models.Test_Case, { through: models.Test_Run_Case, foreignKey: 'test_run_id' });
     }
   }
   Test_Run.init({

@@ -28,7 +28,6 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Project.init({
-    id: DataTypes.INTEGER,
     name: DataTypes.STRING,
     created_at: DataTypes.DATE
   }, {

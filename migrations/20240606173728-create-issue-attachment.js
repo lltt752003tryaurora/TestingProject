@@ -2,7 +2,11 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
+<<<<<<< HEAD
     await queryInterface.createTable('IssueAttachments', {
+=======
+    await queryInterface.createTable('Issue_Attachments', {
+>>>>>>> refs/remotes/origin/master
       id: {
         allowNull: false,
         autoIncrement: true,

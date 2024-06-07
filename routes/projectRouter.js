@@ -1,23 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../models/index');
+const projectController = require('../controllers/projectController');
 
-router.get('/:projectId', async (req, res) => {
-    const { projectId } = req.params;
+router.get('/:projectId', projectController.getProjectById);
 
-    const project = await db.Project.findByPk(projectId);
-    if (project) {
-        res.send(project.toJSON());
-    } else {
-        console.log('Not found');
-        res.status(404).send({
-            message: 'Project not found.'
-        })
-    }
-})
+router.get('/:projectId/members', projectController.getProjectMembers);
 
-router.post('/create', (req, res) => {
-    
-})
 
 module.exports = router;

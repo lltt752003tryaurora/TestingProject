@@ -11,20 +11,33 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      this.belongsTo(models.Project, { foreignKey: 'project_id', as: 'project' });
-      this.belongsTo(models.Requirement, { foreignKey: 'parent_requirement_id', as: 'parentRequirement' });
-      this.hasMany(models.Requirement, { foreignKey: 'parent_requirement_id', as: 'childRequirements' });
-      this.belongsTo(models.Release, { foreignKey: 'release_id', as: 'release' });
+      this.belongsTo(models.Project, { foreignKey: 'projectId', as: 'project' });
+      this.belongsTo(models.Requirement, { foreignKey: 'parentRequirementId', as: 'parentRequirement' });
+      this.hasMany(models.Requirement, { foreignKey: 'parentRequirementId', as: 'childRequirements' });
+      // this.belongsTo(models.Release, { foreignKey: 'releaseId', as: 'release' });
     }
   }
   Requirement.init({
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    projectId: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
     name: DataTypes.STRING,
     description: DataTypes.TEXT,
-    parent_requirement_id: DataTypes.INTEGER,
-    created_at: DataTypes.DATE
+    parentRequirementId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
   }, {
     sequelize,
     modelName: 'Requirement',
+    timestamps: true,
+    paranoid: true
   });
   return Requirement;
 };

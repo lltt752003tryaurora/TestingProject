@@ -11,12 +11,12 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      this.belongsToMany(models.Project, { through: models.ProjectMember, foreignKey: 'user_id', as: 'projects' });
-      this.hasMany(models.TestRun, { foreignKey: 'assigned_user_id', as: 'assignedTestRuns' });
-      this.hasMany(models.Issue, { foreignKey: 'creator_user_id', as: 'createdIssues' });
-      this.hasMany(models.Issue, { foreignKey: 'assigned_user_id', as: 'assignedIssues' });
-      this.hasMany(models.IssueComment, { foreignKey: 'user_id', as: 'issueComments' });
-      this.hasMany(models.Activity, { foreignKey: 'user_id', as: 'activities' });
+      this.belongsToMany(models.Project, { through: models.ProjectMember, foreignKey: 'userId', as: 'projects' });
+      this.hasMany(models.TestRun, { foreignKey: 'assigned_userId', as: 'assignedTestRuns' });
+      this.hasMany(models.Issue, { foreignKey: 'creator_userId', as: 'createdIssues' });
+      this.hasMany(models.Issue, { foreignKey: 'assigned_userId', as: 'assignedIssues' });
+      this.hasMany(models.IssueComment, { foreignKey: 'userId', as: 'issueComments' });
+      this.hasMany(models.Activity, { foreignKey: 'userId', as: 'activities' });
     }
   }
   User.init({

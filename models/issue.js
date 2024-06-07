@@ -11,21 +11,28 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      this.belongsTo(models.Project, { foreignKey: 'project_id', as: 'project' });
-      this.belongsTo(models.User, { foreignKey: 'creator_user_id', as: 'creator' });
-      this.belongsTo(models.User, { foreignKey: 'assigned_user_id', as: 'assignedUser' });
-      this.hasMany(models.IssueDetail, { foreignKey: 'issue_id', as: 'details' });
-      this.belongsToMany(models.Attachment, { through: models.IssueAttachment, foreignKey: 'issue_id', as: 'attachments' });
-      this.hasMany(models.IssueComment, { foreignKey: 'issue_id', as: 'comments' });
+      this.belongsTo(models.Project, { foreignKey: 'projectId', as: 'project' });
+      this.belongsTo(models.User, { foreignKey: 'creatorUserId', as: 'creator' });
+      this.belongsTo(models.User, { foreignKey: 'assignedUserId', as: 'assignedUser' });
+      this.hasMany(models.IssueDetail, { foreignKey: 'issueId', as: 'details' });
+      this.belongsToMany(models.Attachment, { through: models.IssueAttachment, foreignKey: 'issueId', as: 'attachments' });
+      this.hasMany(models.IssueComment, { foreignKey: 'issueId', as: 'comments' });
     }
   }
   Issue.init({
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
     name: DataTypes.STRING,
     description: DataTypes.TEXT,
-    created_at: DataTypes.DATE
+
   }, {
     sequelize,
     modelName: 'Issue',
+    timestamps: true,
+    paranoid: true,
   });
   return Issue;
 };

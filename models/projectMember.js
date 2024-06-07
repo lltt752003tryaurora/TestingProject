@@ -11,16 +11,28 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      this.belongsTo(models.Project, { foreignKey: 'project_id', as: 'project' });
-      this.belongsTo(models.User, { foreignKey: 'user_id', as: 'user' });
+      this.belongsTo(models.Project, { foreignKey: 'projectId', as: 'project' });
+      this.belongsTo(models.User, { foreignKey: 'userId', as: 'user' });
     }
   }
   ProjectMember.init({
-    role: DataTypes.STRING,
-    created_at: DataTypes.DATE
+    role: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    projectId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
   }, {
     sequelize,
     modelName: 'ProjectMember',
+    timestamps: true,
+    paranoid: true,
   });
   return ProjectMember;
 };

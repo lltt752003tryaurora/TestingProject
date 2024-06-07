@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      this.belongsTo(models.Project, { foreignKey: 'project_id', as: 'project' });
+      this.belongsTo(models.Project, { foreignKey: 'projectId', as: 'project' });
       this.belongsTo(models.Module, { foreignKey: 'parent_module_id', as: 'parentModule' });
       this.hasMany(models.Module, { foreignKey: 'parent_module_id', as: 'childModules' });
       this.hasMany(models.TestCase, { foreignKey: 'module_id', as: 'testCases' });

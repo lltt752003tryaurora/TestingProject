@@ -11,20 +11,34 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      this.belongsTo(models.Project, { foreignKey: 'project_id', as: 'project' });
+      this.belongsTo(models.Project, { foreignKey: 'projectId', as: 'project' });
       this.belongsToMany(models.Attachment, { through: models.ReleaseAttachment, foreignKey: 'release_id', as: 'attachments' });
       this.hasMany(models.TestRun, { foreignKey: 'release_id', as: 'testRuns' });
       this.hasMany(models.Requirement, { foreignKey: 'release_id', as: 'requirements' });
     }
   }
   Release.init({
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
+    projectId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'Projects',
+        key: 'id'
+      }
+    },
     name: DataTypes.STRING,
-    start_date: DataTypes.DATE,
-    end_date: DataTypes.DATE,
-    created_at: DataTypes.DATE
+    startDate: DataTypes.DATE,
+    endDate: DataTypes.DATE,
   }, {
     sequelize,
     modelName: 'Release',
+    timestamps: true,
+    paranoid: true,
   });
   return Release;
 };

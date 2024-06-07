@@ -15,18 +15,23 @@ module.exports = (sequelize, DataTypes) => {
       this.hasMany(models.TestRun, { foreignKey: 'assigned_user_id', as: 'assignedTestRuns' });
       this.hasMany(models.Issue, { foreignKey: 'creator_user_id', as: 'createdIssues' });
       this.hasMany(models.Issue, { foreignKey: 'assigned_user_id', as: 'assignedIssues' });
-      this.hasMany(models.Issue_Comment, { foreignKey: 'user_id', as: 'issueComments' });
+      this.hasMany(models.IssueComment, { foreignKey: 'user_id', as: 'issueComments' });
       this.hasMany(models.Activity, { foreignKey: 'user_id', as: 'activities' });
     }
   }
   User.init({
-    id: DataTypes.INTEGER,
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
     username: DataTypes.STRING,
     fullname: DataTypes.STRING,
-    created_at: DataTypes.DATE
   }, {
     sequelize,
     modelName: 'User',
+    timestamps: true,
+    paranoid: true,
   });
   return User;
 };

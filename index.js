@@ -21,6 +21,8 @@ app.set("view engine", "hbs");
 // routes
 app.use("/", require('./routes/indexRouter.js'))
 
+app.use('/api', require('./routes/apiRouter.js'));
+
 // Init web server
 app.listen(port, () => {
     console.log(`listening on port ${port}`);

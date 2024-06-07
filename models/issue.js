@@ -14,9 +14,9 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.Project, { foreignKey: 'project_id', as: 'project' });
       this.belongsTo(models.User, { foreignKey: 'creator_user_id', as: 'creator' });
       this.belongsTo(models.User, { foreignKey: 'assigned_user_id', as: 'assignedUser' });
-      this.hasMany(models.Issue_Detail, { foreignKey: 'issue_id', as: 'details' });
-      this.belongsToMany(models.Attachment, { through: models.Issue_Attachment, foreignKey: 'issue_id', as: 'attachments' });
-      this.hasMany(models.Issue_Comment, { foreignKey: 'issue_id', as: 'comments' });
+      this.hasMany(models.IssueDetail, { foreignKey: 'issue_id', as: 'details' });
+      this.belongsToMany(models.Attachment, { through: models.IssueAttachment, foreignKey: 'issue_id', as: 'attachments' });
+      this.hasMany(models.IssueComment, { foreignKey: 'issue_id', as: 'comments' });
     }
   }
   Issue.init({

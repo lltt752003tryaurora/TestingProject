@@ -23,7 +23,6 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Project.init({
-<<<<<<< HEAD
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -33,10 +32,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-=======
-    name: DataTypes.STRING,
-    created_at: DataTypes.DATE
->>>>>>> refs/remotes/origin/master
   }, {
     sequelize,
     modelName: 'Project',

@@ -17,7 +17,6 @@ module.exports = (sequelize, DataTypes) => {
   TestPlanComponent.init({
     name: DataTypes.STRING,
     description: DataTypes.TEXT,
-    created_at: DataTypes.DATE
   }, {
     sequelize,
     modelName: 'TestPlanComponent',

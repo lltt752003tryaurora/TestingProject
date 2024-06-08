@@ -20,7 +20,6 @@ module.exports = (sequelize, DataTypes) => {
   }
   TestRun.init({
     name: DataTypes.STRING,
-    created_at: DataTypes.DATE
   }, {
     sequelize,
     modelName: 'TestRun',

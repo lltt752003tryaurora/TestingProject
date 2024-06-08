@@ -18,7 +18,6 @@ module.exports = (sequelize, DataTypes) => {
   }
   IssueComment.init({
     comment: DataTypes.TEXT,
-    created_at: DataTypes.DATE
   }, {
     sequelize,
     modelName: 'IssueComment',

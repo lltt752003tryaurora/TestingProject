@@ -20,7 +20,6 @@ module.exports = (sequelize, DataTypes) => {
   Module.init({
     name: DataTypes.STRING,
     parent_module_id: DataTypes.INTEGER,
-    created_at: DataTypes.DATE
   }, {
     sequelize,
     modelName: 'Module',

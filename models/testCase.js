@@ -23,7 +23,6 @@ module.exports = (sequelize, DataTypes) => {
     description: DataTypes.TEXT,
     type: DataTypes.STRING,
     priority: DataTypes.STRING,
-    created_at: DataTypes.DATE
   }, {
     sequelize,
     modelName: 'TestCase',

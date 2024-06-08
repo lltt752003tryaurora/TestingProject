@@ -22,7 +22,6 @@ module.exports = (sequelize, DataTypes) => {
     start_date: DataTypes.DATE,
     end_date: DataTypes.DATE,
     description: DataTypes.TEXT,
-    created_at: DataTypes.DATE
   }, {
     sequelize,
     modelName: 'TestPlan',

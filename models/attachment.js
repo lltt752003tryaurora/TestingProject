@@ -18,7 +18,6 @@ module.exports = (sequelize, DataTypes) => {
   }
   Attachment.init({
     file_path: DataTypes.STRING,
-    created_at: DataTypes.DATE
   }, {
     sequelize,
     modelName: 'Attachment',

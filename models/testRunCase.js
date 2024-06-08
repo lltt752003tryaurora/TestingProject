@@ -17,7 +17,6 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   TestRunCase.init({
-    created_at: DataTypes.DATE
   }, {
     sequelize,
     modelName: 'TestRunCase',

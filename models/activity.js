@@ -18,7 +18,6 @@ module.exports = (sequelize, DataTypes) => {
   Activity.init({
     type: DataTypes.STRING,
     detail: DataTypes.TEXT,
-    created_at: DataTypes.DATE
   }, {
     sequelize,
     modelName: 'Activity',

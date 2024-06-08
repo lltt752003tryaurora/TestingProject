@@ -18,7 +18,6 @@ module.exports = (sequelize, DataTypes) => {
   IssueDetail.init({
     name: DataTypes.STRING,
     value: DataTypes.STRING,
-    created_at: DataTypes.DATE
   }, {
     sequelize,
     modelName: 'IssueDetail',

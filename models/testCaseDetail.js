@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
   TestCaseDetail.init({
     name: DataTypes.STRING,
     detail: DataTypes.TEXT,
-    created_at: DataTypes.DATE
+    
   }, {
     sequelize,
     modelName: 'TestCaseDetail',

@@ -11,10 +11,10 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      this.belongsTo(models.Project, { foreignKey: 'projectId', as: 'project' });
+      // this.belongsTo(models.Project, { foreignKey: 'projectId', as: 'project' });
       this.belongsTo(models.Requirement, { foreignKey: 'parentRequirementId', as: 'parentRequirement' });
       this.hasMany(models.Requirement, { foreignKey: 'parentRequirementId', as: 'childRequirements' });
-      // this.belongsTo(models.Release, { foreignKey: 'releaseId', as: 'release' });
+      this.belongsTo(models.Release, { foreignKey: 'releaseId', as: 'release' });
     }
   }
   Requirement.init({
@@ -23,16 +23,20 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       autoIncrement: true,
     },
-    projectId: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
+    // projectId: {
+    //   type: DataTypes.INTEGER,
+    //   allowNull: false
+    // },
     name: DataTypes.STRING,
     description: DataTypes.TEXT,
     parentRequirementId: {
       type: DataTypes.INTEGER,
       allowNull: true,
     },
+    releaseId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    }
   }, {
     sequelize,
     modelName: 'Requirement',

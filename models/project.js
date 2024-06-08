@@ -10,8 +10,8 @@ module.exports = (sequelize, DataTypes) => {
       this.hasMany(models.Requirement, { foreignKey: 'projectId', as: 'requirements' });
       this.hasMany(models.Release, { foreignKey: 'projectId', as: 'releases' });
       this.hasMany(models.Module, { foreignKey: 'projectId', as: 'modules' });
-      this.hasMany(models.TestPlan, { foreignKey: 'projectId', as: 'testPlans' });
-      this.hasMany(models.TestCase, { foreignKey: 'projectId', as: 'testCases' });
+      // this.hasMany(models.TestPlan, { foreignKey: 'projectId', as: 'testPlans' });
+      // this.hasMany(models.TestCase, { foreignKey: 'projectId', as: 'testCases' });
       this.hasMany(models.TestRun, { foreignKey: 'projectId', as: 'testRuns' });
       this.hasMany(models.TestRunCase, { foreignKey: 'projectId', as: 'testRunCases' });
       this.hasMany(models.Issue, { foreignKey: 'projectId', as: 'issues' });

@@ -9,22 +9,34 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      testPlanId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'TestPlans',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+      },
       name: {
         type: Sequelize.STRING
       },
       description: {
         type: Sequelize.TEXT
       },
-      created_at: {
-        type: Sequelize.DATE
-      },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.fn('now')
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.fn('now')
+      },
+      deletedAt: {
+        allowNull: true,
+        type: Sequelize.DATE,
       }
     });
   },

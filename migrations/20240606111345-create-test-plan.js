@@ -12,25 +12,37 @@ module.exports = {
       name: {
         type: Sequelize.STRING
       },
-      start_date: {
+      startDate: {
         type: Sequelize.DATE
       },
-      end_date: {
+      endDate: {
         type: Sequelize.DATE
       },
       description: {
         type: Sequelize.TEXT
       },
-      created_at: {
-        type: Sequelize.DATE
+      releaseId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Releases',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.fn('now')
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.fn('now')
+      },
+      deletedAt: {
+        allowNull: true,
+        type: Sequelize.DATE,
       }
     });
   },

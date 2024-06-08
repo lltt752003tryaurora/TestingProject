@@ -12,19 +12,39 @@ module.exports = {
       name: {
         type: Sequelize.STRING
       },
-      parent_module_id: {
-        type: Sequelize.INTEGER
+      projectId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Projects',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
-      created_at: {
-        type: Sequelize.DATE
+      parentModuleId: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'Modules',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.fn('now')
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.fn('now')
+      },
+      deletedAt: {
+        allowNull: true,
+        type: Sequelize.DATE,
       }
     });
   },

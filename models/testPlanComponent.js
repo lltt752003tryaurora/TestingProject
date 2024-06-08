@@ -11,16 +11,17 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      this.belongsTo(models.TestPlan, { foreignKey: 'test_plan_id', as: 'testPlan' });
+      this.belongsTo(models.TestPlan, { foreignKey: 'testPlanId', as: 'testPlan' });
     }
   }
   TestPlanComponent.init({
     name: DataTypes.STRING,
     description: DataTypes.TEXT,
-    created_at: DataTypes.DATE
   }, {
     sequelize,
     modelName: 'TestPlanComponent',
+    timestamps: true,
+    paranoid: true,
   });
   return TestPlanComponent;
 };

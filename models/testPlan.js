@@ -11,21 +11,23 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      this.belongsTo(models.Project, { foreignKey: 'projectId', as: 'project' });
-      this.hasMany(models.TestPlanComponent, { foreignKey: 'test_plan_id', as: 'components' });
-      this.hasMany(models.TestCase, { foreignKey: 'test_plan_id', as: 'testCases' });
-      this.hasMany(models.TestRun, { foreignKey: 'test_plan_id', as: 'testRuns' });
+      // this.belongsTo(models.Project, { foreignKey: 'projectId', as: 'project' });
+      this.hasMany(models.TestPlanComponent, { foreignKey: 'testPlanId', as: 'components' });
+      this.hasMany(models.TestCase, { foreignKey: 'testPlanId', as: 'testCases' });
+      // this.hasMany(models.TestRun, { foreignKey: 'test_plan_id', as: 'testRuns' });
+      this.belongsTo(models.Release, { foreignKey: 'releaseId', as: 'release' });
     }
   }
   TestPlan.init({
     name: DataTypes.STRING,
-    start_date: DataTypes.DATE,
-    end_date: DataTypes.DATE,
+    startDate: DataTypes.DATE,
+    endDate: DataTypes.DATE,
     description: DataTypes.TEXT,
-    created_at: DataTypes.DATE
   }, {
     sequelize,
     modelName: 'TestPlan',
+    timestamps: true,
+    paranoid: true
   });
   return TestPlan;
 };

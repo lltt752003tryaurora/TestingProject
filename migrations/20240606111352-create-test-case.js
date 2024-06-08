@@ -9,6 +9,24 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      moduleId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Modules',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+      },
+      testPlanId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'TestPlans',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+      },
       name: {
         type: Sequelize.STRING
       },
@@ -21,16 +39,22 @@ module.exports = {
       priority: {
         type: Sequelize.STRING
       },
-      created_at: {
-        type: Sequelize.DATE
+      detail: {
+        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.fn('now')
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.fn('now')
+      },
+      deletedAt: {
+        allowNull: true,
+        type: Sequelize.DATE,
       }
     });
   },

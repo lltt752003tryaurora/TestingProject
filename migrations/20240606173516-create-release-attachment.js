@@ -2,27 +2,46 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-<<<<<<< HEAD
     await queryInterface.createTable('ReleaseAttachments', {
-=======
-    await queryInterface.createTable('Release_Attachments', {
->>>>>>> refs/remotes/origin/master
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      name: {
-        type: Sequelize.STRING
+      releaseId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Releases',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+      },
+      attachmentId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Attachments',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.fn('now')
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.fn('now')
+      },
+      deletedAt: {
+        allowNull: true,
+        type: Sequelize.DATE,
       }
     });
   },

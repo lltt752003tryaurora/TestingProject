@@ -11,16 +11,18 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      this.belongsTo(models.Project, { foreignKey: 'projectId', as: 'project' });
-      this.belongsToMany(models.Release, { through: models.ReleaseAttachment, foreignKey: 'attachment_id', as: 'releases' });
-      this.belongsToMany(models.Issue, { through: models.IssueAttachment, foreignKey: 'attachment_id', as: 'issues' });
+      // this.belongsTo(models.Project, { foreignKey: 'projectId', as: 'project' });
+      this.belongsToMany(models.Release, { through: models.ReleaseAttachment, foreignKey: 'attachmentId', as: 'releases' });
+      this.belongsToMany(models.Issue, { through: models.IssueAttachment, foreignKey: 'attachmentId', as: 'issues' });
     }
   }
   Attachment.init({
-    file_path: DataTypes.STRING,
+    url: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'Attachment',
+    timestamps: true,
+    paranoid: true,
   });
   return Attachment;
 };

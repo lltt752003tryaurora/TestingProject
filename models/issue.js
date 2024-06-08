@@ -11,12 +11,13 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      this.belongsTo(models.Project, { foreignKey: 'projectId', as: 'project' });
+      // this.belongsTo(models.Project, { foreignKey: 'projectId', as: 'project' });
       this.belongsTo(models.User, { foreignKey: 'creatorUserId', as: 'creator' });
       this.belongsTo(models.User, { foreignKey: 'assignedUserId', as: 'assignedUser' });
-      this.hasMany(models.IssueDetail, { foreignKey: 'issueId', as: 'details' });
+      // this.hasMany(models.IssueDetail, { foreignKey: 'issueId', as: 'details' });
       this.belongsToMany(models.Attachment, { through: models.IssueAttachment, foreignKey: 'issueId', as: 'attachments' });
       this.hasMany(models.IssueComment, { foreignKey: 'issueId', as: 'comments' });
+      this.belongsTo(models.TestRun, { foreignKey: 'testRunId', as: 'testRun' });
     }
   }
   Issue.init({
@@ -27,7 +28,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     name: DataTypes.STRING,
     description: DataTypes.TEXT,
-
+    priority: DataTypes.STRING,
+    status: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'Issue',

@@ -15,16 +15,6 @@ module.exports = {
       description: {
         type: Sequelize.TEXT
       },
-      projectId: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        references: {
-          model: 'Projects',
-          key: 'id'
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE'
-      },
       creatorUserId: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -45,6 +35,8 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       },
+      priority: Sequelize.STRING,
+      status: Sequelize.STRING,
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

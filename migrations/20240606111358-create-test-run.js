@@ -12,16 +12,37 @@ module.exports = {
       name: {
         type: Sequelize.STRING
       },
-      created_at: {
-        type: Sequelize.DATE
+      assignedUserId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Users',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+      },
+      testCase: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'TestCases',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.fn('now')
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.fn('now')
+      },
+      deletedAt: {
+        allowNull: true,
+        type: Sequelize.DATE,
       }
     });
   },

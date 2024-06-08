@@ -12,14 +12,16 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      this.belongsTo(models.Release, { foreignKey: "release_id" })
-      this.belongsTo(models.Attachment, { foreignKey: "attachment_id" })
+      this.belongsTo(models.Release, { foreignKey: "releaseId" })
+      this.belongsTo(models.Attachment, { foreignKey: "attachmentId" })
     }
   }
   ReleaseAttachment.init({
   }, {
     sequelize,
     modelName: 'ReleaseAttachment',
+    timestamps: true,
+    paranoid: true,
   });
   return ReleaseAttachment;
 };

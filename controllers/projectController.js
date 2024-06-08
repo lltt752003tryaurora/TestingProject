@@ -98,12 +98,19 @@ const controller = {
             offset: PAGE_LIMIT * (page - 1),
             limit: PAGE_LIMIT,
             order: [[sortField, sortOrder]],
-            include: [{
-                model: db.Release,
-                as: 'releases',
-                where: { projectId },
-                attributes: [],
-            }]
+            include: [
+                {
+                    model: db.Release,
+                    as: 'release',
+                    where: { projectId },
+                    attributes: [],
+                },
+                {
+                    model: db.TestPlanComponent,
+                    as: 'components',
+                    attributes: ['id', 'name']
+                }
+            ]
         };
         const keyword = req.query.keyword || '';
         if (keyword.trim() !== '') {
@@ -117,7 +124,7 @@ const controller = {
             return res.send({
                 page: page,
                 totalPages: Math.ceil(projectTestPlanCount / PAGE_LIMIT),
-                releases: projectTestPlans.map(testPlan => testPlan.toJSON())
+                testPlans: projectTestPlans.map(testPlan => testPlan.toJSON())
             });
         } catch (error) {
             console.log(error);
@@ -201,10 +208,10 @@ const controller = {
                 }]
             }],
         };
-        // const keyword = req.query.keyword || '';
-        // if (keyword.trim() !== '') {
-        //     options.include.include.include[0].where.name = { [Op.iLike]: `%${keyword}%` }
-        // }
+        const keyword = req.query.keyword || '';
+        if (keyword.trim() !== '') {
+            options.where.name = { [Op.iLike]: `%${keyword}%` }
+        }
         try {
             const projectTestCases = await db.TestCase.findAll(options);
             const projectTestCaseCount = await db.TestCase.count({
@@ -217,6 +224,70 @@ const controller = {
                 testCases: projectTestCases.map(testCase => {
                     return {
                         ...testCase.toJSON(),
+                    };
+                })
+            });
+        } catch (error) {
+            console.log(error);
+            res.status(500).send({
+                message: 'Internal server error.'
+            });
+        }
+    },
+
+    getProjectIssues: async (req, res) => {
+        const { projectId } = req.params;
+        const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
+        const sortField = req.query.sort === 'updatedAt' ? 'updatedAt' : 'id';
+        const sortOrder = req.query.order === 'asc' ? 'ASC' : 'DESC';
+        const options = {
+            where: {},
+            offset: PAGE_LIMIT * (page - 1),
+            limit: PAGE_LIMIT,
+            order: [[sortField, sortOrder]],
+            include: [{
+                model: db.TestRun,
+                as: 'testRun',
+                attributes: [],
+                include: [{
+                    model: db.TestCase,
+                    as: 'testCase',
+                    attributes: [],
+                    include: [{
+                        model: db.TestPlan,
+                        as: 'testPlan',
+                        attributes: [],
+                        include: [{
+                            model: db.Release,
+                            as: 'release',
+                            attributes: [],
+                            include: [{
+                                model: db.Project,
+                                as: 'project',
+                                attributes: [],
+                                where: { projectId }
+                            }]
+                        }]
+                    }]
+                }]
+            }],
+        };
+        const keyword = req.query.keyword || '';
+        if (keyword.trim() !== '') {
+            options.where.name = { [Op.iLike]: `%${keyword}%` }
+        }
+        try {
+            const projectIssues = await db.Issue.findAll(options);
+            const projectIssueCount = await db.Issue.count({
+                where: options.where,
+                include: options.include,
+            });
+            return res.send({
+                page: page,
+                totalPages: Math.ceil(projectIssueCount / PAGE_LIMIT),
+                issues: projectIssues.map(issue => {
+                    return {
+                        ...issue.toJSON(),
                     };
                 })
             });

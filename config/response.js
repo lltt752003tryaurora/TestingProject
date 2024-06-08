@@ -1,5 +1,5 @@
 // format data
-export const responseData = (res, message, data, statusCode) => {
+module.exports.responseData = (res, message, data, statusCode) => {
     res.status(statusCode).json({
         message,
         content: data,

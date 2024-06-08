@@ -14,7 +14,6 @@ const model = require("../models/index");
 export const login = async (req, res) => {
     try {
         let { username, pass_word } = req.body;
-        console.log({ username, pass_word });
         let checkUser = await model.user.findOne({
             where: {
                 username,
@@ -87,11 +86,9 @@ export const signup = async (req, res) => {
 // refresh token
 export const tokenRefresh = async (req, res) => {
     try {
-        // cấu trúc token:  {data: {id}}
         let { token } = req.headers;
 
         let checkTokenVerify = checkToken(token);
-        console.log("checkTokenVerify", checkTokenVerify);
         if (
             checkTokenVerify != null &&
             checkTokenVerify.name != "TokenExpiredError"

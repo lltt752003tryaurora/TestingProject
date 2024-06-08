@@ -6,5 +6,6 @@ router.use('/releases', require('./releaseRouter'));
 router.use('/modules', require('./moduleRouter'));
 router.use('/testPlans', require('./testPlanRouter'));
 router.use('/testPlanComponents', require('./testPlanComponentRouter'));
+router.use("/auth", require('./authRouter'));
 
 module.exports = router;

@@ -1,50 +1,67 @@
-import jwt from "jsonwebtoken";
+const jwt = require("jsonwebtoken");
 
-export const createRefreshToken = (data) => {
-    let token = jwt.sign({ data }, "KOBIMAT", {
-        algorithm: "HS256",
-        expiresIn: "7d",
-    });
-    return token;
-};
 
-export const checkRefreshToken = (token) => {
-    return jwt.verify(
-        token,
-        "KOBIMAT",
-        (error, decoded) => {
-            return error;
+module.exports = {
+    createRefreshToken: (data) => {
+        let token = jwt.sign({ data }, "KOBIMAT", {
+            algorithm: "HS256",
+            expiresIn: "7d",
+        });
+        return token;
+    },
+
+    checkRefreshToken: (token) => {
+        try {
+            const decoded = jwt.verify(token, "KOBIMAT");
+            return null; // Không có lỗi, trả về null
+        } catch (error) {
+            return error; // Trả về lỗi nếu có
         }
-    );
-};
+    },
 
-export const createToken = (data) => {
-    let token = jwt.sign({ data }, "BIMAT", {
-        algorithm: "HS256",
-        expiresIn: "5s",
-    });
-    return token;
-};
+    createToken: (data) => {
+        let token = jwt.sign({ data }, "BIMAT", {
+            algorithm: "HS256",
+            expiresIn: "5s",
+        });
+        return token;
+    },
 
-export const checkToken = (token) => {
-    // kiểm tra khóa bí mật có trùng hay ko
-    return jwt.verify(token, "BIMAT", (error, decoded) => {
-        return error;
-    });
-};
+    checkToken: (token) => {
+        try {
+            jwt.verify(token, "BIMAT");
+            return null; // Không có lỗi, trả về null
+        } catch (error) {
+            return error; // Trả về lỗi nếu có
+        }
+    },
 
-export const decodeToken = (token) => {
-    return jwt.decode(token);
-};
+    decodeToken: (token) => {
+        return jwt.decode(token);
+    },
 
-export const verifyToken = (req, res, next) => {
-    let { token } = req.headers;
+    getUserFromToken: (token) => {
+        try {
+            const decoded = jwt.verify(token, "BIMAT");
+            return decoded.data;
+        } catch (error) {
+            return null;
+        }
+    },
 
-    let checkTokenVerify = checkToken(token);
-    console.log("checkTokenVerify", checkTokenVerify);
-    if (checkTokenVerify == null) {
-        next();
-    } else {
-        res.status(401).send(checkTokenVerify.name);
+    verifyToken: (req, res, next) => {
+        let { token } = req.headers;
+
+        let checkTokenVerify = checkToken(token);
+        if (checkTokenVerify === null) {
+            req.user = getUserFromToken(token);
+            next();
+        } else {
+            if (checkTokenVerify.name === "TokenExpiredError") {
+                res.status(401).send("Token expired");
+            } else {
+                res.status(401).send("Invalid token");
+            }
+        }
     }
 };

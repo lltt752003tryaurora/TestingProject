@@ -50,6 +50,18 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date(),
         deletedAt: null,
+      },
+      {
+        moduleId: 5,
+        testPlanId: 5,
+        name: 'Test Case E',
+        description: 'Description for Test Case E',
+        type: 'performance',
+        priority: 'medium',
+        detail: 'Detail for Test Case E',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        deletedAt: null,
       }
     ], {});
   },

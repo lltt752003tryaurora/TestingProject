@@ -35,6 +35,16 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       },
+      testRunId: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'TestRuns',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
+      },
       priority: Sequelize.STRING,
       status: Sequelize.STRING,
       createdAt: {

@@ -21,7 +21,7 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
-      testCase: {
+      testCaseId: {
         type: Sequelize.INTEGER,
         references: {
           model: 'TestCases',

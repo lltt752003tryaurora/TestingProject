@@ -12,10 +12,10 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.belongsTo(models.Project, { foreignKey: 'projectId', as: 'project' });
-      this.belongsToMany(models.Attachment, { through: models.ReleaseAttachment, foreignKey: 'release_id', as: 'attachments' });
-      // this.hasMany(models.TestRun, { foreignKey: 'release_id', as: 'testRuns' });
+      this.belongsToMany(models.Attachment, { through: models.ReleaseAttachment, foreignKey: 'releaseId', as: 'attachments' });
+      // this.hasMany(models.TestRun, { foreignKey: 'releaseId', as: 'testRuns' });
       this.hasMany(models.TestPlan, { foreignKey: 'releaseId', as: 'testPlans' });
-      this.hasMany(models.Requirement, { foreignKey: 'release_id', as: 'requirements' });
+      this.hasMany(models.Requirement, { foreignKey: 'releaseId', as: 'requirements' });
     }
   }
   Release.init({

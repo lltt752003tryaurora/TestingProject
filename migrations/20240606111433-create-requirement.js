@@ -8,11 +8,11 @@ module.exports = {
         primaryKey: true,
         autoIncrement: true,
       },
-      projectId: {
+      releaseId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'Projects',
+          model: 'Releases',
           key: 'id',
         },
         onUpdate: 'CASCADE',

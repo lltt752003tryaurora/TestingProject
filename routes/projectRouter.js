@@ -14,6 +14,10 @@ router.get('/:projectId/testPlans', projectController.getProjectTestPlans);
 
 router.get('/:projectId/testCases', projectController.getProjectTestCases);
 
+router.get('/:projectId/testRuns', projectController.getProjectTestRuns);
+
 router.get('/:projectId/issues', projectController.getProjectIssues);
+
+router.get('/:projectId/requirements', projectController.getProjectRequirements);
 
 module.exports = router;

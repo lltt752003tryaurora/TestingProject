@@ -194,10 +194,12 @@ const controller = {
                 model: db.TestPlan,
                 as: 'testPlan',
                 attributes: [],
+                required: true,
                 include: [{
                     model: db.Release,
                     as: 'release',
                     attributes: [],
+                    required: true,
                     include: [{
                         model: db.Project,
                         as: 'project',
@@ -235,6 +237,69 @@ const controller = {
         }
     },
 
+    getProjectTestRuns: async (req, res) => {
+        const { projectId } = req.params;
+        const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
+        const sortField = req.query.sort === 'updatedAt' ? 'updatedAt' : 'id';
+        const sortOrder = req.query.order === 'asc' ? 'ASC' : 'DESC';
+        const options = {
+            where: {},
+            offset: PAGE_LIMIT * (page - 1),
+            limit: PAGE_LIMIT,
+            order: [[sortField, sortOrder]],
+            include: [{
+                model: db.TestCase,
+                as: 'testCase',
+                attributes: [],
+                required: true,
+                include: [{
+                    model: db.TestPlan,
+                    as: 'testPlan',
+                    attributes: [],
+                    required: true,
+                    include: [{
+                        model: db.Release,
+                        as: 'release',
+                        attributes: [],
+                        required: true,
+                        include: [{
+                            model: db.Project,
+                            as: 'project',
+                            attributes: [],
+                            where: { id: projectId },
+                            required: true
+                        }]
+                    }],
+                }]
+            }],
+        };
+        const keyword = req.query.keyword || '';
+        if (keyword.trim() !== '') {
+            options.where.name = { [Op.iLike]: `%${keyword}%` }
+        }
+        try {
+            const projectTestRuns = await db.TestRun.findAll(options);
+            const projectTestRunCount = await db.TestRun.count({
+                where: options.where,
+                include: options.include,
+            });
+            return res.send({
+                page: page,
+                totalPages: Math.ceil(projectTestRunCount / PAGE_LIMIT),
+                testRuns: projectTestRuns.map(testRun => {
+                    return {
+                        ...testRun.toJSON(),
+                    };
+                })
+            });
+        } catch (error) {
+            console.log(error);
+            res.status(500).send({
+                message: 'Internal server error.'
+            });
+        }
+    },
+
     getProjectIssues: async (req, res) => {
         const { projectId } = req.params;
         const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
@@ -249,23 +314,28 @@ const controller = {
                 model: db.TestRun,
                 as: 'testRun',
                 attributes: [],
+                required: true,
                 include: [{
                     model: db.TestCase,
                     as: 'testCase',
                     attributes: [],
+                    required: true,
                     include: [{
                         model: db.TestPlan,
                         as: 'testPlan',
                         attributes: [],
+                        required: true,
                         include: [{
                             model: db.Release,
                             as: 'release',
                             attributes: [],
+                            required: true,
                             include: [{
                                 model: db.Project,
                                 as: 'project',
                                 attributes: [],
-                                where: { projectId }
+                                required: true,
+                                where: { id: projectId }
                             }]
                         }]
                     }]
@@ -288,6 +358,64 @@ const controller = {
                 issues: projectIssues.map(issue => {
                     return {
                         ...issue.toJSON(),
+                    };
+                })
+            });
+        } catch (error) {
+            console.log(error);
+            res.status(500).send({
+                message: 'Internal server error.'
+            });
+        }
+    },
+
+    getProjectRequirements: async (req, res) => {
+        const { projectId } = req.params;
+        const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
+        const sortField = req.query.sort === 'updatedAt' ? 'updatedAt' : 'id';
+        const sortOrder = req.query.order === 'asc' ? 'ASC' : 'DESC';
+        const options = {
+            where: { parentModuleId: null },
+            offset: PAGE_LIMIT * (page - 1),
+            limit: PAGE_LIMIT,
+            order: [[sortField, sortOrder]],
+            include: [
+                {
+                    model: db.Requirement,
+                    as: 'childRequirements',
+                    attributes: ['id'],
+                    required: false
+                },
+                {
+                    model: db.Release,
+                    as: 'release',
+                    attributes: [],
+                    required: true,
+                    include: [{
+                        model: db.Project,
+                        as: 'project',
+                        attributes: [],
+                        where: { id: projectId }
+                    }]
+                }
+            ]
+        };
+        const keyword = req.query.keyword || '';
+        if (keyword.trim() !== '') {
+            options.where.name = { [Op.iLike]: `%${keyword}%` }
+        }
+        try {
+            const projectFirstLevelRequirements = await db.Requirement.findAll(options);
+            const projectFirstLevelRequirementCount = await db.Requirement.count({
+                where: options.where,
+                include: options.include,
+            });
+            return res.send({
+                page: page,
+                totalPages: Math.ceil(projectFirstLevelRequirementCount / PAGE_LIMIT),
+                requirements: projectFirstLevelRequirements.map(requirement => {
+                    return {
+                        ...requirement.toJSON(),
                     };
                 })
             });

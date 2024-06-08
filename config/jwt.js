@@ -37,14 +37,27 @@ export const decodeToken = (token) => {
     return jwt.decode(token);
 };
 
+export const getUserFromToken = (token) => {
+    try {
+        const decoded = jwt.verify(token, "BIMAT");
+        return decoded.data; // Trả về thông tin người dùng từ payload
+    } catch (error) {
+        return null; // Hoặc throw error để xử lý ở nơi khác
+    }
+};
+
 export const verifyToken = (req, res, next) => {
     let { token } = req.headers;
 
     let checkTokenVerify = checkToken(token);
-    console.log("checkTokenVerify", checkTokenVerify);
     if (checkTokenVerify == null) {
+        req.user = getUserFromToken(token);
         next();
     } else {
-        res.status(401).send(checkTokenVerify.name);
+        if (checkTokenVerify.name === "TokenExpiredError") {
+            res.status(401).send("Token expired");
+        } else {
+            res.status(401).send("Invalid token");
+        }
     }
 };

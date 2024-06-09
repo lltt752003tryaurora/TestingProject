@@ -11,7 +11,7 @@ const fs = require('fs');
 const removeFile = require('../utils/removeFile.js');
 
 const model = require("../models/index");
-const { responseData } = require("../config/response.js");
+const { responseData } = require("../utils/response.js");
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -189,9 +189,8 @@ const controller = {
     },
     logout: async (req, res) => {
         try {
-            let { token } = req.headers;
 
-            let accessToken = decodeToken(token);
+            let accessToken = decodeToken(req.cookies.accessToken);
 
             let getUser = await model.User.findOne({
                 where: {
@@ -208,7 +207,7 @@ const controller = {
                 }
             );
 
-            responseData(res, "Successfully logout", newToken, 200);
+            responseData(res, "Successfully logout", "Logout", 200);
         } catch (err) {
             responseData(res, "Failed logout", err.message, 500);
         }

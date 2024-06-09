@@ -48,19 +48,17 @@ module.exports = {
         }
     },
 
-    verifyToken: (req, res, next) => {
-        let accessToken = req.cookies.accessToken;
-
+    verifyToken: (accessToken) => {
         let checkTokenVerify = module.exports.checkAccessToken(accessToken);
         if (checkTokenVerify === null) {
-            req.user = module.exports.getUserFromToken(accessToken);
-            next();
+            return {
+                valid: true,
+            };
         } else {
-            if (checkTokenVerify.name === "TokenExpiredError") {
-                res.status(401).send("Token expired");
-            } else {
-                res.status(401).send("Invalid token");
-            }
+            return {
+                valid: false,
+                error: checkTokenVerify.name === "TokenExpiredError" ? "Token expired" : "Invalid token"
+            };
         }
-    }
+    },
 };

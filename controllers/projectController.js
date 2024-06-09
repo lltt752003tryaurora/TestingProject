@@ -5,6 +5,7 @@ const PAGE_LIMIT = 10;
 
 const controller = {
     getProjectById: async (req, res) => {
+        console.log(req.user);
         const { projectId } = req.params;
         try {
             const project = await db.Project.findByPk(projectId);

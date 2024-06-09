@@ -51,11 +51,11 @@ module.exports = {
     },
 
     verifyToken: (req, res, next) => {
-        let { token } = req.headers;
+        let accessToken = req.cookies.accessToken;
 
-        let checkTokenVerify = checkToken(token);
+        let checkTokenVerify = module.exports.checkAccessToken(accessToken);
         if (checkTokenVerify === null) {
-            req.user = getUserFromToken(token);
+            req.user = module.exports.getUserFromToken(accessToken);
             next();
         } else {
             if (checkTokenVerify.name === "TokenExpiredError") {

@@ -6,8 +6,8 @@ const app = express();
 const port = process.env.PORT || 5000;
 const expressHandlebars = require('express-handlebars');
 const bodyParser = require('body-parser');
-const multer = require('multer');
 const cookieParser = require('cookie-parser');
+
 
 // config public static folder => express will return Free Template
 app.use(express.static(__dirname + '/public'))

@@ -1,0 +1,101 @@
+{{#> modal }}
+<div class="d-flex flex-column p-4 gap-4">
+  <div class="d-flex align-items-center justify-content-between">
+    <div class="fw-semibold text-gray fs-3">
+      Create new Project
+    </div>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  </div>
+
+  
+  <form id="create-project-form" class="needs-validation" onsubmit="return createProject(event)" novalidate>
+    <div class="mb-3">
+      <label for="name" class="form-label text-gray">Project Name</label>
+      <input type="text" class="form-control" id="name" placeholder="Foobar" required>
+      <div class="invalid-feedback">
+        Please provide a valid name.
+      </div>
+    </div>
+    <div class="mb-3">
+      <label for="description" class="form-label text-gray">Project Description</label>
+      <textarea class="form-control" id="description" rows="5" placeholder="Something about this requirement..."></textarea>
+    </div>
+    <div class="d-flex align-items-center justify-content-center gap-3">
+      <button type="submit" class="btn btn-primary">Create</button>
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+    </div>
+  </form>
+  
+</div>
+{{/modal}}
+
+<main class="d-flex h-100 overflow-hidden">
+	<div id="content" class="h-100 overflow-auto p-4" style="width: 100%; ">
+		<div class="text-gray fw-semibold fs-4 pb-5">
+			My Projects
+		</div>
+		<div class="d-flex flex-wrap gap-4" id="projects">
+			<button class="btn bg-white rounded bottom-shadow d-flex flex-column align-items-center justify-content-center" data-bs-toggle="modal" data-bs-target="#modal" style="width: 25%; height: 200px;">
+				<div class="">
+					<img src="/assets/create_project.png" height="80px" />
+				</div>
+				<div class="fw-bold fs-4" style="color: #C3CAD9;">
+					New Project
+				</div>
+			</button>
+
+			<a href="project/1/" class="text-decoration-none bg-white rounded bottom-shadow" style="width: 25%; height: 200px;">
+				<div class="d-flex flex-column p-4 justify-content-between h-100">
+					<div class="d-flex justify-content-between align-items-center">
+						<div class="text-gray fw-bold fs-5">
+							Project 1
+						</div>
+						<button class="btn p-0">
+							<img src="/assets/more_x.png" height="30px"/>
+						</button>
+					</div>
+					<div class="d-flex align-items-center justify-content-between">
+						<div class="d-flex flex-column lh-1">
+							<div class="text-secondary fs-6">
+								Tests
+							</div>
+							<div class="text-gray fw-bold">
+								17/23
+							</div>
+						</div>
+						<div class="d-flex flex-column lh-1">
+							<div class="text-secondary fs-6">
+								Runs
+							</div>
+							<div class="text-gray fw-bold">
+								3
+							</div>
+						</div>
+						<div class="d-flex flex-column lh-1">
+							<div class="text-secondary fs-6">
+								Issues
+							</div>
+							<div class="text-gray fw-bold">
+								0
+							</div>
+						</div>
+					</div>
+					<div class="d-flex">
+						<div class="d-flex flex-column lh-1">
+							<div class="text-secondary fs-6">
+								Last Run
+							</div>
+							<div class="text-gray fw-bold">
+								30/03/2024
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</a>
+		</div>
+
+	</div>
+</main>
+
+<script src="js/projects.js"></script>

@@ -193,13 +193,13 @@ const controller = {
 
             let accessToken = decodeToken(token);
 
-            let getUser = await model.user.findOne({
+            let getUser = await model.User.findOne({
                 where: {
                     id: accessToken.data.id,
                 },
             });
 
-            await model.user.update(
+            await model.User.update(
                 { ...getUser.dataValues, refreshToken: "" },
                 {
                     where: {

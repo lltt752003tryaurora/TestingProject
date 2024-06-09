@@ -6,3 +6,4 @@ module.exports.responseData = (res, message, data, statusCode) => {
         date: new Date(),
     });
 };
+

@@ -1,0 +1,16 @@
+{{#> modal }}
+{{/modal}}
+
+<main class="d-flex h-100 overflow-hidden">
+  {{>sidebar}}
+  <div id="content" class="h-100 overflow-auto p-4" style="width: 80%; ">
+    <div id="content-empty">
+      <div class="d-flex flex-column align-items-center justify-content-center mt-5">
+        <img src="/assets/empty_box.png" height="140px" width="140px" />
+        <div class="fw-semibold fs-2" style="color: #9FAAC0">It’s empty. Create something new</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script src="/js/dashboard.js"></script>

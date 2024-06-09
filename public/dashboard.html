@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>Dashboard</title>
+		<!-- Required meta tags -->
+		<meta charset="utf-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1, shrink-to-fit=no"
+		/>
+		<!-- Bootstrap CSS v5.2.1 -->
+		<link
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+			rel="stylesheet"
+			integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+			crossorigin="anonymous"
+		/>
+		<link rel="stylesheet" href="/css/base.css"/>
+	</head>
+
+	<body class="vh-100 d-flex flex-column overflow-hidden">
+		<div class="modal fade" id="modal" tabindex="-1" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="d-flex flex-column p-4 gap-4">
+						<div class="d-flex align-items-center justify-content-between">
+							<ul class="nav nav-tabs flex-grow-1">
+								<li class="nav-item">
+									<a class="nav-link active" href="#">Assign User</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link disabled" href="#">Modify User</a>
+								</li>
+							</ul>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+
+						
+						<form class="needs-validation" novalidate>
+							<div class="mb-3">
+								<label for="username" class="form-label text-gray">Select User</label>
+								<input type="text" class="form-control" id="username" placeholder="Username" required>
+								<div class="invalid-feedback">
+									Please provide a valid username.
+								</div>
+							</div>
+							<div class="mb-3">
+								<label for="role" class="form-label text-gray">Select Role</label>
+								<select id="role" class="form-select" required>
+									<option value="" disabled selected>Role...</option>
+									<option value="manager">Manager</option>
+									<option value="tester">Tester</option>
+									<option value="developer">Developer</option>
+								</select>
+								<div class="invalid-feedback">
+									Please select a valid role.
+								</div>
+							</div>
+							<div class="d-flex align-items-center justify-content-center gap-3">
+								<button type="submit" class="btn btn-primary">Create</button>
+								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+							</div>
+						</form>
+						
+					</div>
+				</div>
+			</div>
+		</div>
+		  
+		  
+		<header class="bg-dimmed-white">
+			<nav class="border border-top-0 border-start-0 border-end-0 border-3">
+				<div class="container-fluid d-flex py-3 px-3">
+					<div class="me-auto">
+						<a href="/" class="navbar-brand">
+							<img src="/assets/Logo.png" alt="Logo" height="34" class="d-inline-block align-text-top">
+						</a>
+					</div>
+					<div class="d-flex gap-3">
+						<div class="d-flex gap-2">
+							<div class="d-inline-block bg-divisor-gray rounded-pill" style="width: 3px;"></div>
+							<a href="/index.html" class="text-decoration-none">
+								<img src="/assets/projects.png" alt="Logo" height="32" class="">
+								<span class="align-middle text-gray fw-semibold px-1">My Projects</span>
+							</a>
+							<div class="d-inline-block bg-divisor-gray rounded-pill" style="width: 3px;"></div>
+						</div>
+						<img src="/assets/bell.png" alt="Logo" height="32" class="d-inline-block align-text-top">
+						<img src="/assets/avatar.png" alt="Logo" height="32" class="d-inline-block align-text-top">
+						
+					</div>
+				</div>
+			</nav>
+		</header>
+		<main class="d-flex h-100 overflow-hidden">
+			<div id="sidebar" class="overflow-auto border border-top-0 border-start-0 border-bottom-0 border-3" style="width: 20%; ">
+				<a href="/index.html" id="project-info" class="sticky-top text-decoration-none d-flex bottom-shadow bg-white">
+					<div class="d-flex align-items-center justify-content-between w-100 p-4 px-3">
+						<div class="d-flex align-items-center gap-2">
+							<div class="bg-divisor-gray rounded">
+								<img src="/assets/project_placeholder.png" height="32px" alt="Project Image">
+							</div>
+							<div class="d-flex flex-column lh-sm">
+								<div class="fw-semibold text-gray fs-5">
+									Project 1
+								</div>
+								<div class="text-secondary fs-6">
+									Subtitle
+								</div>
+							</div>
+						</div>
+						<div>
+							<img src="/assets/down_arrow.png" alt="Change project" height="20px">
+						</div>
+					</div>
+				</a>
+				<div id="tabs" class="h-100 overflow-auto d-flex gap-4 py-4 flex-column align-items-center justify-content-center">
+					<a href="/dashboard.html" class="bg-tinted-gray text-decoration-none d-flex align-items-center rounded p-2" style="width: 80%;">
+						<img src="/assets/dashboard.png" alt="#" height="30" class="">
+						<span class="align-middle text-gray fw-semibold px-1">
+							Dashboard
+						</span>
+					</a>
+
+					<a href="/requirements.html" class=" text-decoration-none d-flex align-items-center rounded p-2" style="width: 80%;">
+						<img src="/assets/requirements.png" alt="#" height="30" class="">
+						<span class="align-middle text-gray fw-semibold px-1">
+							Requirements
+						</span>
+					</a>
+
+					<a href="/modules.html" class=" text-decoration-none d-flex align-items-center rounded p-2" style="width: 80%;">
+						<img src="/assets/modules.png" alt="#" height="30" class="">
+						<span class="align-middle text-gray fw-semibold px-1">
+							Modules
+						</span>
+					</a>
+
+					<a href="/releases.html" class=" text-decoration-none d-flex align-items-center rounded p-2" style="width: 80%;">
+						<img src="/assets/releases.png" alt="#" height="30" class="">
+						<span class="align-middle text-gray fw-semibold px-1">
+							Releases
+						</span>
+					</a>
+
+					<div class="bg-divisor-gray rounded-pill" style="height: 3px; width: 80%;"></div>
+
+					<a href="/test_case.html" class=" text-decoration-none d-flex align-items-center rounded p-2" style="width: 80%;">
+						<img src="/assets/test_cases.png" alt="#" height="30" class="">
+						<span class="align-middle text-gray fw-semibold px-1">
+							Test Cases
+						</span>
+					</a>
+
+					<a href="/test_plan.html" class=" text-decoration-none d-flex align-items-center rounded p-2" style="width: 80%;">
+						<img src="/assets/test_plans.png" alt="#" height="30" class="">
+						<span class="align-middle text-gray fw-semibold px-1">
+							Test Plans
+						</span>
+					</a>
+
+					<a href="/test_run.html" class=" text-decoration-none d-flex align-items-center rounded p-2" style="width: 80%;">
+						<img src="/assets/test_runs.png" alt="#" height="30" class="">
+						<span class="align-middle text-gray fw-semibold px-1">
+							Test Runs
+						</span>
+					</a>
+
+					<a href="/issue.html" class=" text-decoration-none d-flex align-items-center rounded p-2" style="width: 80%;">
+						<img src="/assets/issues.png" alt="#" height="30" class="">
+						<span class="align-middle text-gray fw-semibold px-1">
+							Issues
+						</span>
+					</a>
+					
+				</div>
+			</div>
+			<div id="content" class="h-100 overflow-auto p-4" style="width: 80%; ">
+				<button type="button" class="btn btn-primary d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modal">
+					<img src="/assets/user_edit.png" alt="#" height="30px">
+					<div>Edit Users</div>
+				</button>
+				<div id="report" class="mt-5">
+					<div class="d-flex gap-3">
+						<div id="left-report" class="d-flex flex-column gap-3" style="width: 70%;">
+							<div class="bg-white rounded bottom-shadow p-3">
+								<div class="fw-semibold text-gray fs-5 pb-3">
+									Status
+								</div>
+								<div id="progress" class="d-flex align-items-center">
+									<div>
+										<div class="position-relative" style="width:150px; height: 150px;">
+											<canvas id="progress-pie-chart" width="150px" height="150px" class="position-absolute top-0">
+											</canvas>
+											<div class="d-flex fs-1 fw-bold text-gray align-items-center w-100 h-100 mx-auto">
+												<div class="mx-auto" id="progress-pie-label">40%</div>
+											</div>
+										</div>
+									</div>
+									<div class="d-flex p-3 gap-5 flex-wrap">
+										<div class="d-flex flex-column lh-1">
+											<div class="text-gray fs-5">
+												Passed
+											</div>
+											<div id="status-passed" class="fw-bold text-gray fs-4">
+												17
+											</div>
+										</div>
+		
+										<div class="d-flex flex-column lh-1">
+											<div class="text-gray fs-5">
+												Untested
+											</div>
+											<div id="status-untested" class="fw-bold text-gray fs-4">
+												17
+											</div>
+										</div>
+		
+										<div class="d-flex flex-column lh-1">
+											<div class="text-gray fs-5">
+												Blocked
+											</div>
+											<div id="status-blocked" class="fw-bold text-gray fs-4">
+												17
+											</div>
+										</div>
+		
+										<div class="d-flex flex-column lh-1">
+											<div class="text-gray fs-5">
+												Failed
+											</div>
+											<div id="status-failed" class="fw-bold text-gray fs-4">
+												17
+											</div>
+										</div>
+		
+										<div class="d-flex flex-column lh-1">
+											<div class="text-gray fs-5">
+												In Process
+											</div>
+											<div id="status-in-process" class="fw-bold text-gray fs-4">
+												17
+											</div>
+										</div>
+		
+										<div class="d-flex flex-column lh-1">
+											<div class="text-gray fs-5">
+												Hold
+											</div>
+											<div id="status-hold" class="fw-bold text-gray fs-4">
+												17
+											</div>
+										</div>
+		
+										<div class="d-flex flex-column lh-1">
+											<div class="text-gray fs-5">
+												Need Approval
+											</div>
+											<div id="status-need-approval" class="fw-bold text-gray fs-4">
+												17
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="bg-white rounded bottom-shadow p-3">
+								<div class="fw-semibold text-gray fs-5 pb-3">
+									Overall Activities
+								</div>
+								<div id="activity">
+									<canvas id="activity-chart">
+									</canvas>
+								</div>
+							</div>
+						</div>
+
+						
+						<div id="right-report" style="width: 30%;">
+							<div class="bg-white rounded bottom-shadow p-3">
+								<div class="fw-semibold text-gray fs-5">
+									History
+								</div>
+
+								<div class="text-gray fs-6">
+									March 2024
+								</div>
+								<div class="py-2 d-flex flex-column">
+									<div class="d-flex align-items-center">
+										<img src="/assets/history_bottom.svg" height="60px"/>
+										<div class="border border-2 p-2 rounded lh-1 w-100"  style="border-color: #4D5E80 !important;" >
+											<div class="text-gray fw-semibold">
+												Lorem Ipsum
+											</div>
+											<div class="text-secondary fw-light fs-6">
+												Subtitle
+											</div>
+										</div>
+									</div>
+
+									<div class="d-flex align-items-center">
+										<img src="/assets/history_both.svg" height="60px"/>
+										<div class="border border-2 p-2 rounded lh-1 w-100"  style="border-color: #4D5E80 !important;" >
+											<div class="text-gray fw-semibold">
+												Lorem Ipsum
+											</div>
+											<div class="text-secondary fw-light fs-6">
+												Subtitle
+											</div>
+										</div>
+									</div>
+
+									<div class="d-flex align-items-center">
+										<img src="/assets/history_both.svg" height="60px"/>
+										<div class="border border-2 p-2 rounded lh-1 w-100"  style="border-color: #4D5E80 !important;" >
+											<div class="text-gray fw-semibold">
+												Lorem Ipsum
+											</div>
+											<div class="text-secondary fw-light fs-6">
+												Subtitle
+											</div>
+										</div>
+									</div>
+
+									<div class="d-flex align-items-center">
+										<img src="/assets/history_both.svg" height="60px"/>
+										<div class="border border-2 p-2 rounded lh-1 w-100"  style="border-color: #4D5E80 !important;" >
+											<div class="text-gray fw-semibold">
+												Lorem Ipsum
+											</div>
+											<div class="text-secondary fw-light fs-6">
+												Subtitle
+											</div>
+										</div>
+									</div>
+
+									<div class="d-flex align-items-center">
+										<img src="/assets/history_top.svg" height="60px"/>
+										<div class="border border-2 p-2 rounded lh-1 w-100"  style="border-color: #4D5E80 !important;" >
+											<div class="text-gray fw-semibold">
+												Lorem Ipsum
+											</div>
+											<div class="text-secondary fw-light fs-6">
+												Subtitle
+											</div>
+										</div>
+									</div>
+								</div>
+
+								
+								<div class="text-gray fs-6">
+									February 2024
+								</div>
+								<div class="py-2 d-flex flex-column">
+									<div class="d-flex align-items-center">
+										<img src="/assets/history_none.svg" height="60px"/>
+										<div class="border border-2 p-2 rounded lh-1 w-100"  style="border-color: #4D5E80 !important;" >
+											<div class="text-gray fw-semibold">
+												Lorem Ipsum
+											</div>
+											<div class="text-secondary fw-light fs-6">
+												Subtitle
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="text-gray fs-6">
+									January 2024
+								</div>
+								<div class="py-2 d-flex flex-column">
+									<div class="d-flex align-items-center">
+										<img src="/assets/history_bottom.svg" height="60px"/>
+										<div class="border border-2 p-2 rounded lh-1 w-100"  style="border-color: #4D5E80 !important;" >
+											<div class="text-gray fw-semibold">
+												Lorem Ipsum
+											</div>
+											<div class="text-secondary fw-light fs-6">
+												Subtitle
+											</div>
+										</div>
+									</div>
+
+									<div class="d-flex align-items-center">
+										<img src="/assets/history_both.svg" height="60px"/>
+										<div class="border border-2 p-2 rounded lh-1 w-100"  style="border-color: #4D5E80 !important;" >
+											<div class="text-gray fw-semibold">
+												Lorem Ipsum
+											</div>
+											<div class="text-secondary fw-light fs-6">
+												Subtitle
+											</div>
+										</div>
+									</div>
+
+									<div class="d-flex align-items-center">
+										<img src="/assets/history_both.svg" height="60px"/>
+										<div class="border border-2 p-2 rounded lh-1 w-100"  style="border-color: #4D5E80 !important;" >
+											<div class="text-gray fw-semibold">
+												Lorem Ipsum
+											</div>
+											<div class="text-secondary fw-light fs-6">
+												Subtitle
+											</div>
+										</div>
+									</div>
+
+									<div class="d-flex align-items-center">
+										<img src="/assets/history_both.svg" height="60px"/>
+										<div class="border border-2 p-2 rounded lh-1 w-100"  style="border-color: #4D5E80 !important;" >
+											<div class="text-gray fw-semibold">
+												Lorem Ipsum
+											</div>
+											<div class="text-secondary fw-light fs-6">
+												Subtitle
+											</div>
+										</div>
+									</div>
+
+									<div class="d-flex align-items-center">
+										<img src="/assets/history_top.svg" height="60px"/>
+										<div class="border border-2 p-2 rounded lh-1 w-100"  style="border-color: #4D5E80 !important;" >
+											<div class="text-gray fw-semibold">
+												Lorem Ipsum
+											</div>
+											<div class="text-secondary fw-light fs-6">
+												Subtitle
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+				</div>
+			</div>
+		</main>
+		<footer>
+			<!-- place footer here -->
+		</footer>
+		<!-- Bootstrap JavaScript Libraries -->
+		<script
+			src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+			integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+			crossorigin="anonymous"
+		></script>
+
+		<script
+			src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+			integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+			crossorigin="anonymous"
+		></script>
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+		<script src="js/dashboard.js"></script>
+	</body>
+</html>

@@ -1,0 +1,100 @@
+[
+  {
+    "issue": "1",
+    "title": "Icon overlay error",
+    "comments": [
+      {
+        "id": 1,
+        "owner": 1,
+        "time": "1 April",
+        "status": "open",
+        "content": "I encountered the icon overlay error while testing. It seems to occur randomly.",
+        "level": 0
+      },
+      {
+        "id": 2,
+        "owner": 0,
+        "time": "2 April",
+        "status": "open",
+        "content": "I've noticed the same issue. It might be related to the file system.",
+        "level": 1
+      },
+      {
+        "id": 3,
+        "owner": 1,
+        "time": "3 April",
+        "status": "open",
+        "content": "I tried different approaches to reproduce the error, but couldn't find a consistent pattern.",
+        "level": 0
+      }
+    ]
+  },
+  {
+    "issue": "2",
+    "title": "Buffer overflow vulnerability",
+    "comments": [
+      {
+        "id": 1,
+        "owner": 1,
+        "time": "28 March",
+        "status": "open",
+        "content": "Hi, your bof vulnerability is severe. The program crashes when handle a string longer than 1KB. Please fix before 30 March.",
+        "level": 0
+      },
+      {
+        "id": 2,
+        "owner": 0,
+        "time": "28 March",
+        "status": "open",
+        "content": "Got it. I’ll start working on it immediately.",
+        "level": 1
+      },
+      {
+        "id": 3,
+        "owner": 1,
+        "time": "30 March",
+        "status": "open",
+        "content": "Hey, it’s deadline today. Did you fix it?",
+        "level": 0
+      }
+    ]
+  },
+  {
+    "issue": "3",
+    "title": "Error displaying Vietnamese text",
+    "comments": [
+      {
+        "id": 1,
+        "owner": 1,
+        "time": "5 April",
+        "status": "open",
+        "content": "The issue with displaying Vietnamese text seems to be related to font rendering.",
+        "level": 0
+      },
+      {
+        "id": 2,
+        "owner": 0,
+        "time": "6 April",
+        "status": "open",
+        "content": "Have you tried using a different font or encoding?",
+        "level": 0
+      },
+      {
+        "id": 3,
+        "owner": 1,
+        "time": "7 April",
+        "status": "open",
+        "content": "Yes, I've experimented with different fonts, but the issue persists.",
+        "level": 0
+      },
+      {
+        "id": 4,
+        "owner": 0,
+        "time": "8 April",
+        "status": "open",
+        "content": "Let's review the font rendering settings and encoding configurations to identify the cause.",
+        "level": 0
+      }
+    ]
+  }
+]

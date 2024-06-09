@@ -5,10 +5,10 @@ const {
     createRefreshToken,
     createToken,
     decodeToken,
-} = require("../config/jwt.js");
+} = require("../middlewares/jwt.js");
 
 const model = require("../models/index");
-const responseData = require("../config/response.js");
+const { responseData } = require("../config/response.js");
 
 const controller = {
     login: async (req, res) => {
@@ -52,9 +52,12 @@ const controller = {
     },
     signup: async (req, res) => {
         try {
+            console.log(req.body);
             let { fullname, username, pass_word } = req.body;
 
-            let check_username = await model.user.findOne({
+            console.log(bcrypt.hashSync(pass_word, 10));
+
+            let check_username = await model.User.findOne({
                 where: {
                     username,
                 },
@@ -64,6 +67,7 @@ const controller = {
                 responseData(res, "username is exist", "", 400);
                 return;
             }
+            
 
             let newData = {
                 username,
@@ -78,6 +82,7 @@ const controller = {
             // Đăng ký thành công
             responseData(res, "Thành công tạo tài khoản", "", 201);
         } catch (err) {
+            console.log(err);
             responseData(res, "Lỗi...", err, 500);
         }
     },

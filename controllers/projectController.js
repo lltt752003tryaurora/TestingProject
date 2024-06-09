@@ -20,7 +20,52 @@ const controller = {
                     attributes: ['id', 'name', 'updatedAt']
                 });
                 if (projects) {
-                    res.send(projects);
+                    const projectsWithDetails = await Promise.all(projects.map(async (project) => {
+                        const casesCount = await db.TestCase.count({
+                            include: [{
+                                model: db.Module,
+                                as: 'module',
+                                where: { projectId: project.id }
+                            }]
+                        });
+
+                        const runsCount = await db.TestRun.count({
+                            include: [{
+                                model: db.TestCase,
+                                as: 'testCase',
+                                include: [{
+                                    model: db.Module,
+                                    as: 'module',
+                                    where: { projectId: project.id }
+                                }]
+                            }]
+                        });
+
+                        const issueCount = await db.Issue.count({
+                            include: [{
+                                model: db.TestRun,
+                                as: 'testRun',
+                                include: [{
+                                    model: db.TestCase,
+                                    as: 'testCase',
+                                    include: [{
+                                        model: db.Module,
+                                        as: 'module',
+                                        where: { projectId: project.id }
+                                    }]
+                                }]
+                            }]
+                        });
+    
+                        return {
+                            ...project.get({ plain: true }),
+                            casesCount,
+                            runsCount,
+                            issueCount
+                        };
+                    }));
+
+                    res.send(projectsWithDetails);
                 } else {
                     res.status(404).send({
                         message: 'Projects not found.'

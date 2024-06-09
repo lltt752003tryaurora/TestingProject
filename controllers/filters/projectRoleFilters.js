@@ -6,6 +6,7 @@ const extractUserRole = async (projectId, userId) => {
 }
 
 const isUserProjectMember = async (req, res, next) => {
+    const userId = req.user.id;
     const { projectId } = req.params;
     const projectMember = await extractUserRole(projectId, userId);
     if (projectMember !== null) {

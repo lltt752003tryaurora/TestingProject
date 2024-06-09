@@ -9,7 +9,7 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      url: {
+      fileName: {
         type: Sequelize.STRING
       },
       createdAt: {

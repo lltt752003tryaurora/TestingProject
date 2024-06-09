@@ -375,7 +375,7 @@ const controller = {
         const sortField = req.query.sort === 'updatedAt' ? 'updatedAt' : 'id';
         const sortOrder = req.query.order === 'asc' ? 'ASC' : 'DESC';
         const options = {
-            where: { parentModuleId: null },
+            where: { parentRequirementId: null },
             offset: PAGE_LIMIT * (page - 1),
             limit: PAGE_LIMIT,
             order: [[sortField, sortOrder]],

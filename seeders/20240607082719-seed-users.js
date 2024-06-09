@@ -6,6 +6,7 @@ module.exports = {
       {
         username: 'john_doe',
         fullname: 'John Doe',
+        hashedPasword: '$2a$10$hQnflh0wtZ65Co/KSWfmGeUs1f5eJFQ3mHESkxq/uFINF9FPXoUOO',
         createdAt: new Date(),
         updatedAt: new Date(),
       },

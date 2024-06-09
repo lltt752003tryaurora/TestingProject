@@ -16,10 +16,29 @@ const controller = {
             }
         } catch (error) {
             res.status(500).send({
-                message: 'Internal server error'
+                message: 'Internal server error.'
             });
         } 
     },
+
+    getIssueComments: async (req, res) => {
+        const { issueId } = req.params;
+        try {
+            const comments = await db.IssueComment.findAll({
+                where: {
+                    issueId: issueId
+                },
+                order: [['createdAt', 'ASC']]
+            });
+            return res.send({
+                comments: comments.map(comment => comment.toJSON())
+            });
+        } catch (error) {
+            res.status(500).send({
+                message: 'Internal server error.'
+            });
+        } 
+    }
 };
 
 module.exports = controller;

@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Attachment.init({
-    url: DataTypes.STRING,
+    fileName: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'Attachment',

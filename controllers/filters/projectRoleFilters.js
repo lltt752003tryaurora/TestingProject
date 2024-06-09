@@ -1,12 +1,15 @@
 const db = require('../../models/index');
 
+const extractUserRole = async (projectId, userId) => {
+    const projectMember = await db.ProjectMember.findOne({ where: { projectId: projectId, userId: userId } });
+    return projectMember ? { projectId, userId, role: projectMember.role } : null;
+}
+
 const isUserProjectMember = async (req, res, next) => {
     const { projectId } = req.params;
-    const projectMember = await db.ProjectMember.findOne({ where: { projectId: projectId, userId: req.user.id } });
+    const projectMember = await extractUserRole(projectId, userId);
     if (projectMember !== null) {
-        req.filter = {
-            role: projectMember.role
-        };
+        req.filter = projectMember;
         next();
     } else {
         return res.status(403).send({
@@ -26,6 +29,7 @@ const isUserManager = async (req, res, next) => {
 }
 
 module.exports = {
+    extractUserRole,
     isUserProjectMember,
     isUserManager
 };

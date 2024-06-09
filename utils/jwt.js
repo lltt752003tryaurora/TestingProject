@@ -1,9 +1,9 @@
 const jwt = require("jsonwebtoken");
 
-
 module.exports = {
     createRefreshToken: (data) => {
-        let token = jwt.sign({ data }, "KOBIMAT", {
+        console.log('Refresh: ', data);
+        let token = jwt.sign({ data }, "REFRESH_TOKEN_SECRET", {
             algorithm: "HS256",
             expiresIn: "7d",
         });
@@ -12,24 +12,25 @@ module.exports = {
 
     checkRefreshToken: (token) => {
         try {
-            const decoded = jwt.verify(token, "KOBIMAT");
+            const decoded = jwt.verify(token, "REFRESH_TOKEN_SECRET");
             return null; // Không có lỗi, trả về null
         } catch (error) {
             return error; // Trả về lỗi nếu có
         }
     },
 
-    createToken: (data) => {
-        let token = jwt.sign({ data }, "BIMAT", {
+    createAccessToken: (data) => {
+        console.log('Access: ', data);
+        let token = jwt.sign({ data }, "ACCESS_TOKEN_SECRET", {
             algorithm: "HS256",
-            expiresIn: "5s",
+            expiresIn: "1m",
         });
         return token;
     },
 
-    checkToken: (token) => {
+    checkAccessToken: (token) => {
         try {
-            jwt.verify(token, "BIMAT");
+            jwt.verify(token, "ACCESS_TOKEN_SECRET");
             return null; // Không có lỗi, trả về null
         } catch (error) {
             return error; // Trả về lỗi nếu có
@@ -42,7 +43,7 @@ module.exports = {
 
     getUserFromToken: (token) => {
         try {
-            const decoded = jwt.verify(token, "BIMAT");
+            const decoded = jwt.verify(token, "ACCESS_TOKEN_SECRET");
             return decoded.data;
         } catch (error) {
             return null;

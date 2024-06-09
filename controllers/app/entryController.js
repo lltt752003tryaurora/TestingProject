@@ -1,7 +1,7 @@
 const controller = {}
 
 controller.entry = async (req, res, next) => {
-	res.render('landing', {title: 'Welcome', layout: 'blank'});
+	res.render('landing', {title: 'Welcome', layout: 'auth'});
 }
 
 controller.login = async (req, res, next) => {

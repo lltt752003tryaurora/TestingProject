@@ -3,7 +3,7 @@ const db = require('../models/index');
 
 const PAGE_LIMIT = 10;
 
-const { isUserProjectMember, isUserManager } = require('./filters/projectRoleFilters');
+const { extractUserRole, isUserProjectMember, isUserManager } = require('./filters/projectRoleFilters');
 
 const controller = {
     getProjectList: [

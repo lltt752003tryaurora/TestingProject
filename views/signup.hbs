@@ -54,7 +54,34 @@
           form.classList.add('was-validated');
         }
         else {
-          alert("Signup")
+          axios.post('/api/auth/signup', {
+            fullName: document.getElementById('fullname').value,
+            username: document.getElementById('username').value,
+            pass_word: document.getElementById('password').value,
+          })
+          .then(res => {
+            console.log(res);
+            Toastify({
+              text: "Sign up succeeded",
+              style: {
+                background: "linear-gradient(to right, #198754, #198754)",
+              },
+              onClick: function(){} // Callback after click
+            }).showToast();
+            setTimeout(() => {
+              window.location.replace("/login");
+            }, 1500);
+          })
+          .catch(err => {
+            console.log(err);
+            Toastify({
+              text: "Sign up failed",
+              style: {
+                background: "linear-gradient(to right, #dc3545, #dc3545)",
+              },
+              onClick: function(){} // Callback after click
+            }).showToast();
+          })
         }
         
       }, false);

@@ -5,10 +5,10 @@ const {
     createRefreshToken,
     createToken,
     decodeToken,
-} = require("../config/jwt.js");
+} = require("../middlewares/jwt.js");
 
 const model = require("../models/index");
-const responseData = require("../config/response.js");
+const { responseData } = require("../config/response.js");
 
 const controller = {
     login: async (req, res) => {
@@ -29,7 +29,7 @@ const controller = {
                         key,
                     });
 
-                    await model.user.update(
+                    await model.User.update(
                         { ...checkUser.dataValues, refresh_token: refToken },
                         {
                             where: { id: checkUser.id },
@@ -52,7 +52,10 @@ const controller = {
     },
     signup: async (req, res) => {
         try {
+            console.log(req.body);
             let { fullname, username, pass_word } = req.body;
+
+            console.log(bcrypt.hashSync(pass_word, 10));
 
             let check_username = await model.User.findOne({
                 where: {
@@ -64,6 +67,7 @@ const controller = {
                 responseData(res, "username is exist", "", 400);
                 return;
             }
+            
 
             let newData = {
                 username,
@@ -73,11 +77,12 @@ const controller = {
             };
 
             // Create user, thêm data của user vào bảng user
-            await model.user.create(newData);
+            await model.User.create(newData);
 
             // Đăng ký thành công
             responseData(res, "Thành công tạo tài khoản", "", 201);
         } catch (err) {
+            console.log(err);
             responseData(res, "Lỗi...", err, 500);
         }
     },

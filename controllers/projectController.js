@@ -3,7 +3,7 @@ const db = require('../models/index');
 
 const PAGE_LIMIT = 10;
 
-const { extractUserRole, isUserProjectMember, isUserManager } = require('./filters/projectRoleFilters');
+const { extractUserRole, isUserProjectMember, isUserManager, isUserManagerOrTester } = require('./filters/projectRoleFilters');
 
 const controller = {
     getProjectList: [
@@ -360,74 +360,74 @@ const controller = {
 
     getProjectIssues: [
         isUserProjectMember,
-        isUserManager,
+        isUserManagerOrTester,
         async (req, res) => {
-        const { projectId } = req.params;
-        const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
-        const sortField = req.query.sort === 'updatedAt' ? 'updatedAt' : 'id';
-        const sortOrder = req.query.order === 'asc' ? 'ASC' : 'DESC';
-        const options = {
-            where: {},
-            offset: PAGE_LIMIT * (page - 1),
-            limit: PAGE_LIMIT,
-            order: [[sortField, sortOrder]],
-            include: [{
-                model: db.TestRun,
-                as: 'testRun',
-                attributes: [],
-                required: true,
+            const { projectId } = req.params;
+            const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
+            const sortField = req.query.sort === 'updatedAt' ? 'updatedAt' : 'id';
+            const sortOrder = req.query.order === 'asc' ? 'ASC' : 'DESC';
+            const options = {
+                where: {},
+                offset: PAGE_LIMIT * (page - 1),
+                limit: PAGE_LIMIT,
+                order: [[sortField, sortOrder]],
                 include: [{
-                    model: db.TestCase,
-                    as: 'testCase',
+                    model: db.TestRun,
+                    as: 'testRun',
                     attributes: [],
                     required: true,
                     include: [{
-                        model: db.TestPlan,
-                        as: 'testPlan',
+                        model: db.TestCase,
+                        as: 'testCase',
                         attributes: [],
                         required: true,
                         include: [{
-                            model: db.Release,
-                            as: 'release',
+                            model: db.TestPlan,
+                            as: 'testPlan',
                             attributes: [],
                             required: true,
                             include: [{
-                                model: db.Project,
-                                as: 'project',
+                                model: db.Release,
+                                as: 'release',
                                 attributes: [],
                                 required: true,
-                                where: { id: projectId }
+                                include: [{
+                                    model: db.Project,
+                                    as: 'project',
+                                    attributes: [],
+                                    required: true,
+                                    where: { id: projectId }
+                                }]
                             }]
                         }]
                     }]
-                }]
-            }],
-        };
-        const keyword = req.query.keyword || '';
-        if (keyword.trim() !== '') {
-            options.where.name = { [Op.iLike]: `%${keyword}%` }
-        }
-        try {
-            const projectIssues = await db.Issue.findAll(options);
-            const projectIssueCount = await db.Issue.count({
-                where: options.where,
-                include: options.include,
-            });
-            return res.send({
-                page: page,
-                totalPages: Math.ceil(projectIssueCount / PAGE_LIMIT),
-                issues: projectIssues.map(issue => {
-                    return {
-                        ...issue.toJSON(),
-                    };
-                })
-            });
-        } catch (error) {
-            console.log(error);
-            res.status(500).send({
-                message: 'Internal server error.'
-            });
-        }
+                }],
+            };
+            const keyword = req.query.keyword || '';
+            if (keyword.trim() !== '') {
+                options.where.name = { [Op.iLike]: `%${keyword}%` }
+            }
+            try {
+                const projectIssues = await db.Issue.findAll(options);
+                const projectIssueCount = await db.Issue.count({
+                    where: options.where,
+                    include: options.include,
+                });
+                return res.send({
+                    page: page,
+                    totalPages: Math.ceil(projectIssueCount / PAGE_LIMIT),
+                    issues: projectIssues.map(issue => {
+                        return {
+                            ...issue.toJSON(),
+                        };
+                    })
+                });
+            } catch (error) {
+                console.log(error);
+                res.status(500).send({
+                    message: 'Internal server error.'
+                });
+            }
         },
     ],
 

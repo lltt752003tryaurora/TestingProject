@@ -3,242 +3,269 @@ const db = require('../models/index');
 
 const PAGE_LIMIT = 10;
 
+const { isUserProjectMember, isUserManager } = require('./filters/projectRoleFilters');
+
 const controller = {
-    getProjectById: async (req, res) => {
-        console.log(req.user);
-        const { projectId } = req.params;
-        try {
-            const project = await db.Project.findByPk(projectId);
-            if (project) {
-                res.send(project.toJSON());
-            } else {
-                res.status(404).send({
-                    message: 'Project not found.'
+    getProjectById: [
+        isUserProjectMember,
+        async (req, res) => {
+            const { projectId } = req.params;
+            try {
+                const project = await db.Project.findByPk(projectId);
+                if (project) {
+                    res.send(project.toJSON());
+                } else {
+                    res.status(404).send({
+                        message: 'Project not found.'
+                    });
+                }
+            } catch (error) {
+                console.error('Error retrieving project:', error);
+                res.status(500).send({
+                    message: 'Internal server error.'
                 });
             }
-        } catch (error) {
-            console.error('Error retrieving project:', error);
-            res.status(500).send({
-                message: 'Internal server error.'
-            });
         }
-    },
+    ],
 
-    getProjectMembers: async (req, res) => {
-        const { projectId } = req.params;
-        try {
-            const projectMembers = await db.ProjectMember.findAll({
+    getProjectMembers: [
+        isUserProjectMember,
+        isUserManager,
+        async (req, res) => {
+            const { projectId } = req.params;
+            try {
+                const projectMembers = await db.ProjectMember.findAll({
+                    where: {
+                        projectId: projectId
+                    }
+                });
+                res.send({
+                    members: projectMembers.map(member => member.toJSON())
+                });
+            } catch (error) {
+                console.error(error);
+                res.status(500).send({
+                    message: 'Internal server error.'
+                });
+            }
+        }
+    ],
+
+    getProjectReleases: [
+        isUserProjectMember,
+        isUserManager,
+        async (req, res) => {
+            const { projectId } = req.params;
+            const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
+            const sortField = req.query.sort === 'startDate' ? 'startDate' : 'id';
+            const sortOrder = req.query.order === 'asc' ? 'ASC' : 'DESC';
+            const startDate = req.query.startDate ? new Date(req.query.startDate) : null;
+            const endDate = req.query.endDate ? new Date(req.query.endDate) : null;
+
+            const dateFilter = {};
+            if (startDate) {
+                dateFilter[Op.gte] = startDate;
+            }
+            if (endDate) {
+                dateFilter[Op.lte] = endDate;
+            }
+
+            const options = {
                 where: {
-                    projectId: projectId
-                }
-            });
-            res.send({
-                members: projectMembers.map(member => member.toJSON())
-            });
-        } catch (error) {
-            console.error(error);
-            res.status(500).send({
-                message: 'Internal server error.'
-            });
-        }
-    },
-
-    getProjectReleases: async (req, res) => {
-        const { projectId } = req.params;
-        const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
-        const sortField = req.query.sort === 'startDate' ? 'startDate' : 'id';
-        const sortOrder = req.query.order === 'asc' ? 'ASC' : 'DESC';
-        const startDate = req.query.startDate ? new Date(req.query.startDate) : null;
-        const endDate = req.query.endDate ? new Date(req.query.endDate) : null;
-
-        const dateFilter = {};
-        if (startDate) {
-            dateFilter[Op.gte] = startDate;
-        }
-        if (endDate) {
-            dateFilter[Op.lte] = endDate;
-        }
-
-        const options = {
-            where: {
-                projectId: projectId,
-                ...((startDate || endDate) ? { createdAt: dateFilter } : {})
-            },
-            offset: PAGE_LIMIT * (page - 1),
-            limit: PAGE_LIMIT,
-            order: [[sortField, sortOrder]]
-        }
-
-        const keyword = req.query.keyword || '';
-        if (keyword.trim() !== '') {
-            options.where.name = { [Op.iLike]: `%${keyword}%` }
-        }
-
-        try {
-            const projectReleases = await db.Release.findAll(options);
-            const projectReleaseCount = await db.Release.count({ where: options.where });
-            return res.send({
-                page: page,
-                totalPages: Math.ceil(projectReleaseCount / PAGE_LIMIT),
-                releases: projectReleases.map(release => release.toJSON())
-            });
-        } catch (error) {
-            console.error(error);
-            res.status(500).send({
-                message: 'Internal server error.'
-            });
-        }
-    },
-
-    getProjectTestPlans: async (req, res) => {
-        const { projectId } = req.params;
-        const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
-        const sortField = req.query.sort === 'updatedAt' ? 'updatedAt' : 'id';
-        const sortOrder = req.query.order === 'asc' ? 'ASC' : 'DESC';
-        const options = {
-            offset: PAGE_LIMIT * (page - 1),
-            limit: PAGE_LIMIT,
-            order: [[sortField, sortOrder]],
-            include: [
-                {
-                    model: db.Release,
-                    as: 'release',
-                    where: { projectId },
-                    attributes: [],
+                    projectId: projectId,
+                    ...((startDate || endDate) ? { createdAt: dateFilter } : {})
                 },
-                {
-                    model: db.TestPlanComponent,
-                    as: 'components',
-                    attributes: ['id', 'name']
-                }
-            ]
-        };
-        const keyword = req.query.keyword || '';
-        if (keyword.trim() !== '') {
-            options.where.name = { [Op.iLike]: `%${keyword}%` }
-        }
-        try {
-            const projectTestPlans = await db.TestPlan.findAll(options);
-            const projectTestPlanCount = await db.TestPlan.count({ 
-                include: options.include
-            });
-            return res.send({
-                page: page,
-                totalPages: Math.ceil(projectTestPlanCount / PAGE_LIMIT),
-                testPlans: projectTestPlans.map(testPlan => testPlan.toJSON())
-            });
-        } catch (error) {
-            console.log(error);
-            res.status(500).send({
-                message: 'Internal server error.'
-            });
-        }
-    },
+                offset: PAGE_LIMIT * (page - 1),
+                limit: PAGE_LIMIT,
+                order: [[sortField, sortOrder]]
+            }
 
-    getProjectModules: async (req, res) => {
-        const { projectId } = req.params;
-        const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
-        const sortField = req.query.sort === 'updatedAt' ? 'updatedAt' : 'id';
-        const sortOrder = req.query.order === 'asc' ? 'ASC' : 'DESC';
-        const options = {
-            where: {
-                projectId: projectId,
-                parentModuleId: null
-            },
-            offset: PAGE_LIMIT * (page - 1),
-            limit: PAGE_LIMIT,
-            order: [[sortField, sortOrder]],
-            include: [{
-                model: db.Module,
-                as: 'childModules',
-                attributes: ['id'],
-                required: false
-            }]
-        };
-        const keyword = req.query.keyword || '';
-        if (keyword.trim() !== '') {
-            options.where.name = { [Op.iLike]: `%${keyword}%` }
-        }
-        try {
-            const projectFirstLevelModules = await db.Module.findAll(options);
-            const projectModuleCount = await db.Module.count({
-                where: options.where
-            });
-            return res.send({
-                page: page,
-                totalPages: Math.ceil(projectModuleCount / PAGE_LIMIT),
-                modules: projectFirstLevelModules.map(module => {
-                    return {
-                        ...module.toJSON(),
-                    };
-                })
-            });
-        } catch (error) {
-            console.log(error);
-            res.status(500).send({
-                message: 'Internal server error.'
-            });
-        }
-    },
+            const keyword = req.query.keyword || '';
+            if (keyword.trim() !== '') {
+                options.where.name = { [Op.iLike]: `%${keyword}%` }
+            }
 
-    getProjectTestCases: async (req, res) => {
-        const { projectId } = req.params;
-        const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
-        const sortField = req.query.sort === 'updatedAt' ? 'updatedAt' : 'id';
-        const sortOrder = req.query.order === 'asc' ? 'ASC' : 'DESC';
-        const options = {
-            where: {},
-            offset: PAGE_LIMIT * (page - 1),
-            limit: PAGE_LIMIT,
-            order: [[sortField, sortOrder]],
-            include: [{
-                model: db.TestPlan,
-                as: 'testPlan',
-                attributes: [],
-                required: true,
+            try {
+                const projectReleases = await db.Release.findAll(options);
+                const projectReleaseCount = await db.Release.count({ where: options.where });
+                return res.send({
+                    page: page,
+                    totalPages: Math.ceil(projectReleaseCount / PAGE_LIMIT),
+                    releases: projectReleases.map(release => release.toJSON())
+                });
+            } catch (error) {
+                console.error(error);
+                res.status(500).send({
+                    message: 'Internal server error.'
+                });
+            }
+        },
+    ],
+
+    getProjectTestPlans: [
+        isUserProjectMember,
+        isUserManager,
+        async (req, res) => {
+            const { projectId } = req.params;
+            const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
+            const sortField = req.query.sort === 'updatedAt' ? 'updatedAt' : 'id';
+            const sortOrder = req.query.order === 'asc' ? 'ASC' : 'DESC';
+            const options = {
+                offset: PAGE_LIMIT * (page - 1),
+                limit: PAGE_LIMIT,
+                order: [[sortField, sortOrder]],
+                include: [
+                    {
+                        model: db.Release,
+                        as: 'release',
+                        where: { projectId },
+                        attributes: [],
+                    },
+                    {
+                        model: db.TestPlanComponent,
+                        as: 'components',
+                        attributes: ['id', 'name']
+                    }
+                ]
+            };
+            const keyword = req.query.keyword || '';
+            if (keyword.trim() !== '') {
+                options.where.name = { [Op.iLike]: `%${keyword}%` }
+            }
+            try {
+                const projectTestPlans = await db.TestPlan.findAll(options);
+                const projectTestPlanCount = await db.TestPlan.count({ 
+                    include: options.include
+                });
+                return res.send({
+                    page: page,
+                    totalPages: Math.ceil(projectTestPlanCount / PAGE_LIMIT),
+                    testPlans: projectTestPlans.map(testPlan => testPlan.toJSON())
+                });
+            } catch (error) {
+                console.log(error);
+                res.status(500).send({
+                    message: 'Internal server error.'
+                });
+            }
+        },
+    ],
+
+    getProjectModules: [
+        isUserProjectMember,
+        isUserManager,
+        async (req, res) => {
+            const { projectId } = req.params;
+            const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
+            const sortField = req.query.sort === 'updatedAt' ? 'updatedAt' : 'id';
+            const sortOrder = req.query.order === 'asc' ? 'ASC' : 'DESC';
+            const options = {
+                where: {
+                    projectId: projectId,
+                    parentModuleId: null
+                },
+                offset: PAGE_LIMIT * (page - 1),
+                limit: PAGE_LIMIT,
+                order: [[sortField, sortOrder]],
                 include: [{
-                    model: db.Release,
-                    as: 'release',
+                    model: db.Module,
+                    as: 'childModules',
+                    attributes: ['id'],
+                    required: false
+                }]
+            };
+            const keyword = req.query.keyword || '';
+            if (keyword.trim() !== '') {
+                options.where.name = { [Op.iLike]: `%${keyword}%` }
+            }
+            try {
+                const projectFirstLevelModules = await db.Module.findAll(options);
+                const projectModuleCount = await db.Module.count({
+                    where: options.where
+                });
+                return res.send({
+                    page: page,
+                    totalPages: Math.ceil(projectModuleCount / PAGE_LIMIT),
+                    modules: projectFirstLevelModules.map(module => {
+                        return {
+                            ...module.toJSON(),
+                        };
+                    })
+                });
+            } catch (error) {
+                console.log(error);
+                res.status(500).send({
+                    message: 'Internal server error.'
+                });
+            }
+        },
+    ],
+
+    getProjectTestCases: [
+        isUserProjectMember,
+        isUserManager,
+        async (req, res) => {
+            const { projectId } = req.params;
+            const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
+            const sortField = req.query.sort === 'updatedAt' ? 'updatedAt' : 'id';
+            const sortOrder = req.query.order === 'asc' ? 'ASC' : 'DESC';
+            const options = {
+                where: {},
+                offset: PAGE_LIMIT * (page - 1),
+                limit: PAGE_LIMIT,
+                order: [[sortField, sortOrder]],
+                include: [{
+                    model: db.TestPlan,
+                    as: 'testPlan',
                     attributes: [],
                     required: true,
                     include: [{
-                        model: db.Project,
-                        as: 'project',
+                        model: db.Release,
+                        as: 'release',
                         attributes: [],
-                        where: { id: projectId },
-                        required: true
+                        required: true,
+                        include: [{
+                            model: db.Project,
+                            as: 'project',
+                            attributes: [],
+                            where: { id: projectId },
+                            required: true
+                        }]
                     }]
-                }]
-            }],
-        };
-        const keyword = req.query.keyword || '';
-        if (keyword.trim() !== '') {
-            options.where.name = { [Op.iLike]: `%${keyword}%` }
-        }
-        try {
-            const projectTestCases = await db.TestCase.findAll(options);
-            const projectTestCaseCount = await db.TestCase.count({
-                where: options.where,
-                include: options.include,
-            });
-            return res.send({
-                page: page,
-                totalPages: Math.ceil(projectTestCaseCount / PAGE_LIMIT),
-                testCases: projectTestCases.map(testCase => {
-                    return {
-                        ...testCase.toJSON(),
-                    };
-                })
-            });
-        } catch (error) {
-            console.log(error);
-            res.status(500).send({
-                message: 'Internal server error.'
-            });
-        }
-    },
+                }],
+            };
+            const keyword = req.query.keyword || '';
+            if (keyword.trim() !== '') {
+                options.where.name = { [Op.iLike]: `%${keyword}%` }
+            }
+            try {
+                const projectTestCases = await db.TestCase.findAll(options);
+                const projectTestCaseCount = await db.TestCase.count({
+                    where: options.where,
+                    include: options.include,
+                });
+                return res.send({
+                    page: page,
+                    totalPages: Math.ceil(projectTestCaseCount / PAGE_LIMIT),
+                    testCases: projectTestCases.map(testCase => {
+                        return {
+                            ...testCase.toJSON(),
+                        };
+                    })
+                });
+            } catch (error) {
+                console.log(error);
+                res.status(500).send({
+                    message: 'Internal server error.'
+                });
+            }
+        },
+    ],
 
-    getProjectTestRuns: async (req, res) => {
+    getProjectTestRuns: [
+        isUserProjectMember,
+        isUserManager,
+        async (req, res) => {
         const { projectId } = req.params;
         const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
         const sortField = req.query.sort === 'updatedAt' ? 'updatedAt' : 'id';
@@ -299,9 +326,13 @@ const controller = {
                 message: 'Internal server error.'
             });
         }
-    },
+        },
+    ],
 
-    getProjectIssues: async (req, res) => {
+    getProjectIssues: [
+        isUserProjectMember,
+        isUserManager,
+        async (req, res) => {
         const { projectId } = req.params;
         const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
         const sortField = req.query.sort === 'updatedAt' ? 'updatedAt' : 'id';
@@ -368,9 +399,13 @@ const controller = {
                 message: 'Internal server error.'
             });
         }
-    },
+        },
+    ],
 
-    getProjectRequirements: async (req, res) => {
+    getProjectRequirements: [
+        isUserProjectMember,
+        isUserManager,
+        async (req, res) => {
         const { projectId } = req.params;
         const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
         const sortField = req.query.sort === 'updatedAt' ? 'updatedAt' : 'id';
@@ -426,7 +461,8 @@ const controller = {
                 message: 'Internal server error.'
             });
         }
-    }
+        }
+    ],
 }
 
 module.exports = controller;

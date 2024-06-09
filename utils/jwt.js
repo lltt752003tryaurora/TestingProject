@@ -2,7 +2,6 @@ const jwt = require("jsonwebtoken");
 
 module.exports = {
     createRefreshToken: (data) => {
-        console.log('Refresh: ', data);
         let token = jwt.sign({ data }, "REFRESH_TOKEN_SECRET", {
             algorithm: "HS256",
             expiresIn: "7d",
@@ -20,10 +19,9 @@ module.exports = {
     },
 
     createAccessToken: (data) => {
-        console.log('Access: ', data);
         let token = jwt.sign({ data }, "ACCESS_TOKEN_SECRET", {
             algorithm: "HS256",
-            expiresIn: "1m",
+            expiresIn: "30m",
         });
         return token;
     },

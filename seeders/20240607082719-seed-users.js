@@ -84,6 +84,15 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
+      {
+        username: 'thinh2',
+        fullName: 'P0k3rK1ng',
+        avatar: '1717937161902.png',
+        hashedPassword: '$2b$10$Fhso7jTp2gQiuptOsPPHMeaAiIbqgLUnTwfZvCV0cotsf3k6wg9z.',
+        refreshToken: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
     ]);
   },
 

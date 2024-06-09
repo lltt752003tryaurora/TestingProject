@@ -1,7 +1,9 @@
 const db = require('../models/index');
 
+
+
 const controller = {
-    getIssueById: async (req, res) => {
+    getIssueById: [async (req, res) => {
         const { issueId } = req.params;
         try {
             const issue = await db.Issue.findByPk(issueId);
@@ -19,7 +21,7 @@ const controller = {
                 message: 'Internal server error.'
             });
         } 
-    },
+    },],
 
     getIssueComments: async (req, res) => {
         const { issueId } = req.params;

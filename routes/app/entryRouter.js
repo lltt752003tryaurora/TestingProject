@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const entryController = require("../../controllers/app/entryController")
 
-const isLoggedIn = (req, res, next) => {
-	if (res.locals.isLoggedIn) {
+const alreadyLoggedIn = (req, res, next) => {
+	if (req.isLoggedIn) {
 		res.redirect('/project');
         res.end();
 	}
@@ -12,8 +12,8 @@ const isLoggedIn = (req, res, next) => {
 	}
 }
 
-router.get('/', isLoggedIn, entryController.entry);
-router.get('/login', isLoggedIn, entryController.login);
-router.get('/signup', isLoggedIn, entryController.signup);
+router.get('/', entryController.landing);
+router.get('/login', alreadyLoggedIn, entryController.login);
+router.get('/signup', alreadyLoggedIn, entryController.signup);
 
 module.exports = router;

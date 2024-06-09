@@ -1,13 +1,29 @@
 const express = require('express');
 const router = express.Router();
+const { getUserFromToken } = require('../utils/jwt');
+const { responseData } = require("../utils/response.js");
 
-router.use('/projects', require('./projectRouter'));
-router.use('/releases', require('./releaseRouter'));
-router.use('/modules', require('./moduleRouter'));
-router.use('/testPlans', require('./testPlanRouter'));
-router.use('/testPlanComponents', require('./testPlanComponentRouter'));
-router.use('/issues', require('./issueRouter'));
-router.use('/attachments', require('./attachmentRouter'));
+const auth = (req, res, next) => {
+	if (req.isLoggedIn) {
+		req.user = getUserFromToken(req.cookies.accessToken)
+        next();
+	}
+	else {
+		if (req.JWTerror == "Token expired") {
+			responseData(res, "Token expired", "", 401);
+		} else if (req.JWTerror == "Invalid token") {
+			responseData(res, "Invalid token", "", 201);
+		}
+	}
+}
+
+router.use('/projects', auth, require('./projectRouter'));
+router.use('/releases', auth, require('./releaseRouter'));
+router.use('/modules', auth, require('./moduleRouter'));
+router.use('/testPlans', auth, require('./testPlanRouter'));
+router.use('/testPlanComponents', auth, require('./testPlanComponentRouter'));
+router.use('/issues', auth, require('./issueRouter'));
+router.use('/attachments', auth, require('./attachmentRouter'));
 router.use('/auth', require('./authRouter'));
 
 module.exports = router;

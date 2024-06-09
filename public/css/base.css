@@ -25,3 +25,8 @@ main {
 .bottom-shadow {
 	box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.05);
 }
+
+.landing-bg {
+	background-image: url('/assets/landing.png');
+	background-size: cover;
+}

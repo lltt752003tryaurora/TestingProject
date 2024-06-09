@@ -6,7 +6,7 @@ router.post("/login", authController.login);
 // signup
 router.post("/signup", authController.signup);
 // refresh token
-router.post("/refresh-token", authController.tokenRefresh);
+router.post("/refreshToken", authController.refreshToken);
 // api logout
 router.post("/logout", authController.logout);
 

@@ -1,9 +1,8 @@
 const jwt = require("jsonwebtoken");
 
-
 module.exports = {
     createRefreshToken: (data) => {
-        let token = jwt.sign({ data }, "KOBIMAT", {
+        let token = jwt.sign({ data }, "REFRESH_TOKEN_SECRET", {
             algorithm: "HS256",
             expiresIn: "7d",
         });
@@ -12,24 +11,24 @@ module.exports = {
 
     checkRefreshToken: (token) => {
         try {
-            const decoded = jwt.verify(token, "KOBIMAT");
+            const decoded = jwt.verify(token, "REFRESH_TOKEN_SECRET");
             return null; // Không có lỗi, trả về null
         } catch (error) {
             return error; // Trả về lỗi nếu có
         }
     },
 
-    createToken: (data) => {
-        let token = jwt.sign({ data }, "BIMAT", {
+    createAccessToken: (data) => {
+        let token = jwt.sign({ data }, "ACCESS_TOKEN_SECRET", {
             algorithm: "HS256",
-            expiresIn: "5s",
+            expiresIn: "30m",
         });
         return token;
     },
 
-    checkToken: (token) => {
+    checkAccessToken: (token) => {
         try {
-            jwt.verify(token, "BIMAT");
+            jwt.verify(token, "ACCESS_TOKEN_SECRET");
             return null; // Không có lỗi, trả về null
         } catch (error) {
             return error; // Trả về lỗi nếu có
@@ -42,26 +41,24 @@ module.exports = {
 
     getUserFromToken: (token) => {
         try {
-            const decoded = jwt.verify(token, "BIMAT");
+            const decoded = jwt.verify(token, "ACCESS_TOKEN_SECRET");
             return decoded.data;
         } catch (error) {
             return null;
         }
     },
 
-    verifyToken: (req, res, next) => {
-        let { token } = req.headers;
-
-        let checkTokenVerify = checkToken(token);
+    verifyToken: (accessToken) => {
+        let checkTokenVerify = module.exports.checkAccessToken(accessToken);
         if (checkTokenVerify === null) {
-            req.user = getUserFromToken(token);
-            next();
+            return {
+                valid: true,
+            };
         } else {
-            if (checkTokenVerify.name === "TokenExpiredError") {
-                res.status(401).send("Token expired");
-            } else {
-                res.status(401).send("Invalid token");
-            }
+            return {
+                valid: false,
+                error: checkTokenVerify.name === "TokenExpiredError" ? "Token expired" : "Invalid token"
+            };
         }
-    }
+    },
 };

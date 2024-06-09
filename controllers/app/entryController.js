@@ -1,15 +1,15 @@
 const controller = {}
 
-controller.entry = async (req, res, next) => {
-	res.render('landing', {title: 'Welcome', layout: 'auth'});
+controller.landing = async (req, res, next) => {
+	res.render('landing', {title: 'Welcome', hideHeader: true});
 }
 
 controller.login = async (req, res, next) => {
-	res.render('login', {title: 'Login', layout: 'auth'});
+	res.render('login', {title: 'Login', hideHeader: true});
 }
 
 controller.signup = async (req, res, next) => {
-	res.render('signup', {title: 'Sign Up', layout: 'auth'});
+	res.render('signup', {title: 'Sign Up', hideHeader: true});
 }
 
 module.exports = controller;

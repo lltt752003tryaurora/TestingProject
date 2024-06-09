@@ -1,16 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const projectRouter = express.Router({mergeParams: true});
-const projectController = require("../../controllers/app/projectController")
 
 const isLoggedIn = (req, res, next) => {
-	if (res.locals.isLoggedIn) {
+	if (req.isLoggedIn) {
 		next();
 	}
 	else {
-		next();
-		// res.redirect('/login');
-        // res.end();
+		res.redirect('/login');
+        res.end();
 	}
 }
 

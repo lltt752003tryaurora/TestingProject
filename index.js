@@ -6,6 +6,8 @@ const app = express();
 const port = process.env.PORT || 5000;
 const expressHandlebars = require('express-handlebars');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const isLoggedIn = require("./middlewares/auth.js")
 
 // config public static folder => express will return Free Template
 app.use(express.static(__dirname + '/public'))
@@ -26,8 +28,11 @@ app.engine("hbs", expressHandlebars.engine({
 }))
 app.set("view engine", "hbs");
 
+app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(isLoggedIn)
+
 
 // routes
 // app.use("/", require('./routes/indexRouter.js'))

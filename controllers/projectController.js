@@ -17,7 +17,7 @@ const controller = {
                         attributes: [],
                         as: 'members'
                     }],
-                    attributes: ['id']
+                    attributes: ['id', 'name', 'updatedAt']
                 });
                 if (projects) {
                     res.send(projects);

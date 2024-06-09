@@ -14,12 +14,13 @@ const controller = {
                     include: [{
                         model: db.ProjectMember,
                         where: { userId: req.user.id },
-                        attributes: []
+                        attributes: [],
+                        as: 'members'
                     }],
                     attributes: ['id']
                 });
                 if (projects) {
-                    res.send(projects.toJSON());
+                    res.send(projects);
                 } else {
                     res.status(404).send({
                         message: 'Projects not found.'

@@ -6,10 +6,11 @@ const {
 module.exports = (sequelize, DataTypes) => {
   class Project extends Model {
     static associate(models) {
-      this.belongsToMany(models.User, { through: models.ProjectMember, foreignKey: 'projectId', as: 'members' });
+      // this.belongsToMany(models.User, { through: models.ProjectMember, foreignKey: 'projectId', as: 'members' });
       // this.hasMany(models.Requirement, { foreignKey: 'projectId', as: 'requirements' });
       this.hasMany(models.Release, { foreignKey: 'projectId', as: 'releases' });
       this.hasMany(models.Module, { foreignKey: 'projectId', as: 'modules' });
+      this.hasMany(models.ProjectMember, { foreignKey: 'projectId', as: 'members' });
       // this.hasMany(models.TestPlan, { foreignKey: 'projectId', as: 'testPlans' });
       // this.hasMany(models.TestCase, { foreignKey: 'projectId', as: 'testCases' });
       // this.hasMany(models.TestRun, { foreignKey: 'projectId', as: 'testRuns' });

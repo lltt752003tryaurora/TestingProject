@@ -178,15 +178,15 @@
                 >
                   <thead>
                     <tr>
-                      <th>Name testcase</th>
+                      <th>Name</th>
                       <th>Type</th>
                       <th>Description</th>
-                      <th>Hour Test</th>
-                      <th>Start date</th>
-                      <th>Cost($)</th>
+                      <th>Detail</th>
+                      <th>Created At</th>
+                      <th>Test plan</th>
                     </tr>
                   </thead>
-                  <tfoot>
+                  {{!-- <tfoot>
                     <tr>
                       <th>Name</th>
                       <th>Position</th>
@@ -195,9 +195,9 @@
                       <th>Start date</th>
                       <th>Salary</th>
                     </tr>
-                  </tfoot>
+                  </tfoot> --}}
                   <tbody id="tbodyTestCase">
-                    <tr>
+                    {{!-- <tr>
                       <td>Jennifer Acosta</td>
                       <td>Junior Javascript Developer</td>
                       <td>Edinburgh</td>
@@ -220,7 +220,7 @@
                       <td>47</td>
                       <td>2011/03/21</td>
                       <td>356,250</td>
-                    </tr>
+                    </tr> --}}
                   </tbody>
                 </table>
               </div>
@@ -305,6 +305,51 @@
 <!-- Custom scripts for all pages-->
 <script src="/js/sb-admin-2.min.js"></script>
 <script src="/js/AddTest.js"></script>
+
+
+<script>
+  const loadTable = (testCases) => {
+    const table = document.getElementById('tbodyTestCase');
+    const projectId = {{ projectId }};
+
+    testCases.forEach(testCase => {
+      const row = document.createElement("tr");
+      const name = document.createElement("td");
+      const type = document.createElement("td");
+      const description = document.createElement("td");
+      const detail = document.createElement("td");
+      const createdAt = document.createElement("td");
+      const testPlan = document.createElement("td");
+
+      name.innerText = testCase.name;
+      type.innerText = testCase.type;
+      description.innerText = testCase.description;
+      detail.innerText = testCase.detail;
+      createdAt.innerText = new Date(testCase.createdAt);
+      testPlan.innerHTML = `<a href="/project/${projectId}/test_plan/">${testCase.testPlanId}</a>`;
+
+      row.appendChild(name);
+      row.appendChild(type);
+      row.appendChild(description);
+      row.appendChild(detail);
+      row.appendChild(createdAt);
+      row.appendChild(testPlan);
+
+      table.appendChild(row);
+    });
+  }
+
+  const projectId = {{ projectId }};
+  axios.get(`/api/projects/${projectId}/testCases`)
+    .then((response) => {
+      const { testCases } = response.data;
+      loadTable(testCases);
+    })
+    .catch((err) => {
+      console.log(err);
+    })
+</script>
+
 <!-- Page level plugins -->
 <script src="/js/datatables/jquery.dataTables.min.js"></script>
 <script src="/js/datatables/dataTables.bootstrap4.min.js"></script>

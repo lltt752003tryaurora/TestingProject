@@ -104,7 +104,7 @@ const controller = {
 
     getProjectMembers: [
         isUserProjectMember,
-        isUserManager,
+        isUserManagerOrTester,
         async (req, res) => {
             const { projectId } = req.params;
             try {
@@ -127,7 +127,7 @@ const controller = {
 
     getProjectReleases: [
         isUserProjectMember,
-        isUserManager,
+        isUserManagerOrTester,
         async (req, res) => {
             const { projectId } = req.params;
             const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
@@ -178,7 +178,7 @@ const controller = {
 
     getProjectTestPlans: [
         isUserProjectMember,
-        isUserManager,
+        isUserManagerOrTester,
         async (req, res) => {
             const { projectId } = req.params;
             const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
@@ -227,7 +227,7 @@ const controller = {
 
     getProjectModules: [
         isUserProjectMember,
-        isUserManager,
+        isUserManagerOrTester,
         async (req, res) => {
             const { projectId } = req.params;
             const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
@@ -277,7 +277,7 @@ const controller = {
 
     getProjectTestCases: [
         isUserProjectMember,
-        isUserManager,
+        isUserManagerOrTester,
         async (req, res) => {
             const { projectId } = req.params;
             const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
@@ -338,7 +338,7 @@ const controller = {
 
     getProjectTestRuns: [
         isUserProjectMember,
-        isUserManager,
+        isUserManagerOrTester,
         async (req, res) => {
         const { projectId } = req.params;
         const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));

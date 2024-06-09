@@ -1,0 +1,102 @@
+{{#> modal }}
+<div class="d-flex flex-column p-4 gap-4">
+  <div class="d-flex align-items-center justify-content-between">
+    <div class="fw-semibold text-gray fs-3">
+      Create new Requirement
+    </div>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  </div>
+
+  
+  <form id="create-requirement-form" class="needs-validation" onsubmit="return createRequirement(event)" novalidate>
+    <div class="mb-3">
+      <label for="name" class="form-label text-gray">Requirement Name</label>
+      <input type="text" class="form-control" id="name" placeholder="Foobar" required>
+      <div class="invalid-feedback">
+        Please provide a valid name.
+      </div>
+    </div>
+    <div class="mb-3">
+      <label for="description" class="form-label text-gray">Requirement Description</label>
+      <textarea class="form-control" id="description" rows="5" placeholder="Something about this requirement..."></textarea>
+    </div>
+    <div class="d-flex align-items-center justify-content-center gap-3">
+      <button type="submit" class="btn btn-primary">Create</button>
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+    </div>
+  </form>
+  
+</div>
+{{/modal}}
+
+<main class="d-flex h-100 overflow-hidden">
+  {{>sidebar}}
+  <div id="content" class="h-100 overflow-auto p-4" style="width: 80%; ">
+    <button type="button" class="btn btn-success d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modal">
+      <img src="/assets/add.png" alt="#" height="30px">
+      <div>Add Requirements</div>
+    </button>
+
+    <div class="d-flex justify-content-between py-3">
+      <div class="d-flex gap-1">
+        <button class="btn p-0">
+          <img src="/assets/view_grid.png" height="30px" />
+        </button>
+        <button class="btn p-0">
+          <img src="/assets/view_details.png" height="30px" />
+        </button>
+      </div>
+      <div class="d-flex gap-1">
+        <div class="input-group">
+          <input type="text" class="rounded-pill form-control" id="search" placeholder="Search"/>
+          <label for="search" class="position-absolute end-0 pe-2 me-0 d-flex align-items-center h-100" style="z-index: 1000;">
+            <img src="/assets/search.png" height="20px"/>
+          </label>
+        </div>
+        <button class="btn p-0">
+          <img src="/assets/filter.png" height="30px" />
+        </button>
+        <button class="btn p-0">
+          <img src="/assets/sort.png" height="30px" />
+        </button>
+      </div>
+    </div>
+
+    <div id="content-empty">
+      <div class="d-flex flex-column align-items-center justify-content-center mt-5">
+        <img src="/assets/empty_box.png" height="140px" width="140px" />
+        <div class="fw-semibold fs-2" style="color: #9FAAC0">It’s empty. Create something new</div>
+      </div>
+    </div>
+
+    <div id="requirements" class="d-flex flex-column gap-2">
+      <!-- <div class="d-flex flex-column bg-white rounded bottom-shadow ps-4 pe-2 py-3">
+        <div class="d-flex justify-content-between align-items-center pb-2">
+          <div class="text-gray fw-semibold fs-5">
+            Requirements #1
+          </div>
+          <div class="d-flex gap-1">
+            <button class="btn p-0">
+              <img src="/assets/url.png" height="20px" />
+            </button>
+            <button class="btn p-0">
+              <img src="/assets/edit.png" height="20px" />
+            </button>
+            <button class="btn p-0">
+              <img src="/assets/trash.png" height="20px" />
+            </button>
+            <button class="btn p-0">
+              <img src="/assets/more.png" height="20px" />
+            </button>
+          </div>
+        </div>
+        <div class="text-secondary"> 
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Vel sunt consequatur, culpa doloremque veritatis nesciunt ab natus placeat. Nulla magni accusamus saepe minima fuga nobis, rem velit porro unde quia!
+        </div>
+      </div> -->
+    </div>
+
+  </div>
+</main>
+
+<script src="/js/requirements.js"></script>

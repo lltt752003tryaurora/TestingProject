@@ -14,7 +14,7 @@ const controller = {
     login: async (req, res) => {
         try {
             let { username, pass_word } = req.body;
-            let checkUser = await model.user.findOne({
+            let checkUser = await model.User.findOne({
                 where: {
                     username,
                 },
@@ -54,7 +54,7 @@ const controller = {
         try {
             let { fullname, username, pass_word } = req.body;
 
-            let check_username = await model.user.findOne({
+            let check_username = await model.User.findOne({
                 where: {
                     username,
                 },
@@ -97,7 +97,7 @@ const controller = {
 
             let accessToken = decodeToken(token);
 
-            let getUser = await model.user.findOne({
+            let getUser = await model.User.findOne({
                 where: {
                     id: accessToken.data.id,
                 },
@@ -131,13 +131,13 @@ const controller = {
 
             let accessToken = decodeToken(token);
 
-            let getUser = await model.user.findOne({
+            let getUser = await model.User.findOne({
                 where: {
                     id: accessToken.data.id,
                 },
             });
 
-            await model.user.update(
+            await model.User.update(
                 { ...getUser.dataValues, refreshToken: "" },
                 {
                     where: {

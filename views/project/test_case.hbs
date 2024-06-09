@@ -1,0 +1,318 @@
+{{#> modal }}
+{{/modal}}
+
+<main class="d-flex h-100 overflow-hidden">
+  {{>sidebar}}
+  <div id="content" class="h-100 overflow-auto p-4" style="width: 80%; ">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-lg-8">
+          <!-- Table data -->
+          <h1 class="h3 mb-3 text-gray-800">All Tests</h1>
+          
+
+          <!-- DataTales Example -->
+          <div class="card shadow mb-4">
+            <div
+              class="card-header py-3 d-flex align-items-center justify-content-between"
+            >
+              <h6 class="m-0 font-weight-bold text-primary">
+                Test cases
+              </h6>
+              <div class="action-button">
+                <button
+                  type="button"
+                  class="btn btn-primary"
+                  data-bs-toggle="modal"
+                  data-bs-target="#staticBackdrop"
+                >
+                  Click here to add test case
+                </button>
+
+                <!-- Modal -->
+                <div
+                  class="modal fade"
+                  id="staticBackdrop"
+                  data-bs-backdrop="static"
+                  data-bs-keyboard="false"
+                  tabindex="-1"
+                  aria-labelledby="staticBackdropLabel"
+                  aria-hidden="true"
+                >
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h1
+                          class="modal-title fs-5"
+                          id="staticBackdropLabel"
+                        >
+                          Test Case
+                        </h1>
+                        <button
+                          type="button"
+                          class="btn-close"
+                          data-bs-dismiss="modal"
+                          aria-label="Close"
+                        ></button>
+                      </div>
+                      <div class="modal-body">
+                        <form id="formTestCase">
+                          <div class="row">
+                            <div class="col-6 form-group">
+                              <label for="">Name test case</label>
+                              <span class="text-danger">*</span>
+                              <input
+                                type="text"
+                                class="form-control"
+                                id="txtName"
+                              />
+                              <p
+                                class="text-danger py-2 mb-0"
+                                id="notiName"
+                              ></p>
+                            </div>
+                            <div class="col-6 form-group">
+                              <label for="">Hour test</label>
+                              <span class="text-danger">*</span>
+                              <input
+                                type="number"
+                                class="form-control"
+                                id="txtHour"
+                              />
+                              <p
+                                class="text-danger py-2 mb-0"
+                                id="notiHour"
+                              ></p>
+                            </div>
+                            <div class="col-6 form-group">
+                              <label for="">Description</label>
+                              <span class="text-danger">*</span>
+                              <input
+                                type="text"
+                                class="form-control"
+                                id="txtDes"
+                              />
+                              <p
+                                class="text-danger py-2 mb-0"
+                                id="notiDes"
+                              ></p>
+                            </div>
+                            <div class="col-6 form-group">
+                              <label for="">Type</label>
+                              <span class="text-danger">*</span>
+                              <select
+                                name=""
+                                id="txtType"
+                                class="form-control"
+                              >
+                                <option value="">
+                                  Choose type you want
+                                </option>
+                                <option value="T1">Acceptance</option>
+                                <option value="T2">Can Edit</option>
+                                <option value="T3">Only view</option>
+                                <option value="T4">Deny Access</option>
+                              </select>
+                              <p
+                                class="text-danger py-2 mb-0"
+                                id="notiType"
+                              ></p>
+                            </div>
+                            <div class="col-6 form-group">
+                              <label for="">Start date</label>
+                              <span class="text-danger">*</span>
+                              <input
+                                type="date"
+                                class="form-control"
+                                id="txtDate"
+                              />
+                              <p
+                                class="text-danger py-2 mb-0"
+                                id="notiDate"
+                              ></p>
+                            </div>
+                            <div class="col-6 form-group">
+                              <label for="">Cost ($)</label>
+                              <span class="text-danger">*</span>
+                              <input
+                                type="number"
+                                class="form-control"
+                                id="txtCost"
+                              />
+                              <p
+                                class="text-danger py-2 mb-0"
+                                id="notiCost"
+                              ></p>
+                            </div>
+                          </div>
+                        </form>
+                      </div>
+                      <div class="modal-footer">
+                        <button
+                          type="button"
+                          class="btn btn-secondary"
+                          data-bs-dismiss="modal"
+                        >
+                          Close
+                        </button>
+                        <button
+                          id="btnAddTest"
+                          type="button"
+                          class="btn btn-primary"
+                        >
+                          Add Test Case
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table
+                  class="table table-bordered"
+                  id="dataTable"
+                  width="100%"
+                  cellspacing="0"
+                >
+                  <thead>
+                    <tr>
+                      <th>Name testcase</th>
+                      <th>Type</th>
+                      <th>Description</th>
+                      <th>Hour Test</th>
+                      <th>Start date</th>
+                      <th>Cost($)</th>
+                    </tr>
+                  </thead>
+                  <tfoot>
+                    <tr>
+                      <th>Name</th>
+                      <th>Position</th>
+                      <th>Office</th>
+                      <th>Age</th>
+                      <th>Start date</th>
+                      <th>Salary</th>
+                    </tr>
+                  </tfoot>
+                  <tbody id="tbodyTestCase">
+                    <tr>
+                      <td>Jennifer Acosta</td>
+                      <td>Junior Javascript Developer</td>
+                      <td>Edinburgh</td>
+                      <td>43</td>
+                      <td>2013/02/01</td>
+                      <td>75,650</td>
+                    </tr>
+                    <tr>
+                      <td>Cara Stevens</td>
+                      <td>Sales Assistant</td>
+                      <td>New York</td>
+                      <td>46</td>
+                      <td>2011/12/06</td>
+                      <td>145,600</td>
+                    </tr>
+                    <tr>
+                      <td>Hermione Butler</td>
+                      <td>Regional Director</td>
+                      <td>London</td>
+                      <td>47</td>
+                      <td>2011/03/21</td>
+                      <td>356,250</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="card shadow mb-4">
+            <div class="card-header py-3">
+              <h6 class="m-0 font-weight-bold text-primary">
+                Recently Activity <i class="fa-solid fa-clock"></i>
+              </h6>
+            </div>
+            <div class="card-body">
+              <!-- <a href="#" class="btn btn-primary btn-icon-split">
+                <span class="icon text-white-50">
+                  <i class="fas fa-flag"></i>
+                </span>
+                <span class="text">Split Button Primary</span>
+              </a> -->
+              <div class="my-2"></div>
+              <a href="#" class="btn p-0 btn-success btn-icon-split">
+                <span class="icon text-white-50">
+                  <i class="fas fa-check"></i>
+                </span>
+                <span class="text text-white"><b>Jira Task 1</b> is created</span>
+              </a>
+              <!-- <div class="my-2"></div>
+              <a href="#" class="btn btn-info btn-icon-split">
+                <span class="icon text-white-50">
+                  <i class="fas fa-info-circle"></i>
+                </span>
+                <span class="text">Split Button Info</span>
+              </a> -->
+              <div class="my-2"></div>
+              <a href="#" class="btn p-0 btn-warning btn-icon-split">
+                <span class="icon text-white-50">
+                  <i class="fas fa-exclamation-triangle"></i>
+                </span>
+                <span class="text text-white"
+                  ><b>Jira Task 2</b> is waiting for complete</span
+                >
+              </a>
+              <div class="my-2"></div>
+              <a href="#" class="btn p-0 btn-danger btn-icon-split">
+                <span class="icon text-white-50">
+                  <i class="fas fa-trash"></i>
+                </span>
+                <span class="text text-white"><b>Jira Task 3</b> is deleted</span>
+              </a>
+              <div class="my-2"></div>
+              <a href="#" class="btn p-0 btn-secondary btn-icon-split">
+                <span class="icon text-white-50">
+                  <i class="fa-solid fa-skull"></i>
+                </span>
+                <span class="text text-white"><b>Jira Task 4</b> is banned</span>
+              </a>
+              <!-- <div class="my-2"></div>
+              <a href="#" class="btn btn-light btn-icon-split">
+                <span class="icon text-gray-600">
+                  <i class="fa-solid fa-skull"></i>
+                </span>
+                <span class="text">Split Button Light</span>
+              </a> -->
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+
+<!-- Bootstrap core JavaScript-->
+<script src="/js/jquery/jquery.min.js"></script>
+
+<!-- Core plugin JavaScript-->
+<script src="/js/jquery/jquery.easing.min.js"></script>
+
+<!-- Custom scripts for all pages-->
+<script src="/js/sb-admin-2.min.js"></script>
+<script src="/js/AddTest.js"></script>
+<!-- Page level plugins -->
+<script src="/js/datatables/jquery.dataTables.min.js"></script>
+<script src="/js/datatables/dataTables.bootstrap4.min.js"></script>
+
+<!-- Page level custom scripts -->
+<script>
+$(document).ready(function() {
+  $('#dataTable').DataTable();
+});
+</script>
+<script src="/js/validation/validation.js"></script>

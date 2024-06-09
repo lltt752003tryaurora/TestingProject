@@ -1,0 +1,297 @@
+{{#> modal }}
+{{/modal}}
+
+<main class="d-flex h-100 overflow-hidden">
+  {{>sidebar}}
+  <div id="content" class="h-100 overflow-auto p-4" style="width: 80%; ">
+    <!-- Main content wrapper -->
+    <div class="container-fluid m-2">
+      <!-- Header -->
+      <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+          <a href="#" style="text-decoration: none; color: inherit;">Issues</a>
+        </h1>
+        <a
+          href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fa fa-download fa-sm text-white-50"></i> Generate Report</a>
+      </div>
+
+      <!-- Main content -->
+
+      <!-- Content row: Search bar -->
+      <div class="row justify-content-end my-2">
+        <div class="col-auto">
+          <div class="input-group">
+            <div class="form-outline">
+              <input type="search" id="search-input" class="form-control" placeholder="Search" />
+            </div>
+            <button type="button" class="btn btn-primary">
+              <i id="search-btn" class="fa fa-search"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content Row: Filter buttons -->
+      <div class="row justify-content-end my-2">
+        <div class="col-auto">
+          <button id="filter-open" type="button" class="btn btn-primary">Open</button>
+          <button id="filter-closed" type="button" class="btn btn-secondary">Closed</button>
+          <button id="filter-low" type="button" class="btn btn-success">Low</button>
+          <button id="filter-medium" type="button" class="btn btn-warning">Medium</button>
+          <button id="filter-high" type="button" class="btn btn-danger">High</button>
+        </div>
+      </div>
+
+      <!-- Content Row: Issues table -->
+      <div class="row my-2">
+        <table class="table table-striped table-bordered table-hover" cellspacing="0" width="100%">
+          <thead>
+            <tr>
+              <td style="text-align: center;">Select</td>
+              <td style="text-align: center;">ID</td>
+              <td style="text-align: center;">Title</td>
+              <td style="text-align: center;">Created by</td>
+              <td style="text-align: center;">Assigned to</td>
+              <td style="text-align: center;">Status</td>
+              <td style="text-align: center;">Priority</td>
+              <td style="text-align: center;">Created Date</td>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script src="/js/issue.js"></script>
+<script>
+  let tableRows = [];
+  let users = [];
+  const filter = {
+    enableOpen: true,
+    enableClosed: true,
+    enableLow: true,
+    enableMedium: true,
+    enableHigh: true,
+    searchStr: ""
+  };
+
+  const btnStyles = {
+    open: {
+      enabled: ["btn", "btn-primary"],
+      disabled: ["btn", "btn-outline-primary"],
+    },
+    closed: {
+      enabled: ["btn", "btn-secondary"],
+      disabled: ["btn", "btn-outline-secondary"],
+    },                
+    low: {
+      enabled: ["btn", "btn-success"],
+      disabled: ["btn", "btn-outline-success"],
+    },                
+    medium: {
+      enabled: ["btn", "btn-warning"],
+      disabled: ["btn", "btn-outline-warning"],
+    },                
+    high: {
+      enabled: ["btn", "btn-danger"],
+      disabled: ["btn", "btn-outline-danger"],
+    },
+  };
+
+  // Filter open issues element
+  const openBtnEle = document.getElementById("filter-open");
+  openBtnEle.addEventListener("click", () => {
+    filter.enableOpen = !filter.enableOpen;
+    if (filter.enableOpen === true) {
+      openBtnEle.classList.remove(...btnStyles.open.disabled);
+      openBtnEle.classList.add(...btnStyles.open.enabled);
+    } else if (filter.enableOpen === false) {
+      openBtnEle.classList.remove(...btnStyles.open.enabled);
+      openBtnEle.classList.add(...btnStyles.open.disabled);
+    }
+    renderTable();
+  });
+
+  // Filter closed issues element
+  const closedBtnEle = document.getElementById("filter-closed");
+  closedBtnEle.addEventListener("click", () => {
+    filter.enableClosed = !filter.enableClosed;
+    if (filter.enableClosed === true) {
+      closedBtnEle.classList.remove(...btnStyles.closed.disabled);
+      closedBtnEle.classList.add(...btnStyles.closed.enabled);
+    } else if (filter.enableClosed === false) {
+      closedBtnEle.classList.remove(...btnStyles.closed.enabled);
+      closedBtnEle.classList.add(...btnStyles.closed.disabled);
+    }
+    renderTable();
+  });
+
+  // Filter low issues element
+  const lowBtnEle = document.getElementById("filter-low");
+  lowBtnEle.addEventListener("click", () => {
+    filter.enableLow = !filter.enableLow;
+    if (filter.enableLow === true) {
+      lowBtnEle.classList.remove(...btnStyles.low.disabled);
+      lowBtnEle.classList.add(...btnStyles.low.enabled);
+    } else if (filter.enableLow === false) {
+      lowBtnEle.classList.remove(...btnStyles.low.enabled);
+      lowBtnEle.classList.add(...btnStyles.low.disabled);
+    }
+    renderTable();
+  });
+
+  // Filter medium issues element
+  const mediumBtnEle = document.getElementById("filter-medium");
+  mediumBtnEle.addEventListener("click", () => {
+    filter.enableMedium = !filter.enableMedium;
+    if (filter.enableMedium === true) {
+      mediumBtnEle.classList.remove(...btnStyles.medium.disabled);
+      mediumBtnEle.classList.add(...btnStyles.medium.enabled);
+    } else if (filter.enableMedium === false) {
+      mediumBtnEle.classList.remove(...btnStyles.medium.enabled);
+      mediumBtnEle.classList.add(...btnStyles.medium.disabled);
+    }
+    renderTable();
+  });
+
+  // Filter high issues element
+  const highBtnEle = document.getElementById("filter-high");
+  highBtnEle.addEventListener("click", () => {
+    filter.enableHigh = !filter.enableHigh;
+    if (filter.enableHigh === true) {
+      highBtnEle.classList.remove(...btnStyles.high.disabled);
+      highBtnEle.classList.add(...btnStyles.high.enabled);
+    } else if (filter.enableHigh === false) {
+      highBtnEle.classList.remove(...btnStyles.high.enabled);
+      highBtnEle.classList.add(...btnStyles.high.disabled);
+    }
+    renderTable();
+  });
+
+  const searchBtnEle = document.getElementById("search-btn");
+  searchBtnEle.addEventListener("click", () => {
+    const inputEle = document.getElementById("search-input");
+    filter.searchStr = inputEle.value;
+    renderTable();
+    inputEle.value = "";
+  });
+
+  const fetchTable = async () => {
+    const resp = await fetch("/static/issues.json");
+    return await resp.json();
+  }
+
+  // Render table with data
+  const renderTable = (sort) => {
+    const tableBody = document.getElementById("table-body");
+    tableBody.innerHTML = "";
+
+    tableData = tableRows.filter((data) => {
+      if (filter.enableOpen === false && data.status_ === 'open') return false;
+      if (filter.enableClosed === false && data.status_ === 'closed') return false;
+      if (filter.enableLow === false && data.priority === 'low') return false;
+      if (filter.enableMedium === false && data.priority === 'medium') return false;
+      if (filter.enableHigh === false && data.priority === 'high') return false;
+      return (filter.searchStr.length === 0 || (data.title.toLowerCase()).includes(filter.searchStr.toLowerCase()));
+    });
+
+    tableData.forEach(data => {
+
+      // Create a new row
+      const row = document.createElement("tr");
+
+      // Create a cell for each data item
+      const checkboxCell = document.createElement("td");
+      const idCell = document.createElement("td");
+      const titleCell = document.createElement("td");
+      const createdByCell = document.createElement("td");
+      const assignedToCell = document.createElement("td");
+      const statusCell = document.createElement("td");
+      const priorityCell = document.createElement("td");
+      const createdDateCell = document.createElement("td");
+
+      // Checkbox
+      checkboxCell.style.textAlign = "center";
+
+      // Set the innerHTML of each cell
+      checkboxCell.innerHTML = `<input type="checkbox">`;
+      titleCell.textContent = data.title;
+      statusCell.textContent = data.status_;
+      priorityCell.textContent = data.priority;
+      createdDateCell.textContent = data.createdDate;
+
+      // ID
+      idCell.style.textAlign = "center";
+      const url = document.createElement("a");
+      url.innerText = data.id;
+      url.href = './issue/' + data.id + '/';
+      idCell.appendChild(url);
+
+      // Created by
+      createdByCell.style.textAlign = "center";
+      const createdByAvatar = document.createElement("img");
+      createdByAvatar.src = users[data.createdBy].avatar;
+      createdByAvatar.classList.add("rounded-circle");
+      createdByAvatar.style.maxHeight = "25px";
+      createdByCell.appendChild(createdByAvatar);
+
+      // Assigned to
+      assignedToCell.style.textAlign = "center";
+      const assignedToAvatar = document.createElement("img");
+      assignedToAvatar.src = users[data.assignedTo].avatar;
+      assignedToAvatar.classList.add("rounded-circle");
+      assignedToAvatar.style.maxHeight = "25px";
+      assignedToCell.appendChild(assignedToAvatar);
+
+      // Status
+      statusCell.style.textAlign = "center";
+      if (data.status_ === "open") {
+        statusCell.classList.add("text-primary");
+      } else if (data.status_ === "closed") {
+        statusCell.classList.add("text-secondary");
+      }
+
+      // Priority
+      priorityCell.style.textAlign = "center";
+      if (data.priority === "high") {
+        priorityCell.classList.add("text-danger");
+      } else if (data.priority === "medium") {
+        priorityCell.classList.add("text-warning");
+      } else if (data.priority === "low") {
+        priorityCell.classList.add("text-success");
+      }
+
+      // Append cells to the row
+      createdDateCell.style.textAlign = "center";
+      row.appendChild(checkboxCell);
+      row.appendChild(idCell);
+      row.appendChild(titleCell);
+      row.appendChild(createdByCell);
+      row.appendChild(assignedToCell);
+      row.appendChild(statusCell);
+      row.appendChild(priorityCell);
+      row.appendChild(createdDateCell);
+
+      // Append row to table body
+      tableBody.appendChild(row);
+    })
+  }
+
+  const populateTable = async () => {
+    const tableBody = document.getElementById("table-body");
+    const usersData = await fetchUsers();
+    const tableData = await fetchTable();
+
+    tableRows = tableData || [];
+    users = usersData || [];
+
+    renderTable();
+  }
+
+
+</script>
+
+<script>populateTable()</script>

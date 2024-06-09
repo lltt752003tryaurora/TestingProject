@@ -1,0 +1,46 @@
+{{#*inline "sidebarLink"}}
+	<a href="/project/{{projectId}}/{{href}}" class="{{#equal currentTab name}}bg-tinted-gray{{/equal}} text-decoration-none d-flex align-items-center rounded p-2" style="width: 80%;">
+		<img src="{{imgSrc}}" alt="#" height="30" class="">
+		<span class="align-middle text-gray fw-semibold px-1">
+			{{name}}
+		</span>
+	</a>
+{{/inline}}
+
+<div id="sidebar" class="overflow-auto border border-top-0 border-start-0 border-bottom-0 border-3" style="width: 20%; ">
+	<a href="/project" id="project-info" class="sticky-top text-decoration-none d-flex bottom-shadow bg-white">
+		<div class="d-flex align-items-center justify-content-between w-100 p-4 px-3">
+			<div class="d-flex align-items-center gap-2">
+				<div class="bg-divisor-gray rounded">
+					<img src="/assets/project_placeholder.png" height="32px" alt="Project Image">
+				</div>
+				<div class="d-flex flex-column lh-sm">
+					<div class="fw-semibold text-gray fs-5">
+						Project 1
+					</div>
+					<div class="text-secondary fs-6">
+						Subtitle
+					</div>
+				</div>
+			</div>
+			<div>
+				<img src="/assets/down_arrow.png" alt="Change project" height="20px">
+			</div>
+		</div>
+	</a>
+	<div id="tabs" class="h-100 overflow-auto d-flex gap-4 py-4 flex-column align-items-center justify-content-center">
+
+		{{> sidebarLink href="dashboard" imgSrc="/assets/dashboard.png" name="Dashboard"}}
+		{{> sidebarLink href="requirement" imgSrc="/assets/requirements.png" name="Requirements"}}
+		{{> sidebarLink href="module" imgSrc="/assets/modules.png" name="Modules"}}
+		{{> sidebarLink href="release" imgSrc="/assets/releases.png" name="Releases"}}
+
+		<div class="bg-divisor-gray rounded-pill" style="height: 3px; width: 80%;"></div>
+
+		{{> sidebarLink href="test_case" imgSrc="/assets/test_cases.png" name="Test Cases"}}
+		{{> sidebarLink href="test_plan" imgSrc="/assets/test_plans.png" name="Test Plans"}}
+		{{> sidebarLink href="test_run" imgSrc="/assets/test_runs.png" name="Test Runs"}}
+		{{> sidebarLink href="issue" imgSrc="/assets/issues.png" name="Issues"}}
+		
+	</div>
+</div>

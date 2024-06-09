@@ -1,0 +1,27 @@
+.text-gray {
+	color: #4D5E80;
+}
+
+.bg-divisor-gray {
+	background-color: #EDEFF2;
+}
+
+.bg-tinted-gray {
+	background-color: #DCE3EE;
+}
+
+.bg-dimmed-white {
+	background-color: #F7F8FA;
+}
+
+html, body {
+	background-color: #F7F8FA;
+	height: 100%;
+}
+
+main {
+}
+
+.bottom-shadow {
+	box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.05);
+}

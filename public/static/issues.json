@@ -1,0 +1,72 @@
+[
+  {
+    "id": "1",
+    "url": "/issues/1//index.html",
+    "title": "Icon overlay error",
+    "createdBy": 1,
+    "assignedTo": 0,
+    "status_": "open",
+    "priority": "high",
+    "createdDate": "24/03/2024"
+  },
+  {
+    "id": "2",
+    "url": "/issues/2//index.html",
+    "title": "Buffer overflow vulnerability",
+    "createdBy": 1,
+    "assignedTo": 0,
+    "status_": "open",
+    "priority": "medium",
+    "createdDate": "24/03/2024"
+  },
+  {
+    "id": "3",
+    "url": "/issues/3//index.html",
+    "title": "Error displaying Vietnamese text",
+    "createdBy": 1,
+    "assignedTo": 0,
+    "status_": "closed",
+    "priority": "low",
+    "createdDate": "24/03/2024"
+  },
+  {
+    "id": "4",
+    "url": "/issues/4//index.html",
+    "title": "Memory leak in application",
+    "createdBy": 1,
+    "assignedTo": 0,
+    "status_": "open",
+    "priority": "high",
+    "createdDate": "25/03/2024"
+  },
+  {
+    "id": "5",
+    "url": "/issues/5//index.html",
+    "title": "Cross-site scripting vulnerability",
+    "createdBy": 1,
+    "assignedTo": 0,
+    "status_": "open",
+    "priority": "medium",
+    "createdDate": "25/03/2024"
+  },
+  {
+    "id": "6",
+    "url": "/issues/6//index.html",
+    "title": "Authentication bypass vulnerability",
+    "createdBy": 1,
+    "assignedTo": 0,
+    "status_": "closed",
+    "priority": "low",
+    "createdDate": "26/03/2024"
+  },
+  {
+    "id": "7",
+    "url": "/issues/7//index.html",
+    "title": "Database connection timeout",
+    "createdBy": 1,
+    "assignedTo": 0,
+    "status_": "open",
+    "priority": "high",
+    "createdDate": "26/03/2024"
+  }
+]

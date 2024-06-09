@@ -6,6 +6,34 @@ const PAGE_LIMIT = 10;
 const { isUserProjectMember, isUserManager } = require('./filters/projectRoleFilters');
 
 const controller = {
+    getProjectList: [
+        async (req, res) => {
+            const { page, size } = req.params;
+            try {
+                const projects = await db.Project.findAll({
+                    include: [{
+                        model: db.ProjectMember,
+                        where: { userId: req.user.id },
+                        attributes: []
+                    }],
+                    attributes: ['id']
+                });
+                if (projects) {
+                    res.send(projects.toJSON());
+                } else {
+                    res.status(404).send({
+                        message: 'Projects not found.'
+                    });
+                }
+            } catch (error) {
+                console.error('Error retrieving project:', error);
+                res.status(500).send({
+                    message: 'Internal server error.'
+                });
+            }
+        }
+    ],
+
     getProjectById: [
         isUserProjectMember,
         async (req, res) => {

@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const projectController = require('../controllers/projectController');
 
+router.get('/', projectController.getProjectList);
+
 router.get('/:projectId', projectController.getProjectById);
 
 router.get('/:projectId/members', projectController.getProjectMembers);

@@ -20,7 +20,7 @@ const controller = {
                 },
             });
             if (checkUser) {
-                if (bcrypt.compareSync(pass_word, checkUser.pass_word)) {
+                if (bcrypt.compareSync(pass_word, checkUser.hashedPassword)) {
                     console.log(checkUser);
                     let key = new Date().getTime();
                     let token = createToken({ id: checkUser.id, key });

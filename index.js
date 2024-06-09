@@ -23,6 +23,9 @@ app.engine("hbs", expressHandlebars.engine({
             if (a == b) {
               return options.fn(this);
             }
+        },
+        rawHelper: function(options) {
+            return options.fn();
         }
     }
 }))

@@ -6,6 +6,10 @@ router.get('/', projectController.getProjectList);
 
 router.get('/:projectId', projectController.getProjectById);
 
+router.get('/:projectId/activity', projectController.getProjectActivity);
+
+router.get('/:projectId/summary', projectController.getProjectSummary);
+
 router.get('/:projectId/members', projectController.getProjectMembers);
 
 router.get('/:projectId/releases', projectController.getProjectReleases);

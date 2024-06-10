@@ -20,12 +20,25 @@
           <div type="button" class=" p-0" data-bs-toggle="dropdown" aria-expanded="false">
             <img src="/assets/avatar.png" alt="Logo" height="32" class="d-inline-block align-text-top">
           </div>
-          <ul class="dropdown-menu dropdown-menu-end">
-            <li><button class="dropdown-item" type="button">Profile</button></li>
-            <li><button class="dropdown-item" type="button">Log Out</button></li>
+          <ul class="dropdown-menu dropdown-menu-end bg-dimmed-white">
+            {{!-- <li><button class="dropdown-item" type="button">Profile</button></li> --}}
+            <li>
+              <button class="dropdown-item" type="button" onClick="logout()">
+                Log Out
+              </button>
+            </li>
           </ul>
         </div>
       </div>
     </div>
   </nav>
 </header>
+
+<script>
+function logout() {
+  axios.post('/api/auth/logout').then(res => {
+    document.cookie = 'accessToken=; Max-Age=-99999999;';  
+    window.location.replace("/login");
+  });
+}
+</script>

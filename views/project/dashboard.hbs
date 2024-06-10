@@ -57,76 +57,49 @@
               Status
             </div>
             <div id="progress" class="d-flex align-items-center">
-              <div>
+              <div id="progress-pie" class="d-none">
                 <div class="position-relative" style="width:150px; height: 150px;">
                   <canvas id="progress-pie-chart" width="150px" height="150px" class="position-absolute top-0">
                   </canvas>
                   <div class="d-flex fs-1 fw-bold text-gray align-items-center w-100 h-100 mx-auto">
-                    <div class="mx-auto" id="progress-pie-label">40%</div>
+                    <div class="mx-auto" id="progress-pie-label">0%</div>
                   </div>
                 </div>
               </div>
               <div class="d-flex p-3 gap-5 flex-wrap">
                 <div class="d-flex flex-column lh-1">
                   <div class="text-gray fs-5">
-                    Passed
+                    Test Cases
                   </div>
-                  <div id="status-passed" class="fw-bold text-gray fs-4">
-                    17
-                  </div>
-                </div>
-
-                <div class="d-flex flex-column lh-1">
-                  <div class="text-gray fs-5">
-                    Untested
-                  </div>
-                  <div id="status-untested" class="fw-bold text-gray fs-4">
-                    17
+                  <div id="status-cases" class="fw-bold text-gray fs-4">
+                    ...
                   </div>
                 </div>
 
                 <div class="d-flex flex-column lh-1">
                   <div class="text-gray fs-5">
-                    Blocked
+                    Test Runs
                   </div>
-                  <div id="status-blocked" class="fw-bold text-gray fs-4">
-                    17
-                  </div>
-                </div>
-
-                <div class="d-flex flex-column lh-1">
-                  <div class="text-gray fs-5">
-                    Failed
-                  </div>
-                  <div id="status-failed" class="fw-bold text-gray fs-4">
-                    17
+                  <div id="status-runs" class="fw-bold text-gray fs-4">
+                    ...
                   </div>
                 </div>
 
                 <div class="d-flex flex-column lh-1">
                   <div class="text-gray fs-5">
-                    In Process
+                    Test Plans
                   </div>
-                  <div id="status-in-process" class="fw-bold text-gray fs-4">
-                    17
-                  </div>
-                </div>
-
-                <div class="d-flex flex-column lh-1">
-                  <div class="text-gray fs-5">
-                    Hold
-                  </div>
-                  <div id="status-hold" class="fw-bold text-gray fs-4">
-                    17
+                  <div id="status-plans" class="fw-bold text-gray fs-4">
+                    ...
                   </div>
                 </div>
 
                 <div class="d-flex flex-column lh-1">
                   <div class="text-gray fs-5">
-                    Need Approval
+                    Issues
                   </div>
-                  <div id="status-need-approval" class="fw-bold text-gray fs-4">
-                    17
+                  <div id="status-issues" class="fw-bold text-gray fs-4">
+                    ...
                   </div>
                 </div>
               </div>
@@ -145,157 +118,9 @@
 
         
         <div id="right-report" style="width: 30%;">
-          <div class="bg-white rounded bottom-shadow p-3">
+          <div class="bg-white rounded bottom-shadow p-3" id="activites">
             <div class="fw-semibold text-gray fs-5">
               History
-            </div>
-
-            <div class="text-gray fs-6">
-              March 2024
-            </div>
-            <div class="py-2 d-flex flex-column">
-              <div class="d-flex align-items-center">
-                <img src="/assets/history_bottom.svg" height="60px"/>
-                <div class="border border-2 p-2 rounded lh-1 w-100"  style="border-color: #4D5E80 !important;" >
-                  <div class="text-gray fw-semibold">
-                    Lorem Ipsum
-                  </div>
-                  <div class="text-secondary fw-light fs-6">
-                    Subtitle
-                  </div>
-                </div>
-              </div>
-
-              <div class="d-flex align-items-center">
-                <img src="/assets/history_both.svg" height="60px"/>
-                <div class="border border-2 p-2 rounded lh-1 w-100"  style="border-color: #4D5E80 !important;" >
-                  <div class="text-gray fw-semibold">
-                    Lorem Ipsum
-                  </div>
-                  <div class="text-secondary fw-light fs-6">
-                    Subtitle
-                  </div>
-                </div>
-              </div>
-
-              <div class="d-flex align-items-center">
-                <img src="/assets/history_both.svg" height="60px"/>
-                <div class="border border-2 p-2 rounded lh-1 w-100"  style="border-color: #4D5E80 !important;" >
-                  <div class="text-gray fw-semibold">
-                    Lorem Ipsum
-                  </div>
-                  <div class="text-secondary fw-light fs-6">
-                    Subtitle
-                  </div>
-                </div>
-              </div>
-
-              <div class="d-flex align-items-center">
-                <img src="/assets/history_both.svg" height="60px"/>
-                <div class="border border-2 p-2 rounded lh-1 w-100"  style="border-color: #4D5E80 !important;" >
-                  <div class="text-gray fw-semibold">
-                    Lorem Ipsum
-                  </div>
-                  <div class="text-secondary fw-light fs-6">
-                    Subtitle
-                  </div>
-                </div>
-              </div>
-
-              <div class="d-flex align-items-center">
-                <img src="/assets/history_top.svg" height="60px"/>
-                <div class="border border-2 p-2 rounded lh-1 w-100"  style="border-color: #4D5E80 !important;" >
-                  <div class="text-gray fw-semibold">
-                    Lorem Ipsum
-                  </div>
-                  <div class="text-secondary fw-light fs-6">
-                    Subtitle
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            
-            <div class="text-gray fs-6">
-              February 2024
-            </div>
-            <div class="py-2 d-flex flex-column">
-              <div class="d-flex align-items-center">
-                <img src="/assets/history_none.svg" height="60px"/>
-                <div class="border border-2 p-2 rounded lh-1 w-100"  style="border-color: #4D5E80 !important;" >
-                  <div class="text-gray fw-semibold">
-                    Lorem Ipsum
-                  </div>
-                  <div class="text-secondary fw-light fs-6">
-                    Subtitle
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="text-gray fs-6">
-              January 2024
-            </div>
-            <div class="py-2 d-flex flex-column">
-              <div class="d-flex align-items-center">
-                <img src="/assets/history_bottom.svg" height="60px"/>
-                <div class="border border-2 p-2 rounded lh-1 w-100"  style="border-color: #4D5E80 !important;" >
-                  <div class="text-gray fw-semibold">
-                    Lorem Ipsum
-                  </div>
-                  <div class="text-secondary fw-light fs-6">
-                    Subtitle
-                  </div>
-                </div>
-              </div>
-
-              <div class="d-flex align-items-center">
-                <img src="/assets/history_both.svg" height="60px"/>
-                <div class="border border-2 p-2 rounded lh-1 w-100"  style="border-color: #4D5E80 !important;" >
-                  <div class="text-gray fw-semibold">
-                    Lorem Ipsum
-                  </div>
-                  <div class="text-secondary fw-light fs-6">
-                    Subtitle
-                  </div>
-                </div>
-              </div>
-
-              <div class="d-flex align-items-center">
-                <img src="/assets/history_both.svg" height="60px"/>
-                <div class="border border-2 p-2 rounded lh-1 w-100"  style="border-color: #4D5E80 !important;" >
-                  <div class="text-gray fw-semibold">
-                    Lorem Ipsum
-                  </div>
-                  <div class="text-secondary fw-light fs-6">
-                    Subtitle
-                  </div>
-                </div>
-              </div>
-
-              <div class="d-flex align-items-center">
-                <img src="/assets/history_both.svg" height="60px"/>
-                <div class="border border-2 p-2 rounded lh-1 w-100"  style="border-color: #4D5E80 !important;" >
-                  <div class="text-gray fw-semibold">
-                    Lorem Ipsum
-                  </div>
-                  <div class="text-secondary fw-light fs-6">
-                    Subtitle
-                  </div>
-                </div>
-              </div>
-
-              <div class="d-flex align-items-center">
-                <img src="/assets/history_top.svg" height="60px"/>
-                <div class="border border-2 p-2 rounded lh-1 w-100"  style="border-color: #4D5E80 !important;" >
-                  <div class="text-gray fw-semibold">
-                    Lorem Ipsum
-                  </div>
-                  <div class="text-secondary fw-light fs-6">
-                    Subtitle
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -305,5 +130,166 @@
   </div>
 </main>
 
+{{{{rawHelper}}}}
+<script id="template-activity" type="text/x-handlebars-template">
+	{{#each data}}
+    <div class="text-gray fs-6">
+      {{month}}
+    </div>
+    <div class="py-2 d-flex flex-column">
+      {{#each activities}}
+      <div class="d-flex align-items-center">
+        <img src="/assets/history_none.svg" height="60px"/>
+        <div class="border border-2 p-2 rounded lh-1 w-100"  style="border-color: #4D5E80 !important;" >
+          <div class="text-gray fw-semibold">
+            {{type}}
+          </div>
+          <div class="text-secondary fw-light fs-6">
+            {{time}}
+          </div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+    {{else}}
+    <div class="text-gray fs-6">
+      No activity
+    </div>
+	{{/each}}
+</script>
+{{{{/rawHelper}}}}
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="/js/dashboard.js"></script>
+
+<script>
+let template_activity = Handlebars.compile(document.getElementById('template-activity').innerHTML);
+
+function loadActivity() {
+	axios.get('/api/projects/{{projectId}}/activity')
+	.then(res => {
+    let acts = {};
+		res.data.forEach(pj => {
+      let month = dayjs(pj.updatedAt).startOf('month');
+      if (!acts[month]) acts[month] = [];
+      acts[month].push({
+        type: pj.type,
+        detail: pj.detail,
+        time: dayjs(pj.updatedAt).format('DD/MM/YYYY')
+      });
+		})
+
+    let tmpl = [];
+
+    for (const [key, value] of Object.entries(acts)) {
+      tmpl.push({
+        month: dayjs(key).format('MMMM YYYY'),
+        activities: value
+      })
+    }
+    let html = template_activity({
+			data: tmpl,
+		})
+		document.getElementById('activites').innerHTML += html;
+	})
+	.catch(err => {
+		console.log(err);
+	})
+}
+
+loadActivity();
+
+function loadSummary() {
+  axios.get('/api/projects/{{projectId}}/summary')
+	.then(res => {
+    let data = res.data;
+    document.getElementById('status-cases').innerHTML = data.casesCount;
+    document.getElementById('status-runs').innerHTML = data.runsCount;
+    document.getElementById('status-plans').innerHTML = data.plansCount;
+    document.getElementById('status-issues').innerHTML = data.issueCount;
+
+    if (data.ongoingRelease) {
+      let startTime = new Date(data.ongoingRelease.startDate).getTime();
+      let endTime = new Date(data.ongoingRelease.endDate).getTime();
+      let currentTime = new Date().getTime();
+
+      let pie_percent = Math.floor((currentTime - startTime) / (endTime - startTime) * 100);
+      document.getElementById('progress-pie-label').innerHTML = pie_percent + '%';
+      document.getElementById('progress-pie').classList.remove('d-none');
+
+      new Chart(document.getElementById('progress-pie-chart'), {
+        type: 'doughnut',
+        data: {
+          datasets: [{
+            data: [pie_percent, 100 - pie_percent],
+            backgroundColor: [
+              '#5D84E7',
+              '#C3CAD9',
+            ],
+            borderWidth: 0,
+            
+          }],
+        },
+        options: {
+          cutout: '80%',
+          events: [],
+          responsive: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+          }
+        }
+      });
+    }
+	})
+	.catch(err => {
+		console.log(err);
+	})
+}
+
+loadSummary();
+</script>
+
+<script>
+
+
+var ctx = document.getElementById('activity-chart');
+
+new Chart(ctx, {
+	data: {
+		datasets: [{
+			type: 'line',
+			label: 'FizzBuzz',
+			data: [],
+		}],
+		labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+	},
+	options: {
+		plugins: {
+			legend: {
+				display: false
+			},
+		}
+	}
+});
+
+//Form validation
+(() => {
+	'use strict'
+  
+	// Fetch all the forms we want to apply custom Bootstrap validation styles to
+	const forms = document.querySelectorAll('.needs-validation')
+  
+	// Loop over them and prevent submission
+	Array.from(forms).forEach(form => {
+	  form.addEventListener('submit', event => {
+		if (!form.checkValidity()) {
+		  event.preventDefault()
+		  event.stopPropagation()
+		}
+  
+		form.classList.add('was-validated')
+	  }, false)
+	})
+  })()  
+</script>

@@ -38,7 +38,7 @@
     </button>
 
     <div class="d-flex justify-content-between py-3">
-      <div class="d-flex gap-1">
+      {{!-- <div class="d-flex gap-1">
         <button class="btn p-0">
           <img src="/assets/view_grid.png" height="30px" />
         </button>
@@ -59,14 +59,7 @@
         <button class="btn p-0">
           <img src="/assets/sort.png" height="30px" />
         </button>
-      </div>
-    </div>
-
-    <div id="content-empty">
-      <div class="d-flex flex-column align-items-center justify-content-center mt-5">
-        <img src="/assets/empty_box.png" height="140px" width="140px" />
-        <div class="fw-semibold fs-2" style="color: #9FAAC0">It’s empty. Create something new</div>
-      </div>
+      </div> --}}
     </div>
 
     <div id="requirements" class="d-flex flex-column gap-2">
@@ -99,4 +92,113 @@
   </div>
 </main>
 
-<script src="/js/requirements.js"></script>
+{{{{rawHelper}}}}
+<script id="template-requirement" type="text/x-handlebars-template">
+	{{#each data}}
+    <div class="d-flex flex-column bg-white rounded bottom-shadow ps-4 pe-2 py-3">
+      <div class="d-flex justify-content-between align-items-center pb-2">
+        <div class="text-gray fw-semibold fs-5">
+          {{name}}
+        </div>
+        <div class="d-flex gap-1">
+          <button class="btn p-0">
+            <img src="/assets/url.png" height="20px" />
+          </button>
+          <button class="btn p-0">
+            <img src="/assets/edit.png" height="20px" />
+          </button>
+          <button class="btn p-0">
+            <img src="/assets/trash.png" height="20px" />
+          </button>
+          <button class="btn p-0">
+            <img src="/assets/more.png" height="20px" />
+          </button>
+        </div>
+      </div>
+      <div class="text-secondary">
+        {{description}}
+      </div>
+    </div>
+    {{else}}
+    <div id="content-empty">
+      <div class="d-flex flex-column align-items-center justify-content-center mt-5">
+        <img src="/assets/empty_box.png" height="140px" width="140px" />
+        <div class="fw-semibold fs-2" style="color: #9FAAC0">It’s empty. Create something new</div>
+      </div>
+    </div>
+	{{/each}}
+</script>
+{{{{/rawHelper}}}}
+
+<script>
+let template = Handlebars.compile(document.getElementById('template-requirement').innerHTML);
+
+function loadRequirements() {
+  axios.get('/api/projects/{{projectId}}/requirements')
+  .then(res => {
+    let html = template({
+			data: res.data.requirements,
+		})
+		document.getElementById('requirements').innerHTML += html;
+  })
+  .catch(err => {
+    console.log(err)
+  })
+}
+
+loadRequirements()
+
+function createRequirement(e) {
+	e.preventDefault()
+	e.stopPropagation()
+	var form = document.getElementById('create-requirement-form');
+	if (!form.checkValidity()) {
+		form.classList.add('was-validated')
+		return;
+	}
+	form.classList.remove('was-validated')
+
+	var myModalEl = document.getElementById('modal');
+	var modal = bootstrap.Modal.getInstance(myModalEl);
+	modal.hide();
+
+	var contentEmpty = document.getElementById('content-empty');
+	contentEmpty.classList.add("d-none");
+
+	var name = document.getElementById('name');
+	var description = document.getElementById('description');
+
+	var newEl = `
+	<div class="d-flex flex-column bg-white rounded bottom-shadow ps-4 pe-2 py-3">
+		<div class="d-flex justify-content-between align-items-center pb-2">
+			<div class="text-gray fw-semibold fs-5">
+				${name.value}
+			</div>
+			<div class="d-flex gap-1">
+				<button class="btn p-0">
+					<img src="/assets/url.png" height="20px" />
+				</button>
+				<button class="btn p-0">
+					<img src="/assets/edit.png" height="20px" />
+				</button>
+				<button class="btn p-0">
+					<img src="/assets/trash.png" height="20px" />
+				</button>
+				<button class="btn p-0">
+					<img src="/assets/more.png" height="20px" />
+				</button>
+			</div>
+		</div>
+		<div class="text-secondary">
+			${description.value}
+		</div>
+	</div>
+	`
+	//Append requirement
+	document.getElementById('requirements').innerHTML += newEl;
+
+	//Clear form
+	name.value = "";
+	description.value = "";
+}
+</script>

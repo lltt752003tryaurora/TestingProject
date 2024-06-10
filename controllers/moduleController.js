@@ -4,9 +4,17 @@ const controller = {
     getModuleById: async (req, res) => {
         const { moduleId } = req.params;
         try {
-            const module = await db.Module.findByPk(moduleId);
+            const module = await db.Module.findOne({
+                where: {id: moduleId},
+                include: [{
+                    model: db.Module,
+                    as: 'childModules',
+                    attributes: ['id'],
+                    required: false
+                }]
+            });
             if (module) {
-                res.send(module.toJSON());
+                res.send(module);
             } else {
                 res.status(404).send({
                     message: 'Module not found.'

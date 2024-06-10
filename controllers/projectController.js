@@ -102,6 +102,109 @@ const controller = {
         }
     ],
 
+    getProjectActivity: [
+        async (req, res) => {
+            const { projectId } = req.params;
+            try {
+                const activities = await db.Activity.findAll({
+                    where: { projectId: projectId },
+                    attributes: ['type', 'detail', 'updatedAt'],
+                });
+                if (activities) {
+                    res.send(activities);
+                } else {
+                    res.status(404).send({
+                        message: 'Activities not found.'
+                    });
+                }
+            } catch (error) {
+                console.error('Error retrieving activities:', error);
+                res.status(500).send({
+                    message: 'Internal server error.'
+                });
+            }
+        }
+    ],
+
+    getProjectSummary: [
+        async (req, res) => {
+            const { projectId } = req.params;
+            try {
+                const casesCount = await db.TestCase.count({
+                    include: [{
+                        model: db.Module,
+                        as: 'module',
+                        where: { projectId: projectId }
+                    }]
+                });
+
+                const runsCount = await db.TestRun.count({
+                    include: [{
+                        model: db.TestCase,
+                        as: 'testCase',
+                        include: [{
+                            model: db.Module,
+                            as: 'module',
+                            where: { projectId: projectId }
+                        }]
+                    }]
+                });
+
+                let currentDate = new Date();
+
+                const plansCount = await db.TestPlan.count({
+                    include: [{
+                        model: db.Release,
+                        as: 'release',
+                        where: {
+                            projectId: projectId,
+                            startDate: { [Op.lte]: currentDate },
+                            endDate: { [Op.gte]: currentDate }
+                        }
+                    }]
+                });
+
+                const ongoingRelease = await db.Release.findOne({
+                    where: {
+                        projectId: projectId,
+                        startDate: { [Op.lte]: currentDate },
+                        endDate: { [Op.gte]: currentDate }
+                    },
+                    attributes: ['startDate', 'endDate']
+                });
+
+                const issueCount = await db.Issue.count({
+                    include: [{
+                        model: db.TestRun,
+                        as: 'testRun',
+                        include: [{
+                            model: db.TestCase,
+                            as: 'testCase',
+                            include: [{
+                                model: db.Module,
+                                as: 'module',
+                                where: { projectId: projectId }
+                            }]
+                        }]
+                    }]
+                });
+
+                res.send({
+                    casesCount,
+                    runsCount,
+                    plansCount,
+                    issueCount,
+                    ongoingRelease,
+                });
+            } catch (error) {
+                console.error('Error retrieving Summary:', error);
+                res.status(500).send({
+                    message: 'Internal server error.'
+                });
+            }
+        }
+    ],
+
     getProjectMembers: [
         isUserProjectMember,
         isUserManager,
@@ -236,7 +339,6 @@ const controller = {
             const options = {
                 where: {
                     projectId: projectId,
-                    parentModuleId: null
                 },
                 offset: PAGE_LIMIT * (page - 1),
                 limit: PAGE_LIMIT,

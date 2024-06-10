@@ -38,7 +38,7 @@
     </button>
 
     <div class="d-flex justify-content-between py-3">
-      <div class="d-flex gap-1">
+      {{!-- <div class="d-flex gap-1">
         <button class="btn p-0">
           <img src="/assets/view_grid.png" height="30px" />
         </button>
@@ -59,7 +59,7 @@
         <button class="btn p-0">
           <img src="/assets/sort.png" height="30px" />
         </button>
-      </div>
+      </div> --}}
     </div>
 
     <div id="modules" class="d-flex flex-column gap-2">
@@ -69,4 +69,128 @@
   </div>
 </main>
 
-<script src="/js/modules.js"></script>
+<script>
+function resolveChild(modules, child) {
+  let tree = [];
+  child.forEach(ch => {
+    let m = modules.filter(m => m.id == ch.id)[0];
+    tree.push({
+      name: m.name,
+      child: resolveChild(modules, m.childModules)
+    })
+  })
+  return tree;
+}
+
+function buildTree(modules) {
+  let tree = [];
+  modules.forEach(m => {
+    if (m.parentModuleId == null) {
+      tree.push({
+        name: m.name,
+        child: resolveChild(modules, m.childModules)
+      })
+    }
+  })
+  return tree;
+}
+
+function loadModules() {
+  axios.get('/api/projects/{{projectId}}/modules')
+  .then(res => {
+    let tree = buildTree(res.data.modules);
+    console.log(tree)
+    renderModules(tree);
+  })
+  .catch(err => {
+    console.log(err);
+    if (err.response.data.message == 'Access denied.') {
+      alert("Your role isn't allowed to view this page")
+      window.location.replace("/project/{{projectId}}/");
+    }
+  })
+}
+
+loadModules();
+
+function createModule(e) {
+	e.preventDefault()
+	e.stopPropagation()
+	var form = document.getElementById('create-module-form');
+	if (!form.checkValidity()) {
+		form.classList.add('was-validated')
+		return;
+	}
+	form.classList.remove('was-validated')
+
+	var myModalEl = document.getElementById('modal');
+	var modal = bootstrap.Modal.getInstance(myModalEl);
+	modal.hide();
+
+	
+	var name = document.getElementById('name');
+	var description = document.getElementById('description');
+
+	modulesTree[name.value] = {};
+
+	//re render
+	document.getElementById('modules').innerHTML = '';
+	renderModules();
+
+	//Clear form
+	name.value = "";
+	description.value = "";
+}
+
+function isEmpty(obj) {
+	for (const prop in obj) {
+		if (Object.hasOwn(obj, prop)) {
+			return false;
+		}
+	}
+  
+	return true;
+}
+
+function toggleArrowShape(self) {
+	var arrowEl = self.getElementsByClassName('arrow')[0];
+	if (arrowEl.classList.contains('childless'))
+		return;
+	if (arrowEl.classList.contains('expanded')) {
+		arrowEl.src = '/assets/arrow_down.png';
+		arrowEl.classList.remove('expanded');
+	}
+	else {
+		arrowEl.src = '/assets/arrow_right.png';
+		arrowEl.classList.add('expanded');
+	}
+}
+
+function renderSubmodule(submodule, parentStr, rootElement, level) {
+  submodule.forEach(sm => {
+    var hasNoChildren = !sm.child.length;// isEmpty(submodule[key]);
+		var newParent = parentStr + sm.name;
+		var newEl = `
+		<div class="${level > 0 ? 'collapse' : ''}" id="${parentStr}" onclick="toggleArrowShape(this);">
+			<button class="btn p-0 d-flex align-items-center gap-2" data-bs-toggle="collapse" data-bs-target="${hasNoChildren ? '' : '#' + newParent}">
+				${'<img src="/assets/arrow_none.png" height="20px" />'.repeat(level)}
+				<img class="arrow ${hasNoChildren ? 'childless' : ''}" src="${hasNoChildren ? '/assets/arrow_none.png' : '/assets/arrow_down.png'}" height="20px" />
+				<img src="/assets/folder.png" height="30px" />
+				<div class="text-gray fw-semibold">${sm.name}</div>
+			</button>
+		</div>
+		`
+		rootElement.innerHTML += newEl;
+
+		if (!hasNoChildren) {
+			renderSubmodule(sm.child, newParent, rootElement, level + 1);
+		}
+  })
+}
+
+function renderModules(tree) {
+	var modulesDiv = document.getElementById('modules');
+
+	renderSubmodule(tree, '', modulesDiv, 0);
+}
+</script>

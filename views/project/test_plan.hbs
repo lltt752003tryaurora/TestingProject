@@ -178,15 +178,14 @@
                 >
                   <thead>
                     <tr>
-                      <th>Name testcase</th>
-                      <th>Type</th>
+                      <th>ID</th>
+                      <th>Name</th>
                       <th>Description</th>
-                      <th>Hour Test</th>
                       <th>Start date</th>
-                      <th>Cost($)</th>
+                      <th>Release</th>
                     </tr>
                   </thead>
-                  <tfoot>
+                  {{!-- <tfoot>
                     <tr>
                       <th>Name</th>
                       <th>Position</th>
@@ -195,9 +194,9 @@
                       <th>Start date</th>
                       <th>Salary</th>
                     </tr>
-                  </tfoot>
+                  </tfoot> --}}
                   <tbody id="tbodyTestCase">
-                    <tr>
+                    {{!-- <tr>
                       <td>Jennifer Acosta</td>
                       <td>Junior Javascript Developer</td>
                       <td>Edinburgh</td>
@@ -220,7 +219,7 @@
                       <td>47</td>
                       <td>2011/03/21</td>
                       <td>356,250</td>
-                    </tr>
+                    </tr> --}}
                   </tbody>
                 </table>
               </div>
@@ -342,6 +341,47 @@
 <!-- Page level plugins -->
 <script src="/js/datatables/jquery.dataTables.min.js"></script>
 <script src="/js/datatables/dataTables.bootstrap4.min.js"></script>
+
+<script>
+  const loadTable = (testRuns) => {
+    const table = document.getElementById('tbodyTestCase');
+    const projectId = {{ projectId }};
+
+    testRuns.forEach(testRun => {
+      const row = document.createElement("tr");
+      const id = document.createElement("td");
+      const name = document.createElement("td");
+      const description = document.createElement("td");
+      const createdAt = document.createElement("td");
+      const release = document.createElement("td");
+
+      id.innerText = testRun.id;
+      name.innerText = testRun.name;
+      description.innerText = testRun.description;
+      createdAt.innerText = new Date(testRun.createdAt);
+      release.innerHTML = `<a href="/project/${projectId}/release/">${testRun.releaseId}</a>`;
+
+      row.appendChild(id);
+      row.appendChild(name);
+      row.appendChild(description);
+      row.appendChild(createdAt);
+      row.appendChild(release);
+
+      table.appendChild(row);
+    });
+  }
+
+  const projectId = {{ projectId }};
+  axios.get(`/api/projects/${projectId}/testPlans`)
+    .then((response) => {
+      const { testPlans } = response.data;
+      console.log(testPlans);
+      loadTable(testPlans);
+    })
+    .catch((err) => {
+      console.log(err);
+    })
+</script>
 
 <!-- Page level custom scripts -->
 <script>

@@ -65,7 +65,111 @@
   </div>
 </main>
 
-<script src="/js/issue.js"></script>
+<script>
+  const projectId = {{ projectId }};
+  
+  const loadTable = (tableData) => {
+    const tableBody = document.getElementById("table-body");
+    tableBody.innerHTML = "";
+
+    tableData.forEach(data => {
+      // Create a new row
+      const row = document.createElement("tr");
+
+      // Create a cell for each data item
+      const checkboxCell = document.createElement("td");
+      const idCell = document.createElement("td");
+      const titleCell = document.createElement("td");
+      const createdByCell = document.createElement("td");
+      const assignedToCell = document.createElement("td");
+      const statusCell = document.createElement("td");
+      const priorityCell = document.createElement("td");
+      const createdDateCell = document.createElement("td");
+
+      // Checkbox
+      checkboxCell.style.textAlign = "center";
+
+      // Set the innerHTML of each cell
+      checkboxCell.innerHTML = `<input type="checkbox">`;
+      titleCell.textContent = data.name;
+      statusCell.textContent = data.status;
+      priorityCell.textContent = data.priority;
+      createdDateCell.textContent = data.createdAt;
+
+      // ID
+      idCell.style.textAlign = "center";
+      const url = document.createElement("a");
+      url.innerText = data.id;
+      url.href = `/project/${projectId}/issue/${data.id}`;
+      idCell.appendChild(url);
+
+      // Created by
+      createdByCell.style.textAlign = "center";
+      createdByCell.innerText = data.creatorUserId;
+
+      {{!-- const createdByAvatar = document.createElement("img");
+      createdByAvatar.src = users[data.createdBy].avatar;
+      createdByAvatar.classList.add("rounded-circle");
+      createdByAvatar.style.maxHeight = "25px";
+      createdByCell.appendChild(createdByAvatar); --}}
+
+      // Assigned to
+      assignedToCell.style.textAlign = "center";
+      assignedToCell.innerText = data.assignedUserId;
+
+      {{!-- const assignedToAvatar = document.createElement("img");
+      assignedToAvatar.src = users[data.assignedTo].avatar;
+      assignedToAvatar.classList.add("rounded-circle");
+      assignedToAvatar.style.maxHeight = "25px";
+      assignedToCell.appendChild(assignedToAvatar); --}}
+
+      // Status
+      statusCell.style.textAlign = "center";
+      if (data.status === "open") {
+        statusCell.classList.add("text-primary");
+      } else if (data.status === "closed") {
+        statusCell.classList.add("text-secondary");
+      }
+
+      // Priority
+      priorityCell.style.textAlign = "center";
+      if (data.priority === "high") {
+        priorityCell.classList.add("text-danger");
+      } else if (data.priority === "medium") {
+        priorityCell.classList.add("text-warning");
+      } else if (data.priority === "low") {
+        priorityCell.classList.add("text-success");
+      }
+
+      // Append cells to the row
+      createdDateCell.style.textAlign = "center";
+      row.appendChild(checkboxCell);
+      row.appendChild(idCell);
+      row.appendChild(titleCell);
+      row.appendChild(createdByCell);
+      row.appendChild(assignedToCell);
+      row.appendChild(statusCell);
+      row.appendChild(priorityCell);
+      row.appendChild(createdDateCell);
+
+      // Append row to table body
+      tableBody.appendChild(row);
+    })
+  }
+  
+
+  axios.get(`/api/projects/${projectId}/issues`)
+    .then((response) => {
+      const { page, totalPages, issues } = response.data;
+      console.log(issues);
+      loadTable(issues);
+    })
+    .catch((err) => {
+      console.log(err);
+    })
+</script>
+
+{{!-- <script src="/js/issue.js"></script>
 <script>
   let tableRows = [];
   let users = [];
@@ -292,6 +396,6 @@
   }
 
 
-</script>
+</script> --}}
 
-<script>populateTable()</script>
+{{!-- <script>populateTable()</script> --}}

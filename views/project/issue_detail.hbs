@@ -58,7 +58,95 @@
 </script>
 
 <!-- Load comments scripts -->
-<script src="/js/comment/comments.js"></script>
+<script>
+  const displayComments = async (comments) => {
+    const issueId = {{ issueId }};
+    const container = document.getElementById("comments-container");
+
+    container.innerText = "";
+
+    // Container wrapper
+    const wrapper = document.createElement("div");
+    wrapper.classList.add("container");
+    container.appendChild(wrapper);
+
+    if (comments.length === 0) {
+      wrapper.innerHTML = "<div class='container text-center'><i>No comments for this issue yet. You can post your comment, or track this issue for updates.</i></div>";
+      return;
+    }
+
+    // Issue title
+    const issueTitle = document.createElement("h2");
+    issueTitle.classList.add("h4");
+    issueTitle.innerText = `Comments on issue ${issueId}`;
+    wrapper.appendChild(issueTitle);
+
+    comments.forEach(async (comment) => {
+      // Fetch comment's owner info
+      const userId = comment.userId;
+      const userResponse = await axios.get(`/api/users/${userId}`);
+      const {user} = userResponse.data;
+      console.log(user);
+
+      // Comment container = header + content
+      const cmtContainer = document.createElement("div");
+      cmtContainer.classList.add("container", "border", "border-dark", "rounded-lg", "my-4", "py-4");
+      wrapper.appendChild(cmtContainer);
+      
+      // Comment header = left + right
+      const cmtHeader = document.createElement("div");
+      cmtHeader.classList.add("d-flex", "flex-row", "justify-content-between", "align-items-center");
+      cmtContainer.appendChild(cmtHeader);
+
+      // Comment header left
+      const cmtHeaderLeft = document.createElement("div");
+      cmtHeaderLeft.classList.add("d-flex", "flex-row");
+      cmtHeader.appendChild(cmtHeaderLeft);
+
+      // Comment header left avatar
+      const userAvatar = document.createElement("img");
+      userAvatar.src = user.avatar;
+      userAvatar.style = "max-height: 40px;";
+      userAvatar.classList.add("rounded-circle", "mx-2");
+      cmtHeaderLeft.appendChild(userAvatar);
+
+      // Comment header left info
+      const cmtInfo = document.createElement("div");
+      const username = user.username;
+      const createAt = new Date(comment.createdAt);
+      cmtInfo.innerHTML = `<div>${username}</div><div>${createAt}</div>`;
+      cmtHeaderLeft.appendChild(cmtInfo);
+
+      // Comment header right
+      const cmtHeaderRight = document.createElement("div");
+      cmtHeaderRight.classList.add("d-flex", "flex-row");
+      cmtHeader.appendChild(cmtHeaderRight);
+
+      // Comment body
+      const cmtBody = document.createElement("div");
+      cmtBody.classList.add("p-2");
+      cmtContainer.appendChild(cmtBody);
+
+      // Comment content
+      const cmtContent = document.createElement("p");
+      cmtContent.innerText = comment.comment;
+      cmtBody.appendChild(cmtContent);
+    });
+  }
+
+  const issueId = {{ issueId }};
+  axios.get(`/api/issues/${issueId}/comments`)
+    .then((response) => {
+      const { comments } = response.data;
+      console.log(comments);
+      displayComments(comments);
+    })
+    .catch((err) => {
+      console.log(error);
+    });
+</script>
+
+{{!-- <script src="/js/comment/comments.js"></script>
 <script>
   displayComments("{{issueId}}");
 </script>
@@ -89,4 +177,4 @@
   const clearCommentField = () => {
     document.getElementById("comment").value = "";
   }
-</script>
+</script> --}}

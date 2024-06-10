@@ -29,8 +29,19 @@ const isUserManager = async (req, res, next) => {
     }
 }
 
+const isUserManagerOrTester = async (req, res, next) => {
+    if (req.filter && (req.filter.role === 'manager' || req.filter.role === 'tester')) {
+        next();
+    } else {
+        return res.status(403).send({
+            message: 'Access denied.'
+        })
+    }
+}
+
 module.exports = {
     extractUserRole,
     isUserProjectMember,
-    isUserManager
+    isUserManager,
+    isUserManagerOrTester
 };

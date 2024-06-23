@@ -48,7 +48,34 @@ const extractProjectFromTestPlan = async (req, res, next) => {
         next();
     } else {
         return res.status(404).send({
-            message: 'Release does not exist.'
+            message: 'Test pln does not exist.'
+        });
+    }
+}
+
+const extractProjectFromTestCase = async (req, res, next) => {
+    const { testCaseId } = req.params;
+    const testCase = await db.TestCase.findOne({
+        where: { id: testCaseId },
+        include: [{
+            model: db.TestPlan,
+            as: 'testPlan',
+            attributes: [],
+            include: [{
+                model: db.Release,
+                as: 'release',
+                attributes: ['projectId']
+            }]
+        }]
+    });
+    if (testCase) {
+        req.project = {
+            id: testCase.projectId
+        };
+        next();
+    } else {
+        return res.status(404).send({
+            message: 'Test case does not exist.'
         });
     }
 }
@@ -108,4 +135,5 @@ module.exports = {
     filterRoleOr,
     extractProjectIdFromRelease,
     extractProjectFromTestPlan,
+    extractProjectFromTestCase,
 };

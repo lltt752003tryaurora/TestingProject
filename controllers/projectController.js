@@ -18,11 +18,7 @@ const controller = {
             if (page <= 0) page = null;
             try {
                 const options = {
-                    where: {
-                        deletedAt: {
-                            [Op.eq]: null
-                        }
-                    },
+                    where: {},
                     include: [{
                         model: db.ProjectMember,
                         where: { userId: req.user.id },
@@ -203,13 +199,12 @@ const controller = {
                     })
                 }
 
-                await db.Project.update({
-                    deletedAt: new Date()
-                }, {
-                    where: {
-                        id: projectId
-                    }
-                })
+                const project = await db.Project.findByPk(projectId);
+                if (!project) {
+                    return res.status(400).send({message: 'Project does not exist.'});
+                }
+
+                await project.destroy();
 
                 activityHelper.createActivity(projectId, userId, 'DeleteProject', JSON.stringify({
                     project: projectId,
@@ -254,19 +249,43 @@ const controller = {
 
     getProjectActivity: [
         async (req, res) => {
+            let { page, size } = req.query;
+            page = parseInt(page); size = parseInt(size);
+            if (size <= 0) size = null;
+            if (page <= 0) page = null;
             const { projectId } = req.params;
             try {
-                const activities = await db.Activity.findAll({
+                const options = {
                     where: { projectId: projectId },
-                    attributes: ['type', 'detail', 'updatedAt'],
-                });
-                if (activities) {
-                    res.send(activities);
-                } else {
-                    res.status(404).send({
-                        message: 'Activities not found.'
-                    });
+                    attributes: ['type', 'detail', 'createdAt'],
+                    order: [
+                        ['createdAt', 'DESC'],
+                    ],
                 }
+                if (size && page) {
+                    options.limit = size,
+                    options.offset = (page - 1) * size
+                }
+                const activities = await db.Activity.findAndCountAll(options);
+                const activitiesDetails = await Promise.all(activities.rows.map(async (act) => {
+                    let details = JSON.parse(act.detail);
+
+                    let explains = {};
+                    await Promise.all(Object.keys(details).map(async function(key) {
+                        let tmp = await activityHelper.activityExplainer(key, details[key]);
+                        explains[key] = tmp;
+                    }))
+
+                    return {
+                        ...act.get({ plain: true }),
+                        explains: explains
+                    };
+                }));
+                res.status(202).send({
+                    numActivities: activities.count,
+                    numPage: Math.ceil(activities.count / size),
+                    activities: activitiesDetails
+                });
             } catch (error) {
                 console.error('Error retrieving activities:', error);
                 res.status(500).send({
@@ -359,22 +378,150 @@ const controller = {
     getProjectMembers: [
         // isUserProjectMember,
         // isUserManagerOrTester,
-        filterRoleOr(['manager', 'tester']),
+        filterRoleOr(['manager', 'tester', 'developer']),
         async (req, res) => {
             const { projectId } = req.params;
             try {
-                const projectMembers = await db.ProjectMember.findAll({
+                let { page, size, search } = req.query;
+                const options = {
+                    include: [{
+                        model: db.User,
+                        as: 'user',
+                        attributes: ['id', 'username', 'fullName', 'avatar'],
+                        where: {}
+                    }],
                     where: {
                         projectId: projectId
+                    },
+                    attributes: ['role']
+                }
+                if (search) {
+                    options.include[0].where.username = {
+                        [Op.iLike]: `%${search}%`
                     }
-                });
-                res.send({
-                    members: projectMembers.map(member => member.toJSON())
-                });
+                }
+                const projectMembers = await db.ProjectMember.findAll(options);
+                res.send(projectMembers);
             } catch (error) {
                 console.error(error);
                 res.status(500).send({
                     message: 'Internal server error.'
+                });
+            }
+        }
+    ],
+
+    getProjectNonMembers: [
+        async (req, res) => {
+            try {
+                const userId = req.user.id;
+                const { projectId } = req.params;
+                let { page, size, search } = req.query;
+                const userRole = await extractUserRole(projectId, userId);
+                if (userRole?.role != 'manager') {
+                    return res.status(403).send({
+                        message: 'Access denied.'
+                    })
+                }
+
+                const projectMembers = await db.ProjectMember.findAll({
+                    where: { projectId: projectId },
+                    attributes: ['userId']
+                });
+                  
+                const memberUserIds = projectMembers.map(member => member.userId);
+                
+                const options = {
+                    where: {
+                        id: {
+                          [Op.notIn]: memberUserIds
+                        }
+                    },
+                    attributes: ['id', 'username', 'fullName', 'avatar']
+                };
+                if (search) {
+                    options.where.username = {
+                        [Op.iLike]: `%${search}%`
+                    }
+                }
+                let users = await db.User.findAll(options)
+
+                res.status(200).send(users);
+            }
+            catch (error) {
+                console.error(error);
+                res.status(500).send({
+                    message: "Error getting nonmembers"
+                });
+            }
+        }
+    ],
+
+    addProjectMembers: [
+        async (req, res) => {
+            try {
+                const userId = req.user.id;
+                const { projectId } = req.params;
+                const { role, user } = req.body;
+                const userRole = await extractUserRole(projectId, userId);
+                if (userRole?.role != 'manager') {
+                    return res.status(403).send({
+                        message: 'Access denied.'
+                    })
+                }
+                if (!role in ['manager', 'tester', 'developer']) {
+                    return res.status(400).send({
+                        message: 'invalid role'
+                    })
+                }
+
+                let targetUser = await db.User.findOne({
+                    where: {
+                        username: user
+                    }
+                });
+
+                if (!targetUser) {
+                    return res.status(400).send({
+                        message: `User doesn't exist`
+                    })
+                }
+
+                let checkExist = await db.ProjectMember.findOne({
+                    where: {
+                        userId: targetUser.id,
+                        role: role,
+                        projectId: projectId
+                    }
+                })
+
+                if (checkExist) {
+                    return res.status(400).send({
+                        message: 'Role already exists'
+                    })
+                }
+
+                await db.ProjectMember.create({
+                    role: role,
+                    projectId: projectId,
+                    userId: targetUser.id
+                })
+
+                activityHelper.createActivity(projectId, userId, 'EditProjectMember', JSON.stringify({
+                    project: projectId,
+                    user: userId,
+                    target: targetUser.id,
+                    role: role
+                }));
+
+                res.status(200).send({
+                    message: "Succesfully added user role"
+                });
+            }
+            catch (error) {
+                console.error(error);
+                res.status(500).send({
+                    message: "Error adding user role"
                 });
             }
         }

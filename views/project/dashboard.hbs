@@ -1,29 +1,35 @@
 {{#> modal }}
 <div class="d-flex flex-column p-4 gap-4">
   <div class="d-flex align-items-center justify-content-between">
-    <ul class="nav nav-tabs flex-grow-1">
-      <li class="nav-item">
-        <a class="nav-link active" href="#">Assign User</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link disabled" href="#">Modify User</a>
-      </li>
-    </ul>
+    <div class="nav nav-tabs flex-grow-1" id="nav-tab" role="tablist">
+      <button class="nav-link active" id="nav-assign-tab" data-bs-toggle="tab" data-bs-target="#nav-assign" type="button" role="tab">
+        Assign User
+      </button>
+      {{!-- <button class="nav-link" id="nav-modify-tab" data-bs-toggle="tab" data-bs-target="#nav-modify" type="button" role="tab">
+        Modify User
+      </button> --}}
+    </div>
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
   </div>
-
-  
-  <form class="needs-validation" novalidate>
+  {{!-- <div class="tab-content" id="nav-tabContent">
+    <div class="tab-pane fade show active" id="nav-assign" role="tabpanel">
+      A
+    </div>
+    <div class="tab-pane fade" id="nav-modify" role="tabpanel">
+      B
+    </div>
+  </div> --}}
+  <form class="needs-validation" novalidate id="userAssignForm" onsubmit="return addNewUserRole(event)">
     <div class="mb-3">
-      <label for="username" class="form-label text-gray">Select User</label>
-      <input type="text" class="form-control" id="username" placeholder="Username" required>
+      <label for="usernameAssign" class="form-label text-gray">Select User</label>
+      <input type="text" class="form-control" id="usernameAssign" placeholder="Username" required oninput="assignUser()">
       <div class="invalid-feedback">
         Please provide a valid username.
       </div>
     </div>
     <div class="mb-3">
-      <label for="role" class="form-label text-gray">Select Role</label>
-      <select id="role" class="form-select" required>
+      <label for="roleAssign" class="form-label text-gray">Select Role</label>
+      <select id="roleAssign" class="form-select" required>
         <option value="" disabled selected>Role...</option>
         <option value="manager">Manager</option>
         <option value="tester">Tester</option>
@@ -34,7 +40,7 @@
       </div>
     </div>
     <div class="d-flex align-items-center justify-content-center gap-3">
-      <button type="submit" class="btn btn-primary">Create</button>
+      <button type="submit" class="btn btn-primary">Assign</button>
       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
     </div>
   </form>
@@ -160,7 +166,65 @@
 {{{{/rawHelper}}}}
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+function assignUser() {
+  return;//skip temporarily
+  let el = document.getElementById('usernameAssign');
+  let username = el.value;
+  axiosAPI.get('/projects/{{projectId}}/nonmembers', {
+    params: {
+      search: username
+    }
+  })
+  .then(res => {
 
+  })
+  .catch(err => {
+    
+  })
+}
+
+function addNewUserRole(e) {
+	e.preventDefault()
+	e.stopPropagation()
+
+  let username = document.getElementById('usernameAssign');
+  let role = document.getElementById('roleAssign');
+
+	var myModalEl = document.getElementById('modal');
+	var modal = bootstrap.Modal.getInstance(myModalEl);
+
+  axiosAPI.put('/api/projects/{{projectId}}/members', {
+    user: username.value,
+    role: role.value,
+  })
+  .then(res => {
+		Toastify({
+			text: "Successfully assign user",
+			style: {
+			background: "linear-gradient(to right, #198754, #198754)",
+			},
+			onClick: function(){} // Callback after click
+		}).showToast();
+		modal.hide();
+
+    username.value = '';
+    role.value = '';
+
+    document.getElementById('userAssignForm').classList.remove('was-validated');
+	})
+	.catch(err => {
+		console.log(err);
+		Toastify({
+			text: "Failed to assign user: " + err?.response?.data?.message,
+			style: {
+			background: "linear-gradient(to right, #dc3545, #dc3545)",
+			},
+			onClick: function(){} // Callback after click
+		}).showToast();
+	})
+}
+</script>
 <script>
 let template_activity = Handlebars.compile(document.getElementById('template-activity').innerHTML);
 
@@ -168,7 +232,7 @@ function loadActivity() {
 	axiosAPI.get('/api/projects/{{projectId}}/activity')
 	.then(res => {
     let acts = {};
-		res.data.forEach(pj => {
+		res.data.activities.forEach(pj => {
       let month = dayjs(pj.updatedAt).startOf('month');
       if (!acts[month]) acts[month] = [];
       acts[month].push({
@@ -197,7 +261,9 @@ function loadActivity() {
 }
 
 loadActivity();
+</script>
 
+<script>
 function loadSummary() {
   axiosAPI.get('/api/projects/{{projectId}}/summary')
 	.then(res => {

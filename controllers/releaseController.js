@@ -187,7 +187,7 @@ const controller = {
 
                 const release = await db.Release.findByPk(releaseId);
                 if (!release) {
-                    return res.status(400).send('Release does not exist.');
+                    return res.status(400).send({message: 'Release does not exist.'});
                 }
 
                 await release.destroy();

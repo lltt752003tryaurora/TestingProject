@@ -14,6 +14,9 @@ router.get('/:projectId/activity', projectController.getProjectActivity);
 router.get('/:projectId/summary', projectController.getProjectSummary);
 
 router.get('/:projectId/members', projectController.getProjectMembers);
+router.put('/:projectId/members', projectController.addProjectMembers);
+
+router.get('/:projectId/nonmembers', projectController.getProjectNonMembers);
 
 router.get('/:projectId/releases', projectController.getProjectReleases);
 

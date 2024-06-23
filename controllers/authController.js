@@ -93,6 +93,16 @@ const controller = {
                     },
                 });
 
+                // Check username for spaces and length
+                if (/\s/.test(username) || username.length > 20) {
+                    responseData(res, "Username must not contain spaces and must not exceed 20 characters", "", 400);
+                    if (req.file) {
+                        removeFile(`uploads/${req.file.filename}`);
+                    }
+                    return;
+                }
+
+
                 // Check if the username contains spaces
                 if (/\s/.test(username)) { // This regex checks for any whitespace character
                     responseData(res, "Username must not contain spaces", "", 400);

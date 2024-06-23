@@ -33,6 +33,7 @@
 </main>
 <script>
 // Example starter JavaScript for disabling form submissions if there are invalid fields
+// Example starter JavaScript for disabling form submissions if there are invalid fields
 (function() {
   'use strict';
   window.addEventListener('load', function() {
@@ -43,23 +44,28 @@
         event.stopPropagation();
         const password = document.getElementById('password');
         const passwordConfirm = document.getElementById('passwordConfirm');
+        const username = document.getElementById('username').value;
+
         // Check if passwords match and meet the length requirement
         if (password.value !== passwordConfirm.value || password.value.length < 8) {
           passwordConfirm.setCustomValidity('invalid');
+          document.querySelector('#passwordConfirm + .invalid-feedback').textContent = 'Passwords must match and be at least 8 characters long.';
         } else {
           passwordConfirm.setCustomValidity('');
         }
-        // Check if the username is empty or contains spaces
-        const username = document.getElementById('username').value;
-        if (!username.trim() || username.includes(' ')) {
+
+        // Check if the username is empty, contains spaces, or too long
+        if (!username.trim() || username.includes(' ') || username.length > 20) {
           document.getElementById('username').setCustomValidity('invalid');
-          document.querySelector('#username + .invalid-feedback').textContent = username.includes(' ') ? 'Username must not contain spaces.' : 'Please enter your username.';
+          document.querySelector('#username + .invalid-feedback').textContent = username.length > 20 ? 'Username must not exceed 20 characters.' : (username.includes(' ') ? 'Username must not contain spaces.' : 'Please enter your username.');
         } else {
           document.getElementById('username').setCustomValidity('');
         }
+
         if (form.checkValidity() === false) {
           form.classList.add('was-validated');
         } else {
+          // Proceed with the AJAX request
           axios.post('/api/auth/signup', {
             fullName: document.getElementById('fullname').value,
             username: document.getElementById('username').value,
@@ -93,4 +99,5 @@
     });
   }, false);
 })();
+
 </script>

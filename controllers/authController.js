@@ -102,6 +102,7 @@ const controller = {
                     return;
                 }
 
+                // Check username exists
                 if (check_username) {
                     responseData(res, "username is exist", "", 400);
                     if (req.file) {
@@ -110,7 +111,16 @@ const controller = {
                     return;
                 }
 
+                // Validate password length
+                if (pass_word.length < 8) {
+                    responseData(res, "Password must be at least 8 characters long", "", 400);
+                    if (req.file) {
+                        removeFile(`uploads/${req.file.filename}`);
+                    }
+                    return;
+                }
 
+                // Hash password
                 let newUser = {
                     username,
                     fullName,

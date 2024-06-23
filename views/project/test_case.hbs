@@ -350,6 +350,47 @@
     })
 </script>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('formTestCase');
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        const dateInput = document.getElementById('txtDate');
+        const notification = document.getElementById('notiDate');
+
+        if (!isValidDate(dateInput.value)) {
+            notification.textContent = 'Invalid date. Please enter a valid date.';
+            return; 
+        }
+
+        const formData = new FormData(form);
+        
+        axios.post('/api/testCases/', formData)
+            .then(response => {
+                console.log('Success:', response.data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    });
+
+    function isValidDate(dateStr) {
+        const regex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!dateStr.match(regex)) {
+            return false;
+        }
+
+        const date = new Date(dateStr);
+        if (!date.getTime()) { 
+            return false;
+        }
+
+        return date.toISOString().substring(0, 10) === dateStr; 
+    }
+});
+});
+</script>
+
 <!-- Page level plugins -->
 <script src="/js/datatables/jquery.dataTables.min.js"></script>
 <script src="/js/datatables/dataTables.bootstrap4.min.js"></script>

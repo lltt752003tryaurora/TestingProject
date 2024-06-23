@@ -27,7 +27,6 @@ function addTestCase() {
         tc[arrInput[i]] = value;
     }
 
-
     if (valid == true) {
         arrTestCase.push(tc);
         renderTestCase();

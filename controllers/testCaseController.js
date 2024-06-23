@@ -66,7 +66,7 @@ const controller = {
             res.status(500).send({
                 message: 'Internal server error.'
             });
-        } 
+        }
     },
 
     getTestCaseTestRuns: async (req, res) => {
@@ -95,8 +95,32 @@ const controller = {
             res.status(500).send({
                 message: 'Internal server error.'
             });
-        } 
+        }
     },
+
+    createTestCase: async (req, res) => {
+        try {
+            const { moduleId, testPlanId, name, description, type, priority, detail } = req.body;
+            const newTestCase = {
+                moduleId: moduleId || 5,  // Default value as example
+                testPlanId: testPlanId || 4,
+                name,
+                description,
+                type,
+                priority: priority || 'high',
+                detail,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                deletedAt: null
+            };
+            // Assume create method saves the test case in a database
+            const savedTestCase = await model.TestCase.create(newTestCase);
+            res.status(201).send(savedTestCase);
+        } catch (error) {
+            console.error(error);
+            res.status(500).send({ message: "Error creating the test case" });
+        }
+    }
 };
 
 module.exports = controller;

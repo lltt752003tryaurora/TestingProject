@@ -93,6 +93,15 @@ const controller = {
                     },
                 });
 
+                // Check if the username contains spaces
+                if (/\s/.test(username)) { // This regex checks for any whitespace character
+                    responseData(res, "Username must not contain spaces", "", 400);
+                    if (req.file) {
+                        removeFile(`uploads/${req.avatarName}`);
+                    }
+                    return;
+                }
+
                 if (check_username) {
                     responseData(res, "username is exist", "", 400);
                     if (req.file) {

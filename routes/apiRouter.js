@@ -6,7 +6,7 @@ const {verifyToken} = require('../utils/jwt.js');
 
 const auth = (req, res, next) => {
 	if (req.isLoggedIn) {
-		req.user = getUserFromToken(req.cookies.accessToken)
+		req.user = getUserFromToken(req.cookies.accessToken);
         next();
 	}
 	else {

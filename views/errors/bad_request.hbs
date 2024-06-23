@@ -1,0 +1,10 @@
+<div class="container">
+    <h1 class="display-1 text-danger">400</h1>
+    <p class="lead">Bad request</p>
+    {{#if message}}
+        <p>Error message: {{message}}</p>
+    {{else}}
+        <p>Unknown error.</p>
+    {{/if}}
+    <a href="/projects" class="btn btn-primary">Go back to HOME</a>
+</div>

@@ -7,15 +7,35 @@ const extractUserRole = async (projectId, userId) => {
 
 const isUserProjectMember = async (req, res, next) => {
     const userId = req.user.id;
-    const { projectId } = req.params;
+    const projectId = req.params.projectId || req.params.project_id;
     const projectMember = await extractUserRole(projectId, userId);
     if (projectMember !== null) {
         req.filter = projectMember;
         next();
     } else {
-        return res.status(403).send({
-            message: 'User is not a project member.'
-        })
+        // return res.status(403).send({
+        //     message: 'User is not a project member.'
+        // });
+        return res.status(400).render('errors/bad_request', { message: 'Project does not exist, or user is not a project member.' });
+
+    }
+}
+
+const filterRoleOr = (roles) => {
+    return async (req, res, next) => {
+        const userId = req.user.id;
+        const projectId = req.params.projectId || req.params.project_id;
+        const projectMember = await extractUserRole(projectId, userId);
+
+        if (projectMember !== null && roles.includes(projectMember.role)) {
+            next();
+        } else {
+            // return res.status(403).send({
+            //     message: 'Invalid authority.'
+            // });
+
+            return res.status(400).render('errors/bad_request', { message: 'Project does not exist, or user is not a project member.' });
+        }
     }
 }
 
@@ -43,5 +63,6 @@ module.exports = {
     extractUserRole,
     isUserProjectMember,
     isUserManager,
-    isUserManagerOrTester
+    isUserManagerOrTester,
+    filterRoleOr,
 };

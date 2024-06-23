@@ -13,4 +13,8 @@ const isLoggedIn = (req, res, next) => {
 	next();
 }
 
+const roleGuard = (role) => {
+	return () => true;
+}
+
 module.exports = isLoggedIn

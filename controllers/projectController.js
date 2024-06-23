@@ -3,7 +3,7 @@ const db = require('../models/index');
 
 const PAGE_LIMIT = 10;
 
-const { extractUserRole, isUserProjectMember, isUserManager, isUserManagerOrTester } = require('./filters/projectRoleFilters');
+const { extractUserRole, isUserProjectMember, isUserManager, isUserManagerOrTester, filterRoleOr } = require('./filters/projectRoleFilters');
 
 const controller = {
     getProjectList: [
@@ -206,8 +206,9 @@ const controller = {
     ],
 
     getProjectMembers: [
-        isUserProjectMember,
-        isUserManagerOrTester,
+        // isUserProjectMember,
+        // isUserManagerOrTester,
+        filterRoleOr(['manager', 'tester']),
         async (req, res) => {
             const { projectId } = req.params;
             try {
@@ -579,8 +580,9 @@ const controller = {
     ],
 
     getProjectRequirements: [
-        isUserProjectMember,
-        isUserManager,
+        // isUserProjectMember,
+        // isUserManager,
+        filterRoleOr(['developer']),
         async (req, res) => {
         const { projectId } = req.params;
         const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));

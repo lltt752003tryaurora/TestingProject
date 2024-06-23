@@ -48,8 +48,15 @@ app.get('/createTables', (req, res) => {
 
 app.use('/api', require('./routes/apiRouter.js'));
 
+app.use('/project', require('./routes/app/homeRouter.js'));
+app.use('/not_found', (req, res, next) => {
+    res.status(404).render('not_found',);
+});
+app.use('/internal_error', (req, res, next) => {
+    res.status(500).render('internal_error', { layout: false });
+})
 app.use('/', require('./routes/app/entryRouter.js'))
-app.use('/project', require('./routes/app/homeRouter.js'))
+
 // Init web server
 app.listen(port, () => {
     console.log(`listening on port ${port}`);

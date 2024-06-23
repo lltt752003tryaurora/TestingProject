@@ -1,8 +1,8 @@
 const db = require('../models/index');
 const Sequelize = require('sequelize');
 const {extractUserRole} = require('./helpers/userRoleHelper');
-const { extractProjectIdFromRelease, filterRoleOr } = require('./filters/projectRoleFilters');
 const activityHelper = require('./helpers/activityHelper');
+const { extractProjectIdFromRelease, isUserProjectMember, isUserManager, isUserManagerOrTester, filterRoleOr } = require('./filters/projectRoleFilters');
 
 const getRelease = async (releaseId, userId) => {
     const release = await db.Release.findOne({
@@ -71,12 +71,63 @@ const controller = {
         }
     },
 
+    getReleases: [
+        isUserProjectMember,
+        isUserManagerOrTester,
+        async (req, res) => {
+            const { projectId } = req.params;
+            const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
+            const sortField = req.query.sort === 'startDate' ? 'startDate' : 'id';
+            const sortOrder = req.query.order === 'asc' ? 'ASC' : 'DESC';
+            const startDate = req.query.startDate ? new Date(req.query.startDate) : null;
+            const endDate = req.query.endDate ? new Date(req.query.endDate) : null;
+
+            const dateFilter = {};
+            if (startDate) {
+                dateFilter[Op.gte] = startDate;
+            }
+            if (endDate) {
+                dateFilter[Op.lte] = endDate;
+            }
+
+            const options = {
+                where: {
+                    projectId: projectId,
+                    ...((startDate || endDate) ? { createdAt: dateFilter } : {})
+                },
+                offset: PAGE_LIMIT * (page - 1),
+                limit: PAGE_LIMIT,
+                order: [[sortField, sortOrder]]
+            }
+
+            const keyword = req.query.keyword || '';
+            if (keyword.trim() !== '') {
+                options.where.name = { [Op.iLike]: `%${keyword}%` }
+            }
+
+            try {
+                const projectReleases = await db.Release.findAll(options);
+                const projectReleaseCount = await db.Release.count({ where: options.where });
+                return res.send({
+                    page: page,
+                    totalPages: Math.ceil(projectReleaseCount / PAGE_LIMIT),
+                    releases: projectReleases.map(release => release.toJSON())
+                });
+            } catch (error) {
+                console.error(error);
+                res.status(500).send({
+                    message: 'Internal server error.'
+                });
+            }
+        },
+    ],
+
     createRelease: [
         filterRoleOr(['manager']),
         async (req, res, next) => {
             try {
                 const userId = req.user.id;
-                const { projectId } =  req.body;
+                const { projectId } =  req.params;
                 const name = req.body.name;
                 if (!name || name.trim() === '') {
                     return res.status(400).send({
@@ -118,41 +169,39 @@ const controller = {
     ],
 
     editRelease: [
-        extractProjectIdFromRelease,
         filterRoleOr(['manager']),
         async (req, res, next) => {
             try {
                 const userId = req.user.id;
-                const projectId = req.project.id;
-                const { releaseId } = req.params;
+                const { projectId, releaseId } = req.params;
                 const { name, startDate, endDate } = req.body;
                 if (name && name.trim() === '') {
-                    return res.status(400).send('Release name must not be empty.');
+                    return res.status(400).send({message:'Release name must not be empty.'});
                 }
 
                 const release = await db.Release.findByPk(releaseId);
                 if (!release) {
-                    return res.status(400).send('Release does not exist.');
+                    return res.status(400).send({ message: 'Release does not exist.'});
                 }
                 if (name) release.name = name;
                 if (startDate && endDate) {
                     const newStartDate = new Date(startDate);
                     const newEndDate = new Date(endDate);
                     if (newStartDate > newEndDate) {
-                        return res.status(400).send('Invalid timestamps.');
+                        return res.status(400).send({ message: 'Invalid timestamps.'});
                     }
                     release.startDate = newStartDate;
                     release.endDate = newEndDate;
                 } else if (startDate) {
                     const newStartDate = new Date(startDate);
                     if (newStartDate > release.endDate) {
-                        return res.status(400).send('Invalid timestamps.');
+                        return res.status(400).send({ message: 'Invalid timestamps.'});
                     }
                     release.startDate = newStartDate;
                 } else if (endDate) {
                     const newEndDate = new Date(endDate);
                     if (release.startDate > newEndDate) {
-                        return res.status(400).send('Invalid timestamps.');
+                        return res.status(400).send({ message: 'Invalid timestamps.'});
                     }
                     release.endDate = newEndDate;
                 }
@@ -177,13 +226,11 @@ const controller = {
     ],
 
     deleteRelease: [
-        extractProjectIdFromRelease,
         filterRoleOr(['manager']),
         async (req, res, next) => {
             try {
                 const userId = req.user.id;
-                const projectId = req.project.id;
-                const { releaseId } = req.params;
+                const { projectId, releaseId } = req.params;
 
                 const release = await db.Release.findByPk(releaseId);
                 if (!release) {

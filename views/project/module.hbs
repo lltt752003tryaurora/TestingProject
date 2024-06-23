@@ -16,10 +16,10 @@
         Please provide a valid name.
       </div>
     </div>
-    <div class="mb-3">
+    {{!-- <div class="mb-3">
       <label for="description" class="form-label text-gray">Module Description</label>
       <textarea class="form-control" id="description" rows="5" placeholder="Something about this requirement..."></textarea>
-    </div>
+    </div> --}}
     <div class="d-flex align-items-center justify-content-center gap-3">
       <button type="submit" class="btn btn-primary">Create</button>
       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -87,6 +87,7 @@ function buildTree(modules) {
   modules.forEach(m => {
     if (m.parentModuleId == null) {
       tree.push({
+        id: m.id,
         name: m.name,
         child: resolveChild(modules, m.childModules)
       })
@@ -125,21 +126,70 @@ function createModule(e) {
 
 	var myModalEl = document.getElementById('modal');
 	var modal = bootstrap.Modal.getInstance(myModalEl);
-	modal.hide();
-
 	
 	var name = document.getElementById('name');
-	var description = document.getElementById('description');
 
-	modulesTree[name.value] = {};
-
-	//re render
-	document.getElementById('modules').innerHTML = '';
-	renderModules();
+	axiosAPI.put('/api/projects/{{projectId}}/modules', {
+		name: name.value,
+	})
+	.then(res => {
+		console.log(res);
+		Toastify({
+			text: "New module created",
+			style: {
+			background: "linear-gradient(to right, #198754, #198754)",
+			},
+			onClick: function(){} // Callback after click
+		}).showToast();
+		modal.hide();
+		setTimeout(() => {
+			window.location.reload();
+		}, 500);
+	})
+	.catch(err => {
+		console.log(err);
+		Toastify({
+			text: "Failed to create module",
+			style: {
+			background: "linear-gradient(to right, #dc3545, #dc3545)",
+			},
+			onClick: function(){} // Callback after click
+		}).showToast();
+	})
 
 	//Clear form
 	name.value = "";
-	description.value = "";
+}
+
+function deleteModule(e, id) {
+  e.preventDefault()
+  e.stopPropagation();
+  if (confirm("Do you want to delete this module?") == true) {
+    axiosAPI.delete('/api/projects/{{projectId}}/modules/' + id)
+    .then(res => {
+      console.log(res);
+      Toastify({
+        text: "Deleted",
+        style: {
+        background: "linear-gradient(to right, #198754, #198754)",
+        },
+        onClick: function(){} // Callback after click
+      }).showToast();
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    })
+    .catch(err => {
+      console.log(err);
+      Toastify({
+        text: "Failed to delete module",
+        style: {
+        background: "linear-gradient(to right, #dc3545, #dc3545)",
+        },
+        onClick: function(){} // Callback after click
+      }).showToast();
+    })
+  }
 }
 
 function isEmpty(obj) {
@@ -172,12 +222,17 @@ function renderSubmodule(submodule, parentStr, rootElement, level) {
 		var newParent = parentStr + sm.name;
 		var newEl = `
 		<div class="${level > 0 ? 'collapse' : ''}" id="${parentStr}" onclick="toggleArrowShape(this);">
-			<button class="btn p-0 d-flex align-items-center gap-2" data-bs-toggle="collapse" data-bs-target="${hasNoChildren ? '' : '#' + newParent}">
-				${'<img src="/assets/arrow_none.png" height="20px" />'.repeat(level)}
-				<img class="arrow ${hasNoChildren ? 'childless' : ''}" src="${hasNoChildren ? '/assets/arrow_none.png' : '/assets/arrow_down.png'}" height="20px" />
-				<img src="/assets/folder.png" height="30px" />
-				<div class="text-gray fw-semibold">${sm.name}</div>
-			</button>
+      <div class="d-flex align-items-center justify-content-between" data-bs-toggle="collapse" data-bs-target="${hasNoChildren ? '' : '#' + newParent}">
+        <button class="btn p-0 d-flex align-items-center gap-2 w-100">
+          ${'<img src="/assets/arrow_none.png" height="20px" />'.repeat(level)}
+          <img class="arrow ${hasNoChildren ? 'childless' : ''}" src="${hasNoChildren ? '/assets/arrow_none.png' : '/assets/arrow_down.png'}" height="20px" />
+          <img src="/assets/folder.png" height="30px" />
+          <div class="text-gray fw-semibold">${sm.name}</div>
+        </button>
+        <button class="btn p-0" onclick="deleteModule(event, ${sm.id})">
+          <img src="/assets/trash.png" height="20px" />
+        </button>
+      </div>
 		</div>
 		`
 		rootElement.innerHTML += newEl;

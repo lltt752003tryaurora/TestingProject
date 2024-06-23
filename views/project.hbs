@@ -106,8 +106,11 @@
 				<div class="text-gray fw-bold fs-5">
 					{{name}}
 				</div>
-				<button class="btn p-0" onclick="">
+				{{!-- <button class="btn p-0" onclick="">
 					<img src="/assets/more_x.png" height="30px"/>
+				</button> --}}
+				<button class="btn p-0" onclick="deleteProject(event, {{id}})">
+					<img src="/assets/trash.png" height="20px" />
 				</button>
 			</div>
 			<div class="d-flex align-items-center justify-content-between">
@@ -309,5 +312,37 @@ function createProject(e) {
 		}).showToast();
 	})
 }
+
+function deleteProject(e, id) {
+  e.preventDefault()
+  e.stopPropagation();
+  if (confirm("Do you want to delete this project?") == true) {
+    axiosAPI.delete('/api/projects/' + id)
+    .then(res => {
+      console.log(res);
+      Toastify({
+        text: "Deleted",
+        style: {
+        background: "linear-gradient(to right, #198754, #198754)",
+        },
+        onClick: function(){} // Callback after click
+      }).showToast();
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    })
+    .catch(err => {
+      console.log(err);
+      Toastify({
+        text: "Failed to delete project",
+        style: {
+        background: "linear-gradient(to right, #dc3545, #dc3545)",
+        },
+        onClick: function(){} // Callback after click
+      }).showToast();
+    })
+  }
+}
+
 
 </script>

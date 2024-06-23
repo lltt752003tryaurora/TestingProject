@@ -81,7 +81,9 @@ const controller = {
                     const userCount = await db.ProjectMember.count({
                         where: {
                             projectId: project.id,
-                        }
+                        },
+                        distinct: true,
+                        col: 'userId' 
                     })
 
                     return {
@@ -153,7 +155,8 @@ const controller = {
         async (req, res) => {
             try {
                 const userId = req.user.id;
-                const { name, projectId } = req.body;
+                const { projectId } = req.params;
+                const { name } = req.body;
                 const userRole = await extractUserRole(projectId, userId);
                 if (userRole?.role != 'manager') {
                     return res.status(403).send({
@@ -191,7 +194,7 @@ const controller = {
         async (req, res) => {
             try {
                 const userId = req.user.id;
-                const { projectId } = req.body;
+                const { projectId } = req.params;
                 const userRole = await extractUserRole(projectId, userId);
                 if (userRole?.role != 'manager') {
                     return res.status(403).send({
@@ -375,209 +378,6 @@ const controller = {
         }
     ],
 
-    getProjectMembers: [
-        // isUserProjectMember,
-        // isUserManagerOrTester,
-        filterRoleOr(['manager', 'tester', 'developer']),
-        async (req, res) => {
-            const { projectId } = req.params;
-            try {
-                let { page, size, search } = req.query;
-                const options = {
-                    include: [{
-                        model: db.User,
-                        as: 'user',
-                        attributes: ['id', 'username', 'fullName', 'avatar'],
-                        where: {}
-                    }],
-                    where: {
-                        projectId: projectId
-                    },
-                    attributes: ['role']
-                }
-                if (search) {
-                    options.include[0].where.username = {
-                        [Op.iLike]: `%${search}%`
-                    }
-                }
-                const projectMembers = await db.ProjectMember.findAll(options);
-                res.send(projectMembers);
-            } catch (error) {
-                console.error(error);
-                res.status(500).send({
-                    message: 'Internal server error.'
-                });
-            }
-        }
-    ],
-
-    getProjectNonMembers: [
-        async (req, res) => {
-            try {
-                const userId = req.user.id;
-                const { projectId } = req.params;
-                let { page, size, search } = req.query;
-                const userRole = await extractUserRole(projectId, userId);
-                if (userRole?.role != 'manager') {
-                    return res.status(403).send({
-                        message: 'Access denied.'
-                    })
-                }
-
-                const projectMembers = await db.ProjectMember.findAll({
-                    where: { projectId: projectId },
-                    attributes: ['userId']
-                });
-                  
-                const memberUserIds = projectMembers.map(member => member.userId);
-                
-                const options = {
-                    where: {
-                        id: {
-                          [Op.notIn]: memberUserIds
-                        }
-                    },
-                    attributes: ['id', 'username', 'fullName', 'avatar']
-                };
-                if (search) {
-                    options.where.username = {
-                        [Op.iLike]: `%${search}%`
-                    }
-                }
-                let users = await db.User.findAll(options)
-
-                res.status(200).send(users);
-            }
-            catch (error) {
-                console.error(error);
-                res.status(500).send({
-                    message: "Error getting nonmembers"
-                });
-            }
-        }
-    ],
-
-    addProjectMembers: [
-        async (req, res) => {
-            try {
-                const userId = req.user.id;
-                const { projectId } = req.params;
-                const { role, user } = req.body;
-                const userRole = await extractUserRole(projectId, userId);
-                if (userRole?.role != 'manager') {
-                    return res.status(403).send({
-                        message: 'Access denied.'
-                    })
-                }
-                if (!role in ['manager', 'tester', 'developer']) {
-                    return res.status(400).send({
-                        message: 'invalid role'
-                    })
-                }
-
-                let targetUser = await db.User.findOne({
-                    where: {
-                        username: user
-                    }
-                });
-
-                if (!targetUser) {
-                    return res.status(400).send({
-                        message: `User doesn't exist`
-                    })
-                }
-
-                let checkExist = await db.ProjectMember.findOne({
-                    where: {
-                        userId: targetUser.id,
-                        role: role,
-                        projectId: projectId
-                    }
-                })
-
-                if (checkExist) {
-                    return res.status(400).send({
-                        message: 'Role already exists'
-                    })
-                }
-
-                await db.ProjectMember.create({
-                    role: role,
-                    projectId: projectId,
-                    userId: targetUser.id
-                })
-
-                activityHelper.createActivity(projectId, userId, 'EditProjectMember', JSON.stringify({
-                    project: projectId,
-                    user: userId,
-                    target: targetUser.id,
-                    role: role
-                }));
-
-                res.status(200).send({
-                    message: "Succesfully added user role"
-                });
-            }
-            catch (error) {
-                console.error(error);
-                res.status(500).send({
-                    message: "Error adding user role"
-                });
-            }
-        }
-    ],
-
-    getProjectReleases: [
-        isUserProjectMember,
-        isUserManagerOrTester,
-        async (req, res) => {
-            const { projectId } = req.params;
-            const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
-            const sortField = req.query.sort === 'startDate' ? 'startDate' : 'id';
-            const sortOrder = req.query.order === 'asc' ? 'ASC' : 'DESC';
-            const startDate = req.query.startDate ? new Date(req.query.startDate) : null;
-            const endDate = req.query.endDate ? new Date(req.query.endDate) : null;
-
-            const dateFilter = {};
-            if (startDate) {
-                dateFilter[Op.gte] = startDate;
-            }
-            if (endDate) {
-                dateFilter[Op.lte] = endDate;
-            }
-
-            const options = {
-                where: {
-                    projectId: projectId,
-                    ...((startDate || endDate) ? { createdAt: dateFilter } : {})
-                },
-                offset: PAGE_LIMIT * (page - 1),
-                limit: PAGE_LIMIT,
-                order: [[sortField, sortOrder]]
-            }
-
-            const keyword = req.query.keyword || '';
-            if (keyword.trim() !== '') {
-                options.where.name = { [Op.iLike]: `%${keyword}%` }
-            }
-
-            try {
-                const projectReleases = await db.Release.findAll(options);
-                const projectReleaseCount = await db.Release.count({ where: options.where });
-                return res.send({
-                    page: page,
-                    totalPages: Math.ceil(projectReleaseCount / PAGE_LIMIT),
-                    releases: projectReleases.map(release => release.toJSON())
-                });
-            } catch (error) {
-                console.error(error);
-                res.status(500).send({
-                    message: 'Internal server error.'
-                });
-            }
-        },
-    ],
-
     getProjectTestPlans: [
         isUserProjectMember,
         isUserManagerOrTester,
@@ -617,55 +417,6 @@ const controller = {
                     page: page,
                     totalPages: Math.ceil(projectTestPlanCount / PAGE_LIMIT),
                     testPlans: projectTestPlans.map(testPlan => testPlan.toJSON())
-                });
-            } catch (error) {
-                console.log(error);
-                res.status(500).send({
-                    message: 'Internal server error.'
-                });
-            }
-        },
-    ],
-
-    getProjectModules: [
-        isUserProjectMember,
-        isUserManagerOrTester,
-        async (req, res) => {
-            const { projectId } = req.params;
-            const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
-            const sortField = req.query.sort === 'updatedAt' ? 'updatedAt' : 'id';
-            const sortOrder = req.query.order === 'asc' ? 'ASC' : 'DESC';
-            const options = {
-                where: {
-                    projectId: projectId,
-                },
-                offset: PAGE_LIMIT * (page - 1),
-                limit: PAGE_LIMIT,
-                order: [[sortField, sortOrder]],
-                include: [{
-                    model: db.Module,
-                    as: 'childModules',
-                    attributes: ['id'],
-                    required: false
-                }]
-            };
-            const keyword = req.query.keyword || '';
-            if (keyword.trim() !== '') {
-                options.where.name = { [Op.iLike]: `%${keyword}%` }
-            }
-            try {
-                const projectFirstLevelModules = await db.Module.findAll(options);
-                const projectModuleCount = await db.Module.count({
-                    where: options.where
-                });
-                return res.send({
-                    page: page,
-                    totalPages: Math.ceil(projectModuleCount / PAGE_LIMIT),
-                    modules: projectFirstLevelModules.map(module => {
-                        return {
-                            ...module.toJSON(),
-                        };
-                    })
                 });
             } catch (error) {
                 console.log(error);
@@ -875,69 +626,6 @@ const controller = {
                 });
             }
         },
-    ],
-
-    getProjectRequirements: [
-        // isUserProjectMember,
-        // isUserManager,
-        filterRoleOr(['developer']),
-        async (req, res) => {
-        const { projectId } = req.params;
-        const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
-        const sortField = req.query.sort === 'updatedAt' ? 'updatedAt' : 'id';
-        const sortOrder = req.query.order === 'asc' ? 'ASC' : 'DESC';
-        const options = {
-            where: { parentRequirementId: null },
-            offset: PAGE_LIMIT * (page - 1),
-            limit: PAGE_LIMIT,
-            order: [[sortField, sortOrder]],
-            include: [
-                {
-                    model: db.Requirement,
-                    as: 'childRequirements',
-                    attributes: ['id'],
-                    required: false
-                },
-                {
-                    model: db.Release,
-                    as: 'release',
-                    attributes: [],
-                    required: true,
-                    include: [{
-                        model: db.Project,
-                        as: 'project',
-                        attributes: [],
-                        where: { id: projectId }
-                    }]
-                }
-            ]
-        };
-        const keyword = req.query.keyword || '';
-        if (keyword.trim() !== '') {
-            options.where.name = { [Op.iLike]: `%${keyword}%` }
-        }
-        try {
-            const projectFirstLevelRequirements = await db.Requirement.findAll(options);
-            const projectFirstLevelRequirementCount = await db.Requirement.count({
-                where: options.where,
-                include: options.include,
-            });
-            return res.send({
-                page: page,
-                totalPages: Math.ceil(projectFirstLevelRequirementCount / PAGE_LIMIT),
-                requirements: projectFirstLevelRequirements.map(requirement => {
-                    return {
-                        ...requirement.toJSON(),
-                    };
-                })
-            });
-        } catch (error) {
-            console.log(error);
-            res.status(500).send({
-                message: 'Internal server error.'
-            });
-        }
-        }
     ],
 }
 

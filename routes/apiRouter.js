@@ -20,7 +20,6 @@ const auth = (req, res, next) => {
 
 router.use('/projects', auth, require('./projectRouter'));
 router.use('/users/', auth, require('./userRouter.js'));
-router.use('/releases', auth, require('./releaseRouter'));
 router.use('/modules', auth, require('./moduleRouter'));
 router.use('/testPlans', auth, require('./testPlanRouter'));
 router.use('/testPlanComponents', auth, require('./testPlanComponentRouter'));

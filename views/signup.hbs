@@ -66,7 +66,7 @@
           form.classList.add('was-validated');
         } else {
           // Proceed with the AJAX request
-          axios.post('/api/auth/signup', {
+          axiosAuth.post('/api/auth/signup', {
             fullName: document.getElementById('fullname').value,
             username: document.getElementById('username').value,
             pass_word: document.getElementById('password').value,

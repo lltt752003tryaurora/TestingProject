@@ -36,7 +36,7 @@
 
 <script>
 function logout() {
-  axios.post('/api/auth/logout').then(res => {
+  axiosAuth.post('/api/auth/logout').then(res => {
     window.location.replace("/login");
   });
 }

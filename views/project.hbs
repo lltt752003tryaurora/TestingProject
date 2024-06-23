@@ -31,8 +31,32 @@
 
 <main class="d-flex h-100 overflow-hidden">
 	<div id="content" class="h-100 overflow-auto p-4" style="width: 100%; ">
-		<div class="text-gray fw-semibold fs-4 pb-5">
+		<div class="text-gray fw-semibold fs-4">
 			My Projects
+		</div>
+		<div class="d-flex justify-content-end py-3">
+			<div class="d-flex gap-1">
+				<div class="input-group">
+					<input type="text" class="rounded-pill form-control" id="search" placeholder="Search" oninput="searchOnInput()"/>
+					<label for="search" class="position-absolute end-0 pe-2 me-0 d-flex align-items-center h-100" style="z-index: 1000;">
+						<img src="/assets/search.png" height="20px"/>
+					</label>
+				</div>
+				<div class="btn-group">
+					<button class="btn p-0 border-0" data-bs-toggle="dropdown">
+						<img src="/assets/filter.png" height="30px" />
+					</button>
+					<div class="dropdown-menu dropdown-menu-right">
+						<button class="dropdown-item" onclick="currentFilter = ''; loadProject(1)">All</button>
+						<button class="dropdown-item" onclick="currentFilter = 'manager'; loadProject(1)">Manager</button>
+						<button class="dropdown-item" onclick="currentFilter = 'tester'; loadProject(1)">Tester</button>
+						<button class="dropdown-item" onclick="currentFilter = 'developer'; loadProject(1)">Developer</button>
+					</div>
+				</div>
+				{{!-- <button class="btn p-0">
+					<img src="/assets/sort.png" height="30px" />
+				</button> --}}
+			</div>
 		</div>
 		<div class="d-grid gap-2 project-grid-cols-1 sm:project-grid-cols-2 md:project-grid-cols-4" id="projects">
 			<button class="btn bg-white rounded bottom-shadow d-flex flex-column align-items-center justify-content-center" data-bs-toggle="modal" data-bs-target="#modal" style="height: 200px;">
@@ -44,12 +68,37 @@
 				</div>
 			</button>
 		</div>
+		<div class="d-flex justify-content-end align-items-center text-gray mt-4 mr-2 gap-1">
+			<button class="btn p-0" id="previousPage">
+				<i class="bi bi-chevron-left h4 m-0"></i>
+			</button>
+			<div class="d-flex gap-1" id="pagination">
+				
+			</div>
+			<button class="btn p-0" id="nextPage">
+				<i class="bi bi-chevron-right h4 m-0"></i>
+			</button>
+		</div>
 	</div>
 </main>
 
 {{!-- Template --}}
 {{{{rawHelper}}}}
-<script id="template-hbs" type="text/x-handlebars-template">
+<script id="template-pagination" type="text/x-handlebars-template">
+	{{#each pages}}
+	<button class="btn p-0" onclick="{{onclick}}">
+		<div class="d-flex rounded-circle {{#if currentPage}}bg-simple-gray{{/if}} justify-content-center align-items-center" style="width: 40px; height: 40px;">
+			<span class="lh-1 h6 m-0">
+				{{text}}
+			</span>
+		</div>
+	</button>
+	{{/each}}
+</script>
+{{{{/rawHelper}}}}
+
+{{{{rawHelper}}}}
+<script id="template-project" type="text/x-handlebars-template">
 	{{#each projects}}
     <a href="/project/{{id}}/" class="col text-decoration-none bg-white rounded bottom-shadow" style="height: 200px;">
 		<div class="d-flex flex-column p-4 justify-content-between h-100">
@@ -57,7 +106,7 @@
 				<div class="text-gray fw-bold fs-5">
 					{{name}}
 				</div>
-				<button class="btn p-0">
+				<button class="btn p-0" onclick="">
 					<img src="/assets/more_x.png" height="30px"/>
 				</button>
 			</div>
@@ -87,16 +136,23 @@
 					</div>
 				</div>
 			</div>
-			<div class="d-flex">
+			<div class="d-flex justify-content-between">
 				<div class="d-flex flex-column lh-1">
 					<div class="text-secondary fs-6">
-						Last Updated
+						My Role
 					</div>
 					<div class="text-gray fw-bold">
-						{{time}}
+						{{role}}
 					</div>
 				</div>
-
+				<div class="d-flex flex-column lh-1">
+					<div class="text-secondary fs-6">
+						Users
+					</div>
+					<div class="text-gray fw-bold">
+						{{userCount}}
+					</div>
+				</div>
 			</div>
 		</div>
 	</a>
@@ -105,26 +161,101 @@
 {{{{/rawHelper}}}}
 
 <script>
-let template = Handlebars.compile(document.getElementById('template-hbs').innerHTML);
+let template_project = Handlebars.compile(document.getElementById('template-project').innerHTML);
+let template_pagination = Handlebars.compile(document.getElementById('template-pagination').innerHTML);
+let currentPage = parseInt(getUrlQuery('page')) || 1;
+
+let currentFilter = ''
+let currentSearch = ''
+
+function clearProject() {
+	document.getElementById('projects').replaceChildren(document.getElementById('projects').firstElementChild)
+	document.getElementById('pagination').innerHTML = '';
+}
+
+function searchOnInput() {
+	let keyword = document.getElementById('search').value;
+	currentSearch = keyword;
+	loadProject(1);
+}
+
+function makePagination(numPage, currentPage) {
+	let opts = [];
+
+	let start = currentPage - 2;
+	let end = currentPage + 2;
+
+	if (start < 1) {
+		start = 1
+		end = Math.min(numPage, 5)
+	}
+	else if (end > numPage) {
+		end = numPage
+		start = Math.max(1, numPage - 4)
+	}
+	
+	for (let i = start; i <= end; i++) {
+		opts.push({
+			text: i,
+			onclick: `loadProject(${i})`,
+			currentPage: currentPage == i
+		})
+	}
+
+	let html = template_pagination({
+		currentPage: currentPage,
+		pages: opts
+	})
+	document.getElementById('pagination').innerHTML = html;
+	document.getElementById('previousPage').onclick = currentPage == 1 ? null : () => {loadProject(currentPage - 1)};
+	document.getElementById('nextPage').onclick = currentPage == numPage ? null : () => {loadProject(currentPage + 1)};
+}
 
 function loadProject(page = 1, size = 7) {
-	axiosAPI.get('/api/projects')
+	axiosAPI.get('/api/projects', {
+		params: {
+			page: page,
+			size: size,
+			filter: currentFilter,
+			search: currentSearch,
+		}
+	})
 	.then(res => {
-		res.data.forEach(pj => {
+		clearProject();
+		setUrlQuery('page', page)
+		res.data.projects.forEach(pj => {
 			pj.time = dayjs(pj.updatedAt).format('DD/MM/YYYY');
+			let rolePriority = {
+				"manager": 10,
+				"tester": 5,
+				"developer": 1,
+				"none": 0,
+			}
+			pj.role = "none";
+			pj.members.forEach(mb => {
+				let newRole = mb.role;
+				let currentPriority = rolePriority[pj.role];
+				let newPriority = rolePriority[newRole];
+				if (newPriority > currentPriority)
+					pj.role = newRole;
+			})
+			pj.role = pj.role.charAt(0).toUpperCase() + pj.role.slice(1);
+			if (pj.members.length > 1)
+				pj.role += `, ${pj.members.length - 1}+`
 		})
-		let html = template({
+		let html = template_project({
 			name: 'test',
-			projects: res.data
+			projects: res.data.projects
 		})
 		document.getElementById('projects').innerHTML += html;
+		makePagination(res.data.numPage, page);
 	})
 	.catch(err => {
 		console.log(err);
 	})
 }
 
-loadProject();
+loadProject(currentPage);
 
 function createProject(e) {
 	e.preventDefault()

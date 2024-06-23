@@ -11,9 +11,13 @@ const { isUserProjectMember, isUserManager, isUserManagerOrTester, filterRoleOr 
 const controller = {
     getProjects: [
         async (req, res) => {
-            const { page, size } = req.params;
+            let { page, size, filter, search } = req.query;
+            page = parseInt(page);
+            size = parseInt(size);
+            if (size <= 0) size = null;
+            if (page <= 0) page = null;
             try {
-                const projects = await db.Project.findAll({
+                const options = {
                     where: {
                         deletedAt: {
                             [Op.eq]: null
@@ -22,22 +26,50 @@ const controller = {
                     include: [{
                         model: db.ProjectMember,
                         where: { userId: req.user.id },
-                        attributes: [],
+                        attributes: ['role'],
                         as: 'members'
                     }],
-                    attributes: ['id', 'name', 'updatedAt']
-                });
-                if (projects) {
-                    const projectsWithDetails = await Promise.all(projects.map(async (project) => {
-                        const casesCount = await db.TestCase.count({
+                    attributes: ['id', 'name', 'updatedAt'],
+                    distinct: true
+                }
+                if (size && page) {
+                    options.limit = size,
+                    options.offset = (page - 1) * size
+                }
+                if (filter) {
+                    options.include[0].where.role = {
+                        [Op.eq]: filter
+                    }
+                }
+                if (search) {
+                    options.where.name = { [Op.iLike]: `%${search}%` }
+                }
+                let projects = await db.Project.findAndCountAll(options);
+                const projectsWithDetails = await Promise.all(projects.rows.map(async (project) => {
+                    const casesCount = await db.TestCase.count({
+                        include: [{
+                            model: db.Module,
+                            as: 'module',
+                        }],
+                        where: { '$module.projectId$': project.id }
+                    });
+
+                    const runsCount = await db.TestRun.count({
+                        include: [{
+                            model: db.TestCase,
+                            as: 'testCase',
                             include: [{
                                 model: db.Module,
                                 as: 'module',
-                            }],
-                            where: { '$module.projectId$': project.id }
-                        });
+                            }]
+                        }],
+                        where: { '$testCase.module.projectId$': project.id }
+                    });
 
-                        const runsCount = await db.TestRun.count({
+                    const issueCount = await db.Issue.count({
+                        include: [{
+                            model: db.TestRun,
+                            as: 'testRun',
                             include: [{
                                 model: db.TestCase,
                                 as: 'testCase',
@@ -45,40 +77,31 @@ const controller = {
                                     model: db.Module,
                                     as: 'module',
                                 }]
-                            }],
-                            where: { '$testCase.module.projectId$': project.id }
-                        });
-
-                        const issueCount = await db.Issue.count({
-                            include: [{
-                                model: db.TestRun,
-                                as: 'testRun',
-                                include: [{
-                                    model: db.TestCase,
-                                    as: 'testCase',
-                                    include: [{
-                                        model: db.Module,
-                                        as: 'module',
-                                    }]
-                                }]
-                            }],
-                            where: { '$testRun.testCase.module.projectId$': project.id }
-                        });
-    
-                        return {
-                            ...project.get({ plain: true }),
-                            casesCount,
-                            runsCount,
-                            issueCount
-                        };
-                    }));
-
-                    res.send(projectsWithDetails);
-                } else {
-                    res.status(404).send({
-                        message: 'Projects not found.'
+                            }]
+                        }],
+                        where: { '$testRun.testCase.module.projectId$': project.id }
                     });
-                }
+
+                    const userCount = await db.ProjectMember.count({
+                        where: {
+                            projectId: project.id,
+                        }
+                    })
+
+                    return {
+                        ...project.get({ plain: true }),
+                        casesCount,
+                        runsCount,
+                        issueCount,
+                        userCount
+                    };
+                }));
+
+                res.send({
+                    numPage: Math.ceil(projects.count / size),
+                    numProject: projects.count,
+                    projects: projectsWithDetails
+                });
             } catch (error) {
                 console.error('Error retrieving project:', error);
                 res.status(500).send({

@@ -34,7 +34,7 @@
           form.classList.add('was-validated');
         }
         else {
-          axios.post('/api/auth/login', {
+          axiosAuth.post('/api/auth/login', {
             username: document.getElementById('username').value,
             pass_word: document.getElementById('password').value,
           })

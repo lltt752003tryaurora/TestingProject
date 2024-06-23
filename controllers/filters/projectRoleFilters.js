@@ -31,14 +31,44 @@ const extractProjectIdFromRelease = async (req, res, next) => {
     }
 }
 
+const extractProjectFromTestPlan = async (req, res, next) => {
+    const { testPlanId } = req.params;
+    const testPlan = await db.TestPlan.findOne({
+        where: { id: testPlanId },
+        include: [{
+            model: db.Release,
+            as: 'release',
+            attributes: ['projectId'],
+        }]
+    });
+    if (testPlan) {
+        req.project = {
+            id: testPlan.projectId
+        };
+        next();
+    } else {
+        return res.status(404).send({
+            message: 'Release does not exist.'
+        });
+    }
+}
+
 const filterRoleOr = (roles) => {
     return async (req, res, next) => {
-        console.log(req.project);
         const userId = req.user.id;
-        const projectId = req.params.projectId || req.params.project_id || req.project.id || req.body.projectId;
+        const projectId = req.params.projectId || req.params.project_id || req.project?.id || req.body.projectId;
+        if (!projectId) {
+            return res.status(400).send({
+                message: 'Missing project ID.'
+            });
+        }
+
         const projectMember = await extractUserRole(projectId, userId);
 
         if (projectMember !== null && roles.includes(projectMember.role)) {
+            if (!req.project) {
+                req.project = { id: projectId };
+            }
             next();
         } else {
             return res.status(403).send({
@@ -77,4 +107,5 @@ module.exports = {
     isUserManagerOrTester,
     filterRoleOr,
     extractProjectIdFromRelease,
+    extractProjectFromTestPlan,
 };

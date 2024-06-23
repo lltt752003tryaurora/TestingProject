@@ -16,10 +16,26 @@ const isUserProjectMember = async (req, res, next) => {
     }
 }
 
+const extractProjectIdFromRelease = async (req, res, next) => {
+    const { releaseId } = req.params;
+    const release = await db.Release.findByPk(releaseId);
+    if (release) {
+        req.project = {
+            id: release.projectId
+        };
+        next();
+    } else {
+        return res.status(404).send({
+            message: 'Release does not exist.'
+        });
+    }
+}
+
 const filterRoleOr = (roles) => {
     return async (req, res, next) => {
+        console.log(req.project);
         const userId = req.user.id;
-        const projectId = req.params.projectId || req.params.project_id;
+        const projectId = req.params.projectId || req.params.project_id || req.project.id || req.body.projectId;
         const projectMember = await extractUserRole(projectId, userId);
 
         if (projectMember !== null && roles.includes(projectMember.role)) {
@@ -60,4 +76,5 @@ module.exports = {
     isUserManager,
     isUserManagerOrTester,
     filterRoleOr,
+    extractProjectIdFromRelease,
 };

@@ -31,7 +31,6 @@
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
 </main>
-
 <script>
 // Example starter JavaScript for disabling form submissions if there are invalid fields
 (function() {
@@ -44,16 +43,25 @@
       form.addEventListener('submit', function(event) {
         event.preventDefault();
         event.stopPropagation();
-		if (document.getElementById('password').value != document.getElementById('passwordConfirm').value) {
-			document.getElementById('passwordConfirm').setCustomValidity('invalid');
-		}
-		else {
-			document.getElementById('passwordConfirm').setCustomValidity('');
-		}
+        // Check if the password fields match
+        if (document.getElementById('password').value != document.getElementById('passwordConfirm').value) {
+          document.getElementById('passwordConfirm').setCustomValidity('invalid');
+        } else {
+          document.getElementById('passwordConfirm').setCustomValidity('');
+        }
+        // Check if the username is empty or contains spaces
+        const username = document.getElementById('username').value;
+        if (!username.trim() || username.includes(' ')) {
+          document.getElementById('username').setCustomValidity('invalid');
+          document.querySelector('#username + .invalid-feedback').textContent = username.includes(' ') ? 'Username must not contain spaces.' : 'Please enter your username.';
+        } else {
+          document.getElementById('username').setCustomValidity('');
+        }
+        // Perform the validation check
         if (form.checkValidity() === false) {
           form.classList.add('was-validated');
-        }
-        else {
+        } else {
+          // If all validations pass, submit the form data
           axios.post('/api/auth/signup', {
             fullName: document.getElementById('fullname').value,
             username: document.getElementById('username').value,
@@ -83,9 +91,9 @@
             }).showToast();
           })
         }
-        
       }, false);
     });
   }, false);
 })();
 </script>
+

@@ -82,7 +82,7 @@ const controller = {
         }
     },
     signup: [
-        upload.single('avatar'), 
+        upload.single('avatar'),
         async (req, res, next) => {
             try {
                 let { fullName, username, pass_word } = req.body;
@@ -100,7 +100,7 @@ const controller = {
                     }
                     return;
                 }
-                
+
 
                 let newUser = {
                     username,

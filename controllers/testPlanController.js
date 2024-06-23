@@ -1,6 +1,6 @@
 const db = require('../models/index');
 const Sequelize = require('sequelize');
-const {extractUserRole} = require('./filters/projectRoleFilters');
+const {extractUserRole} = require('./helpers/userRoleHelper');
 
 const getTestPlan = async (testPlanId, userId) => {
     const testPlan = await db.TestPlan.findOne({

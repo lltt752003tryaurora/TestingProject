@@ -166,7 +166,7 @@ const controller = {
                 checkTokenVerify != null &&
                 checkTokenVerify.name != "TokenExpiredError"
             ) {
-                res.status(401).send(checkTokenVerify.name);
+                res.status(401).send({message: checkTokenVerify.name});
                 return;
             }
 
@@ -235,6 +235,9 @@ const controller = {
                     },
                 }
             );
+
+            res.clearCookie('accessToken');
+            res.clearCookie('refreshToken');
 
             responseData(res, "Successfully logout", "Logout", 200);
         } catch (err) {

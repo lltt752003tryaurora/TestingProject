@@ -154,7 +154,7 @@
 let template = Handlebars.compile(document.getElementById('template-release').innerHTML);
 
 function loadReleases() {
-  axios.get('/api/projects/{{projectId}}/releases')
+  axiosAPI.get('/api/projects/{{projectId}}/releases')
   .then(res => {
     res.data.releases.forEach((re, i) => {
       let startTime = new Date(re.startDate).getTime();

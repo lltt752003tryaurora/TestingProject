@@ -46,7 +46,7 @@
 </div>
 
 <script>
-axios.get('/api/projects/{{projectId}}')
+axiosAPI.get('/api/projects/{{projectId}}')
 .then(res => {
 	document.getElementById('sidebar-project-name').innerHTML = res.data.name;
 })

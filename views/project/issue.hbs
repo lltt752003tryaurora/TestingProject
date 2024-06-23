@@ -158,7 +158,7 @@
   }
   
 
-  axios.get(`/api/projects/${projectId}/issues`)
+  axiosAPI.get(`/api/projects/${projectId}/issues`)
     .then((response) => {
       const { page, totalPages, issues } = response.data;
       console.log(issues);

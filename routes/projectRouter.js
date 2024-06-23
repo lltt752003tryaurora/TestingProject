@@ -2,7 +2,10 @@ const express = require('express');
 const router = express.Router();
 const projectController = require('../controllers/projectController');
 
-router.get('/', projectController.getProjectList);
+router.get('/', projectController.getProjects);
+router.put('/', projectController.createProject);
+router.patch('/', projectController.editProject);
+router.delete('/', projectController.deleteProject);
 
 router.get('/:projectId', projectController.getProjectById);
 

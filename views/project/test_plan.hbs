@@ -372,7 +372,7 @@
   }
 
   const projectId = {{ projectId }};
-  axios.get(`/api/projects/${projectId}/testPlans`)
+  axiosAPI.get(`/api/projects/${projectId}/testPlans`)
     .then((response) => {
       const { testPlans } = response.data;
       console.log(testPlans);

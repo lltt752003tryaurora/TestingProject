@@ -13,13 +13,13 @@
       <label for="name" class="form-label text-gray">Project Name</label>
       <input type="text" class="form-control" id="name" placeholder="Foobar" required>
       <div class="invalid-feedback">
-        Please provide a valid name.
+        Please provide a valid name (Maximum 50 characters)
       </div>
     </div>
-    <div class="mb-3">
+    {{!-- <div class="mb-3">
       <label for="description" class="form-label text-gray">Project Description</label>
       <textarea class="form-control" id="description" rows="5" placeholder="Something about this requirement..."></textarea>
-    </div>
+    </div> --}}
     <div class="d-flex align-items-center justify-content-center gap-3">
       <button type="submit" class="btn btn-primary">Create</button>
       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -34,8 +34,8 @@
 		<div class="text-gray fw-semibold fs-4 pb-5">
 			My Projects
 		</div>
-		<div class="d-flex flex-wrap gap-4" id="projects">
-			<button class="btn bg-white rounded bottom-shadow d-flex flex-column align-items-center justify-content-center" data-bs-toggle="modal" data-bs-target="#modal" style="width: 25%; height: 200px;">
+		<div class="d-grid gap-2 project-grid-cols-1 sm:project-grid-cols-2 md:project-grid-cols-4" id="projects">
+			<button class="btn bg-white rounded bottom-shadow d-flex flex-column align-items-center justify-content-center" data-bs-toggle="modal" data-bs-target="#modal" style="height: 200px;">
 				<div class="">
 					<img src="/assets/create_project.png" height="80px" />
 				</div>
@@ -51,7 +51,7 @@
 {{{{rawHelper}}}}
 <script id="template-hbs" type="text/x-handlebars-template">
 	{{#each projects}}
-    <a href="/project/{{id}}/" class="text-decoration-none bg-white rounded bottom-shadow" style="width: 25%; height: 200px;">
+    <a href="/project/{{id}}/" class="col text-decoration-none bg-white rounded bottom-shadow" style="height: 200px;">
 		<div class="d-flex flex-column p-4 justify-content-between h-100">
 			<div class="d-flex justify-content-between align-items-center">
 				<div class="text-gray fw-bold fs-5">
@@ -108,7 +108,7 @@
 let template = Handlebars.compile(document.getElementById('template-hbs').innerHTML);
 
 function loadProject(page = 1, size = 7) {
-	axios.get('/api/projects')
+	axiosAPI.get('/api/projects')
 	.then(res => {
 		res.data.forEach(pj => {
 			pj.time = dayjs(pj.updatedAt).format('DD/MM/YYYY');
@@ -129,77 +129,54 @@ loadProject();
 function createProject(e) {
 	e.preventDefault()
 	e.stopPropagation()
-	var form = document.getElementById('create-project-form');
-	if (!form.checkValidity()) {
-		form.classList.add('was-validated')
-		return;
-	}
-	form.classList.remove('was-validated')
-
-	var myModalEl = document.getElementById('modal');
-	var modal = bootstrap.Modal.getInstance(myModalEl);
-	modal.hide();
 
 	var name = document.getElementById('name');
 	var description = document.getElementById('description');
 
-	var newEl = `
-	<a href="/dashboard.html" class="text-decoration-none bg-white rounded bottom-shadow" style="width: 25%; height: 200px;">
-		<div class="d-flex flex-column p-4 justify-content-between h-100">
-			<div class="d-flex justify-content-between align-items-center">
-				<div class="text-gray fw-bold fs-5">
-					${name.value}
-				</div>
-				<button class="btn p-0">
-					<img src="/assets/more_x.png" height="30px"/>
-				</button>
-			</div>
-			<div class="d-flex align-items-center justify-content-between">
-				<div class="d-flex flex-column lh-1">
-					<div class="text-secondary fs-6">
-						Tests
-					</div>
-					<div class="text-gray fw-bold">
-						0/0
-					</div>
-				</div>
-				<div class="d-flex flex-column lh-1">
-					<div class="text-secondary fs-6">
-						Runs
-					</div>
-					<div class="text-gray fw-bold">
-						0
-					</div>
-				</div>
-				<div class="d-flex flex-column lh-1">
-					<div class="text-secondary fs-6">
-						Issues
-					</div>
-					<div class="text-gray fw-bold">
-						0
-					</div>
-				</div>
-			</div>
-			<div class="d-flex">
-				<div class="d-flex flex-column lh-1">
-					<div class="text-secondary fs-6">
-						Last Run
-					</div>
-					<div class="text-gray fw-bold">
-						../../....
-					</div>
-				</div>
+	var myModalEl = document.getElementById('modal');
+	var modal = bootstrap.Modal.getInstance(myModalEl);
 
-			</div>
-		</div>
-	</a>
-	`
-	//Append requirement
-	document.getElementById('projects').innerHTML += newEl;
+	if (!name.value.trim() || name.value.length > 50) {
+		name.setCustomValidity('invalid');
+		//document.querySelector('#name + .invalid-feedback').textContent = 'Passwords must match and be at least 8 characters long.';
+	} else {
+		name.setCustomValidity('');
+	}
 
-	//Clear form
-	name.value = "";
-	description.value = "";
+	var form = document.getElementById('create-project-form');
+	if (!form.checkValidity()) {
+		form.classList.add('was-validated');
+		return;
+	}
+	form.classList.remove('was-validated');
+
+	axiosAPI.put('/api/projects', {
+		name: name.value,
+	})
+	.then(res => {
+		console.log(res);
+		Toastify({
+			text: "New project created",
+			style: {
+			background: "linear-gradient(to right, #198754, #198754)",
+			},
+			onClick: function(){} // Callback after click
+		}).showToast();
+		modal.hide();
+		setTimeout(() => {
+			window.location.reload();
+		}, 500);
+	})
+	.catch(err => {
+		console.log(err);
+		Toastify({
+			text: "Failed to create project",
+			style: {
+			background: "linear-gradient(to right, #dc3545, #dc3545)",
+			},
+			onClick: function(){} // Callback after click
+		}).showToast();
+	})
 }
 
 </script>

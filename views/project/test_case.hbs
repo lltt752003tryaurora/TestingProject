@@ -340,7 +340,7 @@
   }
 
   const projectId = {{ projectId }};
-  axios.get(`/api/projects/${projectId}/testCases`)
+  axiosAPI.get(`/api/projects/${projectId}/testCases`)
     .then((response) => {
       const { testCases } = response.data;
       loadTable(testCases);
@@ -365,7 +365,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const formData = new FormData(form);
         
-        axios.post('/api/testCases/', formData)
+        axiosAPI.post('/api/testCases/', formData)
             .then(response => {
                 console.log('Success:', response.data);
             })

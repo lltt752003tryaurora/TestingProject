@@ -1,16 +1,24 @@
 const { Op, where } = require('sequelize');
 const db = require('../models/index');
+const activityHelper = require('./helpers/activityHelper')
 
 const PAGE_LIMIT = 10;
 
-const { extractUserRole, isUserProjectMember, isUserManager, isUserManagerOrTester, filterRoleOr } = require('./filters/projectRoleFilters');
+const { extractUserRole } = require('./helpers/userRoleHelper')
+
+const { isUserProjectMember, isUserManager, isUserManagerOrTester, filterRoleOr } = require('./filters/projectRoleFilters');
 
 const controller = {
-    getProjectList: [
+    getProjects: [
         async (req, res) => {
             const { page, size } = req.params;
             try {
                 const projects = await db.Project.findAll({
+                    where: {
+                        deletedAt: {
+                            [Op.eq]: null
+                        }
+                    },
                     include: [{
                         model: db.ProjectMember,
                         where: { userId: req.user.id },
@@ -25,8 +33,8 @@ const controller = {
                             include: [{
                                 model: db.Module,
                                 as: 'module',
-                                where: { projectId: project.id }
-                            }]
+                            }],
+                            where: { '$module.projectId$': project.id }
                         });
 
                         const runsCount = await db.TestRun.count({
@@ -36,9 +44,9 @@ const controller = {
                                 include: [{
                                     model: db.Module,
                                     as: 'module',
-                                    where: { projectId: project.id }
                                 }]
-                            }]
+                            }],
+                            where: { '$testCase.module.projectId$': project.id }
                         });
 
                         const issueCount = await db.Issue.count({
@@ -51,10 +59,10 @@ const controller = {
                                     include: [{
                                         model: db.Module,
                                         as: 'module',
-                                        where: { projectId: project.id }
                                     }]
                                 }]
-                            }]
+                            }],
+                            where: { '$testRun.testCase.module.projectId$': project.id }
                         });
     
                         return {
@@ -79,6 +87,125 @@ const controller = {
             }
         }
     ],
+
+    createProject: [
+        async (req, res) => {
+            try {
+                const userId = req.user.id;
+                const { name } = req.body;
+                const newProject = await db.Project.create({
+                    name
+                })
+
+                const projectId = newProject.id;
+
+                activityHelper.createActivity(projectId, userId, 'CreateProject', JSON.stringify({
+                    project: projectId,
+                    user: userId,
+                }));
+                
+                const newProjectMember = await db.ProjectMember.create({
+                    role: 'manager',
+                    projectId: projectId,
+                    userId: userId
+                })
+
+                activityHelper.createActivity(projectId, userId, 'EditProjectMember', JSON.stringify({
+                    project: projectId,
+                    user: userId,
+                    target: userId,
+                    role: 'manager'
+                }));
+
+                res.status(200).send({
+                    message: "Succesfully created new project"
+                });
+            }
+            catch (error) {
+                console.error(error);
+                res.status(500).send({
+                    message: "Error creating project"
+                });
+            }
+        }
+    ],
+
+    editProject: [
+        async (req, res) => {
+            try {
+                const userId = req.user.id;
+                const { name, projectId } = req.body;
+                const userRole = await extractUserRole(projectId, userId);
+                if (userRole?.role != 'manager') {
+                    return res.status(403).send({
+                        message: 'Access denied.'
+                    })
+                }
+                await db.Project.update({
+                    name
+                }, {
+                    where: {
+                        id: projectId
+                    }
+                })
+
+                activityHelper.createActivity(projectId, userId, 'EditProject', JSON.stringify({
+                    project: projectId,
+                    user: userId,
+                    name: name,
+                }));
+
+                res.status(200).send({
+                    message: "Succesfully editted project"
+                });
+            }
+            catch (error) {
+                console.error(error);
+                res.status(500).send({
+                    message: "Error editting project"
+                });
+            }
+        }
+    ],
+
+    deleteProject: [
+        async (req, res) => {
+            try {
+                const userId = req.user.id;
+                const { projectId } = req.body;
+                const userRole = await extractUserRole(projectId, userId);
+                if (userRole?.role != 'manager') {
+                    return res.status(403).send({
+                        message: 'Access denied.'
+                    })
+                }
+
+                await db.Project.update({
+                    deletedAt: new Date()
+                }, {
+                    where: {
+                        id: projectId
+                    }
+                })
+
+                activityHelper.createActivity(projectId, userId, 'DeleteProject', JSON.stringify({
+                    project: projectId,
+                    user: userId,
+                }));
+
+                res.status(200).send({
+                    message: "Succesfully deleted project"
+                });
+            }
+            catch (error) {
+                console.error(error);
+                res.status(500).send({
+                    message: "Error deleting project"
+                });
+            }
+        }
+    ],
+    
 
     getProjectById: [
         isUserProjectMember,
@@ -134,8 +261,8 @@ const controller = {
                     include: [{
                         model: db.Module,
                         as: 'module',
-                        where: { projectId: projectId }
-                    }]
+                    }],
+                    where: { '$module.projectId$': projectId }
                 });
 
                 const runsCount = await db.TestRun.count({
@@ -145,9 +272,9 @@ const controller = {
                         include: [{
                             model: db.Module,
                             as: 'module',
-                            where: { projectId: projectId }
                         }]
-                    }]
+                    }],
+                    where: { '$testCase.module.projectId$': projectId }
                 });
 
                 let currentDate = new Date();
@@ -157,11 +284,11 @@ const controller = {
                         model: db.Release,
                         as: 'release',
                         where: {
-                            projectId: projectId,
                             startDate: { [Op.lte]: currentDate },
                             endDate: { [Op.gte]: currentDate }
                         }
-                    }]
+                    }],
+                    where: { '$release.projectId$': projectId }
                 });
 
                 const ongoingRelease = await db.Release.findOne({
@@ -186,7 +313,8 @@ const controller = {
                                 where: { projectId: projectId }
                             }]
                         }]
-                    }]
+                    }],
+                    where: { '$testRun.testCase.module.projectId$': projectId }
                 });
 
                 res.send({

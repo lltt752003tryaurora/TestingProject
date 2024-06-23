@@ -96,7 +96,7 @@ function buildTree(modules) {
 }
 
 function loadModules() {
-  axios.get('/api/projects/{{projectId}}/modules')
+  axiosAPI.get('/api/projects/{{projectId}}/modules')
   .then(res => {
     let tree = buildTree(res.data.modules);
     console.log(tree)

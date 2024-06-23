@@ -84,7 +84,7 @@
     comments.forEach(async (comment) => {
       // Fetch comment's owner info
       const userId = comment.userId;
-      const userResponse = await axios.get(`/api/users/${userId}`);
+      const userResponse = await axiosAPI.get(`/api/users/${userId}`);
       const {user} = userResponse.data;
       console.log(user);
 
@@ -135,7 +135,7 @@
   }
 
   const issueId = {{ issueId }};
-  axios.get(`/api/issues/${issueId}/comments`)
+  axiosAPI.get(`/api/issues/${issueId}/comments`)
     .then((response) => {
       const { comments } = response.data;
       console.log(comments);

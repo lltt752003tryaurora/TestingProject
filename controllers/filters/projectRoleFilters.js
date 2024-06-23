@@ -1,9 +1,6 @@
 const db = require('../../models/index');
 
-const extractUserRole = async (projectId, userId) => {
-    const projectMember = await db.ProjectMember.findOne({ where: { projectId: projectId, userId: userId } });
-    return projectMember ? { projectId, userId, role: projectMember.role } : null;
-}
+const { extractUserRole } = require('../helpers/userRoleHelper')
 
 const isUserProjectMember = async (req, res, next) => {
     const userId = req.user.id;
@@ -13,11 +10,9 @@ const isUserProjectMember = async (req, res, next) => {
         req.filter = projectMember;
         next();
     } else {
-        // return res.status(403).send({
-        //     message: 'User is not a project member.'
-        // });
-        return res.status(400).render('errors/bad_request', { message: 'Project does not exist, or user is not a project member.' });
-
+        return res.status(403).send({
+            message: 'User is not a project member.'
+        });
     }
 }
 
@@ -30,9 +25,9 @@ const filterRoleOr = (roles) => {
         if (projectMember !== null && roles.includes(projectMember.role)) {
             next();
         } else {
-            // return res.status(403).send({
-            //     message: 'Invalid authority.'
-            // });
+            return res.status(403).send({
+                message: 'Invalid authority.'
+            });
 
             return res.status(400).render('errors/bad_request', { message: 'Project does not exist, or user is not a project member.' });
         }

@@ -37,7 +37,6 @@
 <script>
 function logout() {
   axios.post('/api/auth/logout').then(res => {
-    document.cookie = 'accessToken=; Max-Age=-99999999;';  
     window.location.replace("/login");
   });
 }

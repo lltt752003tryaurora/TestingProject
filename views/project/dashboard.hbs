@@ -165,7 +165,7 @@
 let template_activity = Handlebars.compile(document.getElementById('template-activity').innerHTML);
 
 function loadActivity() {
-	axios.get('/api/projects/{{projectId}}/activity')
+	axiosAPI.get('/api/projects/{{projectId}}/activity')
 	.then(res => {
     let acts = {};
 		res.data.forEach(pj => {
@@ -199,7 +199,7 @@ function loadActivity() {
 loadActivity();
 
 function loadSummary() {
-  axios.get('/api/projects/{{projectId}}/summary')
+  axiosAPI.get('/api/projects/{{projectId}}/summary')
 	.then(res => {
     let data = res.data;
     document.getElementById('status-cases').innerHTML = data.casesCount;

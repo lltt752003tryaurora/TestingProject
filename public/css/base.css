@@ -19,9 +19,6 @@ html, body {
 	height: 100%;
 }
 
-main {
-}
-
 .bottom-shadow {
 	box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.05);
 }
@@ -29,4 +26,20 @@ main {
 .landing-bg {
 	background-image: url('/assets/landing.png');
 	background-size: cover;
+}
+
+.project-grid-cols-1 {
+	grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+@media (min-width: 450px) { 
+	.sm\:project-grid-cols-2 {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media (min-width: 768px) { 
+	.md\:project-grid-cols-4 {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
 }

@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const { getUserFromToken } = require('../utils/jwt');
 const { responseData } = require("../utils/response.js");
-const {verifyToken} = require('../utils/jwt.js');
 
 const auth = (req, res, next) => {
 	if (req.isLoggedIn) {
@@ -23,8 +22,8 @@ router.use('/users/', auth, require('./userRouter.js'));
 router.use('/modules', auth, require('./moduleRouter'));
 router.use('/testPlans', auth, require('./testPlanRouter'));
 router.use('/testPlanComponents', auth, require('./testPlanComponentRouter'));
-router.use('/testCases/', verifyToken, require('./testCaseRouter'));
-router.use('/testRuns', verifyToken, require('./testRunRouter'));
+router.use('/testCases/', auth, require('./testCaseRouter'));
+router.use('/testRuns', auth, require('./testRunRouter'));
 router.use('/issues', auth, require('./issueRouter'));
 router.use('/attachments', auth, require('./attachmentRouter'));
 router.use('/auth', require('./authRouter'));

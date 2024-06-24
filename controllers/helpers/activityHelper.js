@@ -34,6 +34,20 @@ const activityExplainer = async (keyname, value) => {
 				paranoid: false,
 			})
 			return release?.name;
+		case 'requirementId':
+			let requirement = await db.Requirement.findByPk(value, {
+				attributes: ['name'],
+				paranoid: false,
+			})
+			return requirement?.name;
+		case 'testPlanId':
+			let testPlan = await db.TestPlan.findByPk(value, {
+				attributes: ['name'],
+				paranoid: false,
+			})
+			return testPlan?.name;
+		default:
+			return value;
 	}
 	return '';
 } 

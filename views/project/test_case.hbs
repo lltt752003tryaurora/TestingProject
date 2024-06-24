@@ -59,7 +59,7 @@
                         <form id="formTestCase">
                           <div class="row">
                             <div class="col-6 form-group">
-                              <label for="">Name test case</label>
+                              <label for="">Name</label>
                               <span class="text-danger">*</span>
                               <input
                                 type="text"
@@ -69,19 +69,6 @@
                               <p
                                 class="text-danger py-2 mb-0"
                                 id="notiName"
-                              ></p>
-                            </div>
-                            <div class="col-6 form-group">
-                              <label for="">Hour test</label>
-                              <span class="text-danger">*</span>
-                              <input
-                                type="number"
-                                class="form-control"
-                                id="txtHour"
-                              />
-                              <p
-                                class="text-danger py-2 mb-0"
-                                id="notiHour"
                               ></p>
                             </div>
                             <div class="col-6 form-group">
@@ -108,10 +95,9 @@
                                 <option value="">
                                   Choose type you want
                                 </option>
-                                <option value="T1">Acceptance</option>
-                                <option value="T2">Can Edit</option>
-                                <option value="T3">Only view</option>
-                                <option value="T4">Deny Access</option>
+                                <option value="functional">Functional</option>
+                                <option value="performance">Performance</option>
+                                <option value="other">Other</option>
                               </select>
                               <p
                                 class="text-danger py-2 mb-0"
@@ -119,29 +105,23 @@
                               ></p>
                             </div>
                             <div class="col-6 form-group">
-                              <label for="">Start date</label>
+                              <label for="">Priority</label>
                               <span class="text-danger">*</span>
-                              <input
-                                type="date"
+                              <select
+                                name=""
+                                id="txtPriority"
                                 class="form-control"
-                                id="txtDate"
-                              />
+                              >
+                                <option value="">
+                                  Choose type you want
+                                </option>
+                                <option value="high">High</option>
+                                <option value="medium">Medium</option>
+                                <option value="low">Low</option>
+                              </select>
                               <p
                                 class="text-danger py-2 mb-0"
-                                id="notiDate"
-                              ></p>
-                            </div>
-                            <div class="col-6 form-group">
-                              <label for="">Cost ($)</label>
-                              <span class="text-danger">*</span>
-                              <input
-                                type="number"
-                                class="form-control"
-                                id="txtCost"
-                              />
-                              <p
-                                class="text-danger py-2 mb-0"
-                                id="notiCost"
+                                id="notiPriority"
                               ></p>
                             </div>
                           </div>
@@ -181,7 +161,7 @@
                       <th>Name</th>
                       <th>Type</th>
                       <th>Description</th>
-                      <th>Detail</th>
+                      <th>Priority</th>
                       <th>Created At</th>
                       <th>Test plan</th>
                     </tr>
@@ -196,7 +176,7 @@
                       <th>Salary</th>
                     </tr>
                   </tfoot> --}}
-                  <tbody id="tbodyTestCase">
+                  <tbody id="tbodyTestCase" class="text-break">
                     {{!-- <tr>
                       <td>Jennifer Acosta</td>
                       <td>Junior Javascript Developer</td>
@@ -304,10 +284,56 @@
 
 <!-- Custom scripts for all pages-->
 <script src="/js/sb-admin-2.min.js"></script>
-<script src="/js/AddTest.js"></script>
+{{!-- <script src="/js/AddTest.js"></script> --}}
 
 
 <script>
+  document.getElementById("btnAddTest").onclick = (e) => {
+    let valid = true
+    valid &= checkInputRong('txtName', 'notiName');
+    valid &= checkInputRong('txtDes', 'notiDes');
+    valid &= checkInputRong('txtType', 'notiType');
+    valid &= checkInputRong('txtPriority', 'notiPriority');
+    let name = document.getElementById('txtName').value;
+    let description = document.getElementById('txtDes').value;
+    let type = document.getElementById('txtType').value;
+    let priority = document.getElementById('txtPriority').value;
+
+    if (valid) {
+      axiosAPI.put('/api/projects/{{projectId}}/testCases/', {
+        name: name,
+        description: description,
+        type: type,
+        priority: priority,
+        testPlanId: 1,
+        moduleId: 1,
+      })
+      .then(res => {
+        console.log(res);
+        Toastify({
+          text: "New test case created",
+          style: {
+          background: "linear-gradient(to right, #198754, #198754)",
+          },
+          onClick: function(){} // Callback after click
+        }).showToast();
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+      })
+      .catch(err => {
+        console.log(err);
+        Toastify({
+          text: "Failed to create test case",
+          style: {
+          background: "linear-gradient(to right, #dc3545, #dc3545)",
+          },
+          onClick: function(){} // Callback after click
+        }).showToast();
+      })
+    }
+  }
+
   const loadTable = (testCases) => {
     const table = document.getElementById('tbodyTestCase');
     const projectId = {{ projectId }};
@@ -317,21 +343,21 @@
       const name = document.createElement("td");
       const type = document.createElement("td");
       const description = document.createElement("td");
-      const detail = document.createElement("td");
+      const priority = document.createElement("td");
       const createdAt = document.createElement("td");
       const testPlan = document.createElement("td");
 
       name.innerText = testCase.name;
-      type.innerText = testCase.type;
+      type.innerText = capitalizeFirstLetter(testCase.type);
       description.innerText = testCase.description;
-      detail.innerText = testCase.detail;
-      createdAt.innerText = new Date(testCase.createdAt);
+      priority.innerText = capitalizeFirstLetter(testCase.priority);
+      createdAt.innerText = new dayjs(testCase.createdAt).format('DD/MM/YYYY');
       testPlan.innerHTML = `<a href="/project/${projectId}/test_plan/">${testCase.testPlanId}</a>`;
 
       row.appendChild(name);
       row.appendChild(type);
       row.appendChild(description);
-      row.appendChild(detail);
+      row.appendChild(priority);
       row.appendChild(createdAt);
       row.appendChild(testPlan);
 
@@ -364,6 +390,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const formData = new FormData(form);
+        console.log(form);
         
         axiosAPI.post('/api/testCases/', formData)
             .then(response => {

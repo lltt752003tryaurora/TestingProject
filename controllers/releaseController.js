@@ -149,7 +149,6 @@ const controller = {
                 const releaseId = newRelease.id;
 
                 activityHelper.createActivity(projectId, userId, 'CreateRelease', JSON.stringify({
-                    project: projectId,
                     releaseId: releaseId,
                     user: userId,
                 }));
@@ -209,7 +208,6 @@ const controller = {
                 await release.save();
 
                 activityHelper.createActivity(projectId, userId, 'EditRelease', JSON.stringify({
-                    project: projectId,
                     releaseId: releaseId,
                     user: userId,
                 }));
@@ -240,7 +238,6 @@ const controller = {
                 await release.destroy();
 
                 activityHelper.createActivity(projectId, userId, 'DeleteRelease', JSON.stringify({
-                    project: projectId,
                     releaseId: releaseId,
                     user: userId,
                 }));

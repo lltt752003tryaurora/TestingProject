@@ -21,9 +21,9 @@ router.use('/:projectId/releases', require('./releaseRouter'));
 
 router.use('/:projectId/modules', require('./moduleRouter'));
 
-router.get('/:projectId/testPlans', projectController.getProjectTestPlans);
+router.use('/:projectId/testPlans', require('./testPlanRouter'));
 
-router.get('/:projectId/testCases', projectController.getProjectTestCases);
+router.use('/:projectId/testCases', require('./testCaseRouter'));
 
 router.get('/:projectId/testRuns', projectController.getProjectTestRuns);
 

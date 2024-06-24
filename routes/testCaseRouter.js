@@ -1,5 +1,5 @@
 const express = require('express');
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 const testCaseController = require('../controllers/testCaseController');
 
 // GET
@@ -7,7 +7,8 @@ router.get('/:testCaseId', testCaseController.getTestCaseById);
 router.get('/:testCaseId/testRuns', testCaseController.getTestCaseTestRuns);
 
 // POST
-router.post('/', testCaseController.createTestCase);
+router.get('/', testCaseController.getTestCases);
+router.put('/', testCaseController.createTestCase);
 
 router.patch('/:testCaseId', testCaseController.editTestCase);
 

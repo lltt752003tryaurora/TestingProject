@@ -46,7 +46,7 @@
                           class="modal-title fs-5"
                           id="staticBackdropLabel"
                         >
-                          Test Case
+                          Test Plan
                         </h1>
                         <button
                           type="button"
@@ -59,7 +59,7 @@
                         <form id="formTestCase">
                           <div class="row">
                             <div class="col-6 form-group">
-                              <label for="">Name test plan</label>
+                              <label for="">Name</label>
                               <span class="text-danger">*</span>
                               <input
                                 type="text"
@@ -69,19 +69,6 @@
                               <p
                                 class="text-danger py-2 mb-0"
                                 id="notiName"
-                              ></p>
-                            </div>
-                            <div class="col-6 form-group">
-                              <label for="">Hour plan</label>
-                              <span class="text-danger">*</span>
-                              <input
-                                type="number"
-                                class="form-control"
-                                id="txtHour"
-                              />
-                              <p
-                                class="text-danger py-2 mb-0"
-                                id="notiHour"
                               ></p>
                             </div>
                             <div class="col-6 form-group">
@@ -98,50 +85,29 @@
                               ></p>
                             </div>
                             <div class="col-6 form-group">
-                              <label for="">Type</label>
-                              <span class="text-danger">*</span>
-                              <select
-                                name=""
-                                id="txtType"
-                                class="form-control"
-                              >
-                                <option value="">
-                                  Choose type you want
-                                </option>
-                                <option value="T1">Acceptance</option>
-                                <option value="T2">Can Edit</option>
-                                <option value="T3">Only view</option>
-                                <option value="T4">Deny Access</option>
-                              </select>
-                              <p
-                                class="text-danger py-2 mb-0"
-                                id="notiType"
-                              ></p>
-                            </div>
-                            <div class="col-6 form-group">
                               <label for="">Start date</label>
                               <span class="text-danger">*</span>
                               <input
                                 type="date"
                                 class="form-control"
-                                id="txtDate"
+                                id="txtStartDate"
                               />
                               <p
                                 class="text-danger py-2 mb-0"
-                                id="notiDate"
+                                id="notiStartDate"
                               ></p>
                             </div>
                             <div class="col-6 form-group">
-                              <label for="">Cost ($)</label>
+                              <label for="">End date</label>
                               <span class="text-danger">*</span>
                               <input
-                                type="number"
+                                type="date"
                                 class="form-control"
-                                id="txtCost"
+                                id="txtEndDate"
                               />
                               <p
                                 class="text-danger py-2 mb-0"
-                                id="notiCost"
+                                id="notiEndDate"
                               ></p>
                             </div>
                           </div>
@@ -160,7 +126,7 @@
                           type="button"
                           class="btn btn-primary"
                         >
-                          Add Test Case
+                          Add Test Plan
                         </button>
                       </div>
                     </div>
@@ -195,7 +161,7 @@
                       <th>Salary</th>
                     </tr>
                   </tfoot> --}}
-                  <tbody id="tbodyTestCase">
+                  <tbody id="tbodyTestCase" class="text-break">
                     {{!-- <tr>
                       <td>Jennifer Acosta</td>
                       <td>Junior Javascript Developer</td>
@@ -337,12 +303,57 @@
 
 <!-- Custom scripts for all pages-->
 <script src="/js/sb-admin-2.min.js"></script>
-<script src="/js/AddTest.js"></script>
+{{!-- <script src="/js/AddTest.js"></script> --}}
 <!-- Page level plugins -->
 <script src="/js/datatables/jquery.dataTables.min.js"></script>
 <script src="/js/datatables/dataTables.bootstrap4.min.js"></script>
 
 <script>
+  document.getElementById("btnAddTest").onclick = (e) => {
+    let valid = true
+    valid &= checkInputRong('txtName', 'notiName');
+    valid &= checkInputRong('txtDes', 'notiDes');
+    valid &= checkInputRong('txtStartDate', 'notiStartDate');
+    valid &= checkInputRong('txtEndDate', 'notiEndDate');
+    let name = document.getElementById('txtName').value;
+    let description = document.getElementById('txtDes').value;
+    let startDate = document.getElementById('txtStartDate').value;
+    let endDate = document.getElementById('txtEndDate').value;
+
+    if (valid) {
+      axiosAPI.put('/api/projects/{{projectId}}/testPlans/', {
+        name: name,
+        description: description,
+        startDate: startDate,
+        endDate: endDate,
+        releaseId: 1,
+      })
+      .then(res => {
+        console.log(res);
+        Toastify({
+          text: "New test plan created",
+          style: {
+          background: "linear-gradient(to right, #198754, #198754)",
+          },
+          onClick: function(){} // Callback after click
+        }).showToast();
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+      })
+      .catch(err => {
+        console.log(err);
+        Toastify({
+          text: "Failed to create test plan",
+          style: {
+          background: "linear-gradient(to right, #dc3545, #dc3545)",
+          },
+          onClick: function(){} // Callback after click
+        }).showToast();
+      })
+    }
+  }
+
   const loadTable = (testRuns) => {
     const table = document.getElementById('tbodyTestCase');
     const projectId = {{ projectId }};
@@ -358,7 +369,7 @@
       id.innerText = testRun.id;
       name.innerText = testRun.name;
       description.innerText = testRun.description;
-      createdAt.innerText = new Date(testRun.createdAt);
+      createdAt.innerText = new dayjs(testRun.createdAt).format('DD/MM/YYYY');
       release.innerHTML = `<a href="/project/${projectId}/release/">${testRun.releaseId}</a>`;
 
       row.appendChild(id);

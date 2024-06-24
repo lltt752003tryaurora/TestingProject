@@ -1,8 +1,8 @@
 const db = require('../models/index');
 const Sequelize = require('sequelize');
 const {extractUserRole} = require('./helpers/userRoleHelper');
-const { extractProjectFromTestPlan, filterRoleOr } = require('./filters/projectRoleFilters');
 const activityHelper = require('./helpers/activityHelper');
+const { extractProjectFromTestPlan, isUserProjectMember, isUserManager, isUserManagerOrTester, filterRoleOr } = require('./filters/projectRoleFilters');
 
 
 const getTestPlan = async (testPlanId, userId) => {
@@ -85,6 +85,55 @@ controller = {
         }
     },
 
+    getTestPlans: [
+        isUserProjectMember,
+        isUserManagerOrTester,
+        async (req, res) => {
+            const { projectId } = req.params;
+            const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
+            const sortField = req.query.sort === 'updatedAt' ? 'updatedAt' : 'id';
+            const sortOrder = req.query.order === 'asc' ? 'ASC' : 'DESC';
+            const options = {
+                offset: PAGE_LIMIT * (page - 1),
+                limit: PAGE_LIMIT,
+                order: [[sortField, sortOrder]],
+                include: [
+                    {
+                        model: db.Release,
+                        as: 'release',
+                        where: { projectId },
+                        attributes: [],
+                    },
+                    {
+                        model: db.TestPlanComponent,
+                        as: 'components',
+                        attributes: ['id', 'name']
+                    }
+                ]
+            };
+            const keyword = req.query.keyword || '';
+            if (keyword.trim() !== '') {
+                options.where.name = { [Op.iLike]: `%${keyword}%` }
+            }
+            try {
+                const projectTestPlans = await db.TestPlan.findAll(options);
+                const projectTestPlanCount = await db.TestPlan.count({ 
+                    include: options.include
+                });
+                return res.send({
+                    page: page,
+                    totalPages: Math.ceil(projectTestPlanCount / PAGE_LIMIT),
+                    testPlans: projectTestPlans.map(testPlan => testPlan.toJSON())
+                });
+            } catch (error) {
+                console.log(error);
+                res.status(500).send({
+                    message: 'Internal server error.'
+                });
+            }
+        },
+    ],
+
     createTestPlan: [
         filterRoleOr(['manager']),
         async (req, res, next) => {
@@ -118,8 +167,8 @@ controller = {
                 const testPlanId = newTestPlan.id;
 
                 activityHelper.createActivity(projectId, userId, 'CreateTestPlan', JSON.stringify({
-                    project: projectId,
                     testPlanId: testPlanId,
+                    releaseId: releaseId,
                     user: userId,
                 }));
 
@@ -184,7 +233,6 @@ controller = {
                 await testPlan.save();
 
                 activityHelper.createActivity(projectId, userId, 'EditTestPlan', JSON.stringify({
-                    project: projectId,
                     testPlanId: testPlanId,
                     releaseId: releaseId,
                     user: userId,
@@ -218,7 +266,6 @@ controller = {
                 await testPlan.destroy();
 
                 activityHelper.createActivity(projectId, userId, 'DeleteTestPlan', JSON.stringify({
-                    project: projectId,
                     testPlanId: testPlanId,
                     user: userId,
                 }));

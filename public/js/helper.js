@@ -24,3 +24,7 @@ function parseJwt (token) {
 
 	return JSON.parse(jsonPayload);
 }
+
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}

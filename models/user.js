@@ -30,6 +30,7 @@ module.exports = (sequelize, DataTypes) => {
     username: DataTypes.STRING,
     fullName: DataTypes.STRING,
     hashedPassword: DataTypes.STRING,
+    isAdmin: DataTypes.BOOLEAN,
     refreshToken: DataTypes.STRING,
   }, {
     sequelize,

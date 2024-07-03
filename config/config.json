@@ -12,6 +12,19 @@
       }
     }
   },
+  "development-2": {
+    "username": "devdb_owner",
+    "password": "Qds8hyMV0YJS",
+    "database": "devdb",
+    "host": "ep-red-union-a16rvgpa.ap-southeast-1.aws.neon.tech",
+    "dialect": "postgres",
+    "dialectOptions": {
+      "ssl": {
+        "require": true,
+        "rejectUnauthorized": false
+      }
+    }
+  },
   "test": {
     "username": "tms-dev_owner",
     "password": "VX0aYgcEBJ5f",

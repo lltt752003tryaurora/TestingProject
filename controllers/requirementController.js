@@ -9,6 +9,37 @@ const { isUserProjectMember, isUserManager, isUserManagerOrTester, filterRoleOr 
 PAGE_LIMIT = 10
 
 const controller = {
+    getRequirementById: [
+        filterRoleOr(['manager']),
+        async (req, res) => {
+            try {
+                const { requirementId } = req.params;
+                const requirement = await db.Requirement.findOne({
+                    where: { id: requirementId },
+                    include: [{
+                        model: db.TestCase,
+                        as: 'testCases',
+                        attributes: ['id', 'name', 'description', 'type', 'priority', 'detail', 'createdAt', 'updatedAt']
+                    }]
+                });
+                if (!requirement) {
+                    return res.status(404).send({
+                        message: 'Requirement does not exist.'
+                    });
+                }
+                console.log(requirement)
+                return res.send({
+                    data: requirement.toJSON()
+                });
+            } catch (error) {
+                console.error(error);
+                return res.status(500).send({
+                    message: 'Internal server error.'
+                });
+            }
+        }
+    ],
+
     getRequirements: [
         // isUserProjectMember,
         // isUserManager,

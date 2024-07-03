@@ -26,6 +26,7 @@ router.use('/testCases/', auth, require('./testCaseRouter'));
 router.use('/testRuns', auth, require('./testRunRouter'));
 router.use('/issues', auth, require('./issueRouter'));
 router.use('/attachments', auth, require('./attachmentRouter'));
+router.use('/requirements', auth, require('./requirementRouter'));
 router.use('/auth', require('./authRouter'));
 
 module.exports = router;

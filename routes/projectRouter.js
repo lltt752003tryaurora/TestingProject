@@ -29,6 +29,6 @@ router.get('/:projectId/testRuns', projectController.getProjectTestRuns);
 
 router.get('/:projectId/issues', projectController.getProjectIssues);
 
-router.use('/:projectId/requirements', require('./requirementRouter'));
+// router.use('/:projectId/requirements', require('./requirementRouter'));
 
 module.exports = router;

@@ -6,6 +6,7 @@ module.exports = {
       {
         moduleId: 1,
         testPlanId: 1,
+        requirementId: 1,
         name: 'Test Case A',
         description: 'Description for Test Case A',
         type: 'functional',
@@ -18,6 +19,7 @@ module.exports = {
       {
         moduleId: 2,
         testPlanId: 2,
+        requirementId: 2,
         name: 'Test Case B',
         description: 'Description for Test Case B',
         type: 'functional',
@@ -30,6 +32,7 @@ module.exports = {
       {
         moduleId: 3,
         testPlanId: 3,
+        requirementId: 1,
         name: 'Test Case C',
         description: 'Description for Test Case C',
         type: 'performance',

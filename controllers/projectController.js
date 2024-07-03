@@ -229,7 +229,7 @@ const controller = {
     
 
     getProjectById: [
-        isUserProjectMember,
+        filterRoleOr(['developer', 'tester', 'manager']),
         async (req, res) => {
             const { projectId } = req.params;
             try {

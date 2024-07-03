@@ -17,6 +17,7 @@ module.exports = (sequelize, DataTypes) => {
       // this.hasMany(models.TestCaseDetail, { foreignKey: 'test_case_id', as: 'details' });
       // this.belongsToMany(models.TestRun, { through: models.TestRunCase, foreignKey: 'test_case_id', as: 'testRuns' });
       this.hasMany(models.TestRun, { foreignKey: 'testCaseId', as: 'testRuns' });
+      this.belongsTo(models.Requirement, { foreignKey: 'requirementId', as: 'requirement' });
     }
   }
   TestCase.init({

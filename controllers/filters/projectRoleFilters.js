@@ -80,16 +80,25 @@ const extractProjectFromTestCase = async (req, res, next) => {
     }
 }
 
-const filterRoleOr = (roles) => {
+const filterRoleOr = (roles, allowAdmin = true) => {
     return async (req, res, next) => {
         const userId = req.user.id;
+        if (allowAdmin) {
+            const user = await db.User.findByPk(userId);
+            if (user && user.isAdmin) {
+                req.user.isAdmin = true;
+                next();
+            }
+            return;
+        }
+
         const projectId = req.params.projectId || req.params.project_id || req.project?.id || req.body.projectId;
         if (!projectId) {
             return res.status(400).send({
                 message: 'Missing project ID.'
             });
         }
-
+        
         const projectMember = await extractUserRole(projectId, userId);
 
         if (projectMember !== null && roles.includes(projectMember.role)) {
@@ -101,8 +110,6 @@ const filterRoleOr = (roles) => {
             return res.status(403).send({
                 message: 'Invalid authority.'
             });
-
-            return res.status(400).render('errors/bad_request', { message: 'Project does not exist, or user is not a project member.' });
         }
     }
 }

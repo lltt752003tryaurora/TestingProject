@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.Requirement, { foreignKey: 'parentRequirementId', as: 'parentRequirement' });
       this.hasMany(models.Requirement, { foreignKey: 'parentRequirementId', as: 'childRequirements' });
       this.belongsTo(models.Release, { foreignKey: 'releaseId', as: 'release' });
+      this.hasMany(models.TestCase, { foreignKey: 'requirementId', as: 'testCases' });
     }
   }
   Requirement.init({

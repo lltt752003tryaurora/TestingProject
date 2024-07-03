@@ -27,6 +27,16 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
+      requirementId: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'Requirements',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+      },
       name: {
         type: Sequelize.STRING
       },

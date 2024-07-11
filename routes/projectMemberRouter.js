@@ -3,7 +3,7 @@ const router = express.Router({ mergeParams: true });
 const projectMemberController = require('../controllers/projectMemberController');
 
 router.get('/', projectMemberController.getProjectMembers);
-router.put('/', projectMemberController.addProjectMembers);
+router.post('/', projectMemberController.addProjectMembers);
 
 router.get('/nonmembers', projectMemberController.getProjectNonMembers);
 

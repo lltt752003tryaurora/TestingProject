@@ -198,7 +198,7 @@ function createRequirement(e) {
 	var description = document.getElementById('description');
 	var release = document.getElementById('release');
 
-  axiosAPI.put('/api/projects/{{projectId}}/requirements', {
+  axiosAPI.post('/api/projects/{{projectId}}/requirements', {
     releaseId: release.value,
     name: name.value,
     description: description.value

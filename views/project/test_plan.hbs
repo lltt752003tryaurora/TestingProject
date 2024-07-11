@@ -321,7 +321,7 @@
     let endDate = document.getElementById('txtEndDate').value;
 
     if (valid) {
-      axiosAPI.put('/api/projects/{{projectId}}/testPlans/', {
+      axiosAPI.post('/api/projects/{{projectId}}/testPlans/', {
         name: name,
         description: description,
         startDate: startDate,

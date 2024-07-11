@@ -4,8 +4,8 @@ const projectController = require('../controllers/projectController');
 
 //Project
 router.get('/', projectController.getProjects);
-router.put('/', projectController.createProject);
-router.patch('/:projectId', projectController.editProject);
+router.post('/', projectController.createProject);
+router.put('/:projectId', projectController.editProject);
 router.delete('/:projectId', projectController.deleteProject);
 
 //Overall
@@ -25,10 +25,10 @@ router.use('/:projectId/testPlans', require('./testPlanRouter'));
 
 router.use('/:projectId/testCases', require('./testCaseRouter'));
 
-router.get('/:projectId/testRuns', projectController.getProjectTestRuns);
+router.use('/:projectId/testRuns', require('./testRunRouter'));
 
-router.get('/:projectId/issues', projectController.getProjectIssues);
+router.use('/:projectId/issues', require('./issueRouter'));
 
-// router.use('/:projectId/requirements', require('./requirementRouter'));
+router.use('/:projectId/requirements', require('./requirementRouter'));
 
 module.exports = router;

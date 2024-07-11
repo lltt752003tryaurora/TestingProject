@@ -1,8 +1,10 @@
 const express = require('express');
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 const testRunController = require('../controllers/testRunController');
 
-router.get('/:testRunId', testRunController.getTestRunById);
-router.get('/:testRunId/issues', testRunController.getTestRunIssues);
+router.get('/', testRunController.getTestRun);
+router.post('/', testRunController.createTestRun);
+router.put('/:testRunId', testRunController.editTestRun);
+router.delete('/:testRunId', testRunController.deleteTestRun);
 
 module.exports = router;

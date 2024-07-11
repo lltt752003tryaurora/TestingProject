@@ -238,7 +238,7 @@ function createReleases(e) {
 	var endDate = document.getElementById('end-date');
 	var progress = Math.floor(Math.random() * 80) + 20;
 
-  axios.put('/api/projects/{{projectId}}/releases', {
+  axios.post('/api/projects/{{projectId}}/releases', {
     name: name.value,
     description: description.value,
     startDate: startDate.value,

@@ -284,7 +284,7 @@ function createProject(e) {
 	}
 	form.classList.remove('was-validated');
 
-	axiosAPI.put('/api/projects', {
+	axiosAPI.post('/api/projects', {
 		name: name.value,
 	})
 	.then(res => {

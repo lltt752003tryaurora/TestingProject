@@ -194,7 +194,7 @@ function addNewUserRole(e) {
 	var myModalEl = document.getElementById('modal');
 	var modal = bootstrap.Modal.getInstance(myModalEl);
 
-  axiosAPI.put('/api/projects/{{projectId}}/members', {
+  axiosAPI.post('/api/projects/{{projectId}}/members', {
     user: username.value,
     role: role.value,
   })

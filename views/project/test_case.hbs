@@ -300,7 +300,7 @@
     let priority = document.getElementById('txtPriority').value;
 
     if (valid) {
-      axiosAPI.put('/api/projects/{{projectId}}/testCases/', {
+      axiosAPI.post('/api/projects/{{projectId}}/testCases/', {
         name: name,
         description: description,
         type: type,

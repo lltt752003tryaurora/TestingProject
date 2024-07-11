@@ -1,6 +1,7 @@
 const db = require('../models/index');
 const Sequelize = require('sequelize');
 const {extractUserRole} = require('./helpers/userRoleHelper');
+const { extractProjectFromTestCase, isUserProjectMember, isUserManager, isUserManagerOrTester, filterRoleOr } = require('./filters/projectRoleFilters');
 
 const getTestRun = async (testRunId, userId) => {
     const testRun = await db.TestRun.findOne({
@@ -107,6 +108,103 @@ const controller = {
             });
         } 
     },
+
+    getTestRun: [
+        isUserProjectMember,
+        isUserManagerOrTester,
+        async (req, res) => {
+            const { projectId } = req.params;
+            const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
+            const sortField = req.query.sort === 'updatedAt' ? 'updatedAt' : 'id';
+            const sortOrder = req.query.order === 'asc' ? 'ASC' : 'DESC';
+            const options = {
+                where: {},
+                offset: PAGE_LIMIT * (page - 1),
+                limit: PAGE_LIMIT,
+                order: [[sortField, sortOrder]],
+                include: [{
+                    model: db.TestCase,
+                    as: 'testCase',
+                    attributes: [],
+                    required: true,
+                    include: [{
+                        model: db.TestPlan,
+                        as: 'testPlan',
+                        attributes: [],
+                        required: true,
+                        include: [{
+                            model: db.Release,
+                            as: 'release',
+                            attributes: [],
+                            required: true,
+                            include: [{
+                                model: db.Project,
+                                as: 'project',
+                                attributes: [],
+                                where: { id: projectId },
+                                required: true
+                            }]
+                        }],
+                    }]
+                }],
+            };
+            const keyword = req.query.keyword || '';
+            if (keyword.trim() !== '') {
+                options.where.name = { [Op.iLike]: `%${keyword}%` }
+            }
+            try {
+                const projectTestRuns = await db.TestRun.findAll(options);
+                const projectTestRunCount = await db.TestRun.count({
+                    where: options.where,
+                    include: options.include,
+                });
+                return res.send({
+                    page: page,
+                    totalPages: Math.ceil(projectTestRunCount / PAGE_LIMIT),
+                    testRuns: projectTestRuns.map(testRun => {
+                        return {
+                            ...testRun.toJSON(),
+                        };
+                    })
+                });
+            } catch (error) {
+                console.log(error);
+                res.status(500).send({
+                    message: 'Internal server error.'
+                });
+            }
+            },
+    ],
+
+    createTestRun: [
+        async (req, res, next) => {
+            try {
+                
+            } catch (err) {
+                
+            }
+        }
+    ],
+
+    editTestRun: [
+        async (req, res, next) => {
+            try {
+                
+            } catch (err) {
+                
+            }
+        }
+    ],
+
+    deleteTestRun: [
+        async (req, res, next) => {
+            try {
+                
+            } catch (err) {
+
+            }
+        }
+    ]
 };
 
 module.exports = controller;

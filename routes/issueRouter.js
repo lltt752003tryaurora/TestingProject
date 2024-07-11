@@ -1,9 +1,12 @@
 const express = require('express');
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 const issueController = require('../controllers/issueController');
 
-router.get('/:issueId', issueController.getIssueById);
-router.get('/:issueId/comments', issueController.getIssueComments);
-router.get('/:issueId/attachments', issueController.getIssueAttachments);
+router.get('/', issueController.getIssues);
+router.post('/', issueController.createIssue);
+router.put('/:issueId', issueController.editIssues);
+router.delete('/:issueId', issueController.deleteIssues);
+
+router.use('/:issueId', require('./issueDetailRouter'));
 
 module.exports = router;

@@ -129,7 +129,7 @@ function createModule(e) {
 	
 	var name = document.getElementById('name');
 
-	axiosAPI.put('/api/projects/{{projectId}}/modules', {
+	axiosAPI.post('/api/projects/{{projectId}}/modules', {
 		name: name.value,
 	})
 	.then(res => {

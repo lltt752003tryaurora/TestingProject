@@ -4,8 +4,8 @@ const releaseController = require('../controllers/releaseController');
 
 // router.get('/:releaseId', releaseController.getReleaseById);
 router.get('/', releaseController.getReleases);
-router.put('/', releaseController.createRelease);
-router.patch('/:releaseId', releaseController.editRelease);
+router.post('/', releaseController.createRelease);
+router.put('/:releaseId', releaseController.editRelease);
 router.delete('/:releaseId', releaseController.deleteRelease);
 
 module.exports = router;

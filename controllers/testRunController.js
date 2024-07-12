@@ -219,11 +219,39 @@ const controller = {
     ],
 
     editTestRun: [
-        async (req, res, next) => {
+        extractProjectFromTestCase,
+        filterRoleOr(['manager']),
+        async (req, res) => {
             try {
+                const { testRunId } = req.params;
+                const { name, assignedUserId } = req.body;
+                if (!testRunId) {
+                    return res.status(400).send('Missing test run ID.');
+                }
 
+                const testRun = await db.TestRun.findByPk(testRunId);
+                if (!testRun) {
+                    return res.status(400).send('Test run does not exist.');
+                }
+                if (name) testRun.name = name.trim() ? name : testRun.name;
+                if (assignedUserId) testRun.assignedUserId = assignedUserId;
+
+                await testRun.save();
+
+                // Assuming activity logging is desired
+                activityHelper.createActivity(projectId, userId, 'EditTestRun', JSON.stringify({
+                    testRunId: testRunId,
+                    user: userId,
+                }));
+
+                return res.status(200).send({
+                    message: 'Test run edited successfully.'
+                });
             } catch (err) {
-
+                console.error(err);
+                return res.status(500).send({
+                    message: 'Internal server error.'
+                });
             }
         }
     ],

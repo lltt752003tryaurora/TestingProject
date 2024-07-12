@@ -257,11 +257,33 @@ const controller = {
     ],
 
     deleteTestRun: [
-        async (req, res, next) => {
+        extractProjectFromTestCase, // Adjust accordingly if necessary
+        filterRoleOr(['manager']),
+        async (req, res) => {
             try {
+                const { testRunId } = req.params;
 
+                const testRun = await db.TestRun.findByPk(testRunId);
+                if (!testRun) {
+                    return res.status(400).send('Test run does not exist.');
+                }
+
+                await testRun.destroy();
+
+                // Assuming activity logging is desired
+                activityHelper.createActivity(projectId, userId, 'DeleteTestRun', JSON.stringify({
+                    testRunId: testRunId,
+                    user: userId,
+                }));
+
+                return res.status(200).send({
+                    message: 'Test run deleted successfully.'
+                });
             } catch (err) {
-
+                console.error(err);
+                return res.status(500).send({
+                    message: 'Internal server error.'
+                });
             }
         }
     ]

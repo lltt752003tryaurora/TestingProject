@@ -1,6 +1,6 @@
 const db = require('../models/index');
 const Sequelize = require('sequelize');
-const {extractUserRole} = require('./helpers/userRoleHelper');
+const { extractUserRole } = require('./helpers/userRoleHelper');
 const { extractProjectFromTestCase, isUserProjectMember, isUserManager, isUserManagerOrTester, filterRoleOr } = require('./filters/projectRoleFilters');
 
 const getTestRun = async (testRunId, userId) => {
@@ -73,7 +73,7 @@ const controller = {
             res.status(500).send({
                 message: 'Internal server error.'
             });
-        } 
+        }
     },
 
     getTestRunIssues: async (req, res) => {
@@ -106,7 +106,7 @@ const controller = {
             res.status(500).send({
                 message: 'Internal server error.'
             });
-        } 
+        }
     },
 
     getTestRun: [
@@ -173,15 +173,46 @@ const controller = {
                     message: 'Internal server error.'
                 });
             }
-            },
+        },
     ],
 
     createTestRun: [
         async (req, res, next) => {
             try {
-                
+                const userId = req.user.id;
+                const { testCaseId, assignedUserId, name } = req.body;
+                if (!testCaseId) {
+                    return res.status(400).send('Missing test case ID.');
+                }
+                if (!assignedUserId) {
+                    return res.status(400).send('Missing assigned user ID.');
+                }
+                if (!name || name.trim() === '') {
+                    return res.status(400).send({
+                        message: 'Test run name must not be empty.'
+                    });
+                }
+
+                const newTestRun = await db.TestRun.create({
+                    testCaseId,
+                    assignedUserId,
+                    name
+                });
+                const testRunId = newTestRun.id;
+
+                // Assuming activity logging is desired
+                activityHelper.createActivity(projectId, userId, 'CreateTestRun', JSON.stringify({
+                    testRunId: testRunId,
+                    user: userId,
+                }));
+
+                return res.status(201).send({
+                    message: 'Test run created successfully.',
+                    testRunId: testRunId,
+                });
             } catch (err) {
-                
+                console.error(err);
+                return res.status(500).send({ message: 'An error occurred while creating the test run.' });
             }
         }
     ],
@@ -189,9 +220,9 @@ const controller = {
     editTestRun: [
         async (req, res, next) => {
             try {
-                
+
             } catch (err) {
-                
+
             }
         }
     ],
@@ -199,7 +230,7 @@ const controller = {
     deleteTestRun: [
         async (req, res, next) => {
             try {
-                
+
             } catch (err) {
 
             }

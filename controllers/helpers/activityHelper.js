@@ -1,16 +1,18 @@
 const db = require('../../models/index');
 
-const createActivity = (projectId, userId, type, detail) => {
-	db.Activity.create({
-		userId: userId,
-		projectId: projectId,
-		type,
-		detail,
-	}).then(res => {
-		
-	}).catch(err => {
-		console.log("Error in creating activity: ", err);
-	})
+const createActivity = async (projectId, userId, type, detail) => {
+	try {
+		await db.Activity.create({
+			userId: userId,
+			projectId: projectId,
+			type,
+			detail,
+		});
+	} catch (err) {
+		console.error("Lỗi khi tạo hoạt động: ", err);
+		// Tùy thuộc vào yêu cầu của hệ thống, bạn có thể ném một lỗi, thử lại, hoặc xử lý nó theo cách khác
+		throw new Error("Không thể ghi nhật ký hoạt động. Vui lòng thử lại.");
+	}
 }
 
 const activityExplainer = async (keyname, value) => {
@@ -50,7 +52,7 @@ const activityExplainer = async (keyname, value) => {
 			return value;
 	}
 	return '';
-} 
+}
 
 module.exports = {
 	createActivity,

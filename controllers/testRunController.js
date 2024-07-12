@@ -1,6 +1,7 @@
 const db = require('../models/index');
 const Sequelize = require('sequelize');
 const { extractUserRole } = require('./helpers/userRoleHelper');
+const activityHelper = require('./helpers/activityHelper');
 const { extractProjectFromTestCase, isUserProjectMember, isUserManager, isUserManagerOrTester, filterRoleOr } = require('./filters/projectRoleFilters');
 
 const getTestRun = async (testRunId, userId) => {

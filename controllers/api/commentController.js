@@ -24,6 +24,20 @@ const controller = {
         }
     ],
     deleteComment: [
+        async (req, res) => {
+            try {
+                const { commentId } = req.params;
+                const comment = await db.IssueComment.findByPk(commentId);
+                if (!comment) {
+                    return res.status(404).send({ message: 'Comment not found.' });
+                }
+                await comment.destroy();
+                res.status(200).send({ message: 'Comment deleted successfully.' });
+            } catch (error) {
+                console.error('Delete Comment Error:', error);
+                res.status(500).send({ message: 'Internal server error while deleting comment.' });
+            }
+        }
     ]
 };
 

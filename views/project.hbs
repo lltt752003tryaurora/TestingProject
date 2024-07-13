@@ -39,12 +39,12 @@
 				<div class="input-group">
 					<input type="text" class="rounded-pill form-control" id="search" placeholder="Search" oninput="searchOnInput()"/>
 					<label for="search" class="position-absolute end-0 pe-2 me-0 d-flex align-items-center h-100" style="z-index: 1000;">
-						<img src="/assets/search.png" height="20px"/>
+						<i class="bi bi-search text-gray h6 m-0"></i>
 					</label>
 				</div>
 				<div class="btn-group">
 					<button class="btn p-0 border-0" data-bs-toggle="dropdown">
-						<img src="/assets/filter.png" height="30px" />
+						<i class="bi bi-funnel text-gray h4"></i>
 					</button>
 					<div class="dropdown-menu dropdown-menu-right">
 						<button class="dropdown-item" onclick="currentFilter = ''; loadProject(1)">All</button>
@@ -61,9 +61,9 @@
 		<div class="d-grid gap-2 project-grid-cols-1 sm:project-grid-cols-2 md:project-grid-cols-4" id="projects">
 			<button class="btn bg-white rounded bottom-shadow d-flex flex-column align-items-center justify-content-center" data-bs-toggle="modal" data-bs-target="#modal" style="height: 200px;">
 				<div class="">
-					<img src="/assets/create_project.png" height="80px" />
+					<i class="bi bi-plus-lg h1 text-simple-gray" style="font-size: 100px;"></i>
 				</div>
-				<div class="fw-bold fs-4" style="color: #C3CAD9;">
+				<div class="fw-bold fs-4 text-simple-gray">
 					New Project
 				</div>
 			</button>
@@ -103,14 +103,14 @@
     <a href="/project/{{id}}/" class="col text-decoration-none bg-white rounded bottom-shadow" style="height: 200px;">
 		<div class="d-flex flex-column p-4 justify-content-between h-100">
 			<div class="d-flex justify-content-between align-items-center">
-				<div class="text-gray fw-bold fs-5">
+				<div class="text-gray fw-bold fs-5 text-truncate">
 					{{name}}
 				</div>
 				{{!-- <button class="btn p-0" onclick="">
 					<img src="/assets/more_x.png" height="30px"/>
 				</button> --}}
 				<button class="btn p-0" onclick="deleteProject(event, {{id}})">
-					<img src="/assets/trash.png" height="20px" />
+					<i class="bi bi-trash3-fill text-gray"></i>
 				</button>
 			</div>
 			<div class="d-flex align-items-center justify-content-between">
@@ -225,6 +225,10 @@ function loadProject(page = 1, size = 7) {
 		}
 	})
 	.then(res => {
+		if (page > res.data.numPage) {
+			loadProject(res.data.numPage);
+			return;
+		}
 		clearProject();
 		setUrlQuery('page', page)
 		res.data.projects.forEach(pj => {

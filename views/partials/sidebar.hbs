@@ -15,12 +15,12 @@
 <div id="sidebar" class="overflow-auto border border-top-0 border-start-0 border-bottom-0 border-3" style="width: 20%; ">
 	<a href="/project" id="project-info" class="sticky-top text-decoration-none d-flex bottom-shadow bg-white">
 		<div class="d-flex align-items-center justify-content-between w-100 p-4 px-3">
-			<div class="d-flex align-items-center gap-2">
+			<div class="d-flex align-items-center gap-2 minw-0">
 				<div class="bg-divisor-gray rounded">
 					<img src="/assets/project_placeholder.png" height="32px" alt="Project Image">
 				</div>
-				<div class="d-flex flex-column lh-sm">
-					<div class="fw-semibold text-gray fs-5" id="sidebar-project-name">
+				<div class="d-flex flex-column lh-sm minw-0">
+					<div class="fw-semibold text-gray fs-5 text-truncate" id="sidebar-project-name">
 						{{projectName}}
 					</div>
 					<div class="text-secondary fs-6">
@@ -29,7 +29,7 @@
 				</div>
 			</div>
 			<div>
-				<img src="/assets/down_arrow.png" alt="Change project" height="20px">
+				<i class="bi bi-chevron-down text-gray" alt="Change project"></i>
 			</div>
 		</div>
 	</a>

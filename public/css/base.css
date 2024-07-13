@@ -2,6 +2,10 @@
 	color: #4D5E80;
 }
 
+.text-simple-gray {
+	color: #C3CAD9;
+}
+
 .bg-simple-gray {
 	background-color: #C3CAD9;
 }
@@ -34,6 +38,10 @@ html, body {
 
 .project-grid-cols-1 {
 	grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.minw-0 {
+	min-width: 0;
 }
 
 @media (min-width: 450px) { 

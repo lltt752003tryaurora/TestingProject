@@ -14,6 +14,7 @@ router.delete('/comments/:commentId', commentController.deleteComment);
 router.put('/changeStatus', issueController.changeStatus);
 router.put('/changePriority', issueController.changePriority);
 router.put('/changeSeverity', issueController.changeSeverity);
+router.put('/changeSeverity', issueController.assignUserToIssues);
 
 router.use('/:issueId', require('./issueDetailRouter'));
 

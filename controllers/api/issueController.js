@@ -177,6 +177,7 @@ const controller = {
             }
         }
     ],
+
     changePriority: [
         async (req, res) => {
             const { issueId, priority } = req.body;
@@ -190,6 +191,7 @@ const controller = {
             }
         }
     ],
+
     changeSeverity: [
         async (req, res) => {
             const { issueIds, severity } = req.body;
@@ -203,6 +205,33 @@ const controller = {
             }
         }
     ],
+
+    assignUserToIssues: [
+        async (req, res) => {
+            const { issueIds, userId } = req.body; 
+
+            try {
+                if (!userId) {
+                    return res.status(400).send({ message: "Invalid user ID provided." });
+                }
+
+                const result = await db.Issue.update({ assignedUserId: userId }, {
+                    where: {
+                        id: issueIds
+                    }
+                });
+
+                res.status(200).send({
+                    message: 'User assigned successfully to issues.',
+                    updatedCount: result[0]  
+                });
+            } catch (error) {
+                console.error('Error while assigning user to issues:', error);
+                res.status(500).send({ message: 'Internal server error' });
+            }
+        }
+    ]
+
 };
 
 module.exports = controller;

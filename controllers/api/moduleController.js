@@ -82,19 +82,20 @@ const controller = {
     ],
 
     createModule: [
-        isUserProjectMember,
-        isUserManagerOrTester,
+        // isUserProjectMember,
+        // isUserManagerOrTester,
         async (req, res) => {
             try {
                 const userId = req.user.id;
                 const { projectId } = req.params;
 
-                let {name} = req.body;
+                let { name, parentModule } = req.body;
 
                 const newModule = await db.Module.create({
                     name: name,
-                    projectId: projectId
-                })
+                    projectId: projectId,
+                    parentModuleId: parentModule ? parseInt(parentModule) : null
+                });
 
                 activityHelper.createActivity(projectId, userId, 'CreateModule', JSON.stringify({
                     moduleId: newModule.id,

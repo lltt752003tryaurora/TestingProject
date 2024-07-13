@@ -4,6 +4,10 @@ controller.dashboard = async (req, res, next) => {
 	res.render('project/dashboard', {title: 'Dashboard', currentTab: 'Dashboard'});
 }
 
+controller.overview = async (req, res, next) => {
+	res.render('project/overview', {title: 'Overview', currentTab: 'Overview'});
+}
+
 controller.requirement = async (req, res, next) => {
 	res.render('project/requirement', {title: 'Requirements', currentTab: 'Requirements'});
 }

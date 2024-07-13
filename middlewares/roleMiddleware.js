@@ -1,4 +1,4 @@
-const { getRoleSpecificity } = require('../entities/role.js');
+const { ProjectRole, getRoleSpecificity } = require('../entities/role.js');
 const { responseData } = require('../utils/response.js');
 const errorPage = require('../utils/errorPage.js')
 
@@ -11,6 +11,10 @@ const notAllowed = (req, res, next) => {
 	}
 }
 
+const isAdmin = (req) => {
+	return req.user.role == ProjectRole.ADMIN;
+}
+
 const isProjectMember = (ifNotCallback = null) => {
 	return (req, res, next) => {
 		allowRoleFrom('member', ifNotCallback)(req, res, next);
@@ -20,7 +24,7 @@ const isProjectMember = (ifNotCallback = null) => {
 const allowRoleFrom = (role, ifNotCallback = null) => {
 	role = getRoleSpecificity(role);
 	return (req, res, next) => {
-		if (req.user.role >= role) {
+		if (req.user.role >= role || isAdmin(req)) {
 			next();
 		}
 		else {
@@ -35,7 +39,7 @@ const allowRoleFrom = (role, ifNotCallback = null) => {
 const allowRoleTo = (role, ifNotCallback = null) => {
 	role = getRoleSpecificity(role);
 	return (req, res, next) => {
-		if (req.user.role <= role) {
+		if (req.user.role <= role || isAdmin(req)) {
 			next();
 		}
 		else {
@@ -50,7 +54,7 @@ const allowRoleTo = (role, ifNotCallback = null) => {
 const roleWhitelist = (role, ifNotCallback = null) => {
 	roleArr = role.map(x => getRoleSpecificity(x));
 	return (req, res, next) => {
-		if (roleArr.includes(req.user.role)) {
+		if (roleArr.includes(req.user.role) || isAdmin(req)) {
 			next();
 		}
 		else {
@@ -65,7 +69,7 @@ const roleWhitelist = (role, ifNotCallback = null) => {
 const roleBlacklist = (role, ifNotCallback = null) => {
 	roleArr = role.map(x => getRoleSpecificity(x));
 	return (req, res, next) => {
-		if (!roleArr.includes(req.user.role)) {
+		if (!roleArr.includes(req.user.role) || isAdmin(req)) {
 			next();
 		}
 		else {

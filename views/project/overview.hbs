@@ -1,0 +1,361 @@
+{{#> modal }}
+<div class="d-flex flex-column p-4 gap-4">
+  <div class="d-flex align-items-center justify-content-between">
+    <div class="nav nav-tabs flex-grow-1" id="nav-tab" role="tablist">
+      <button class="nav-link active" id="nav-assign-tab" data-bs-toggle="tab" data-bs-target="#nav-assign" type="button" role="tab">
+        Assign User
+      </button>
+      {{!-- <button class="nav-link" id="nav-modify-tab" data-bs-toggle="tab" data-bs-target="#nav-modify" type="button" role="tab">
+        Modify User
+      </button> --}}
+    </div>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  </div>
+  {{!-- <div class="tab-content" id="nav-tabContent">
+    <div class="tab-pane fade show active" id="nav-assign" role="tabpanel">
+      A
+    </div>
+    <div class="tab-pane fade" id="nav-modify" role="tabpanel">
+      B
+    </div>
+  </div> --}}
+  <form class="needs-validation" novalidate id="userAssignForm" onsubmit="return addNewUserRole(event)">
+    <div class="mb-3">
+      <label for="usernameAssign" class="form-label text-gray">Select User</label>
+      <input type="text" class="form-control" id="usernameAssign" placeholder="Username" required oninput="assignUser()">
+      <div class="invalid-feedback">
+        Please provide a valid username.
+      </div>
+    </div>
+    <div class="mb-3">
+      <label for="roleAssign" class="form-label text-gray">Select Role</label>
+      <select id="roleAssign" class="form-select" required>
+        <option value="" disabled selected>Role...</option>
+        <option value="manager">Manager</option>
+        <option value="tester">Tester</option>
+        <option value="developer">Developer</option>
+      </select>
+      <div class="invalid-feedback">
+        Please select a valid role.
+      </div>
+    </div>
+    <div class="d-flex align-items-center justify-content-center gap-3">
+      <button type="submit" class="btn btn-primary">Assign</button>
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+    </div>
+  </form>
+  
+</div>
+{{/modal}}
+
+<main class="d-flex h-100 overflow-hidden">
+  {{>sidebar}}
+  <div id="content" class="h-100 overflow-auto p-4" style="width: 80%; ">
+    <button type="button" class="btn btn-primary d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modal">
+      <img src="/assets/user_edit.png" alt="#" height="30px">
+      <div>Edit Users</div>
+    </button>
+    <div id="report" class="mt-5">
+      <div class="d-flex gap-3">
+        <div id="left-report" class="d-flex flex-column gap-3" style="width: 70%;">
+          <div class="bg-white rounded bottom-shadow p-3">
+            <div class="fw-semibold text-gray fs-5 pb-3">
+              Status
+            </div>
+            <div id="progress" class="d-flex align-items-center">
+              <div id="progress-pie" class="d-none">
+                <div class="position-relative" style="width:150px; height: 150px;">
+                  <canvas id="progress-pie-chart" width="150px" height="150px" class="position-absolute top-0">
+                  </canvas>
+                  <div class="d-flex fs-1 fw-bold text-gray align-items-center w-100 h-100 mx-auto">
+                    <div class="mx-auto" id="progress-pie-label">0%</div>
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex p-3 gap-5 flex-wrap">
+                <div class="d-flex flex-column lh-1">
+                  <div class="text-gray fs-5">
+                    Test Cases
+                  </div>
+                  <div id="status-cases" class="fw-bold text-gray fs-4">
+                    ...
+                  </div>
+                </div>
+
+                <div class="d-flex flex-column lh-1">
+                  <div class="text-gray fs-5">
+                    Test Runs
+                  </div>
+                  <div id="status-runs" class="fw-bold text-gray fs-4">
+                    ...
+                  </div>
+                </div>
+
+                <div class="d-flex flex-column lh-1">
+                  <div class="text-gray fs-5">
+                    Test Plans
+                  </div>
+                  <div id="status-plans" class="fw-bold text-gray fs-4">
+                    ...
+                  </div>
+                </div>
+
+                <div class="d-flex flex-column lh-1">
+                  <div class="text-gray fs-5">
+                    Issues
+                  </div>
+                  <div id="status-issues" class="fw-bold text-gray fs-4">
+                    ...
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded bottom-shadow p-3">
+            <div class="fw-semibold text-gray fs-5 pb-3">
+              Overall Activities
+            </div>
+            <div id="activity">
+              <canvas id="activity-chart">
+              </canvas>
+            </div>
+          </div>
+        </div>
+
+        
+        <div id="right-report" style="width: 30%;">
+          <div class="bg-white rounded bottom-shadow p-3" id="activites">
+            <div class="fw-semibold text-gray fs-5">
+              History
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</main>
+
+{{{{rawHelper}}}}
+<script id="template-activity" type="text/x-handlebars-template">
+	{{#each data}}
+    <div class="text-gray fs-6">
+      {{month}}
+    </div>
+    <div class="py-2 d-flex flex-column">
+      {{#each activities}}
+      <div class="d-flex align-items-center">
+        <img src="/assets/history_none.svg" height="60px"/>
+        <div class="border border-2 p-2 rounded lh-1 w-100"  style="border-color: #4D5E80 !important;" >
+          <div class="text-gray fw-semibold">
+            {{type}}
+          </div>
+          <div class="text-secondary fw-light fs-6">
+            {{time}}
+          </div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+    {{else}}
+    <div class="text-gray fs-6">
+      No activity
+    </div>
+	{{/each}}
+</script>
+{{{{/rawHelper}}}}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+function assignUser() {
+  return;//skip temporarily
+  let el = document.getElementById('usernameAssign');
+  let username = el.value;
+  axiosAPI.get('/projects/{{projectId}}/nonmembers', {
+    params: {
+      search: username
+    }
+  })
+  .then(res => {
+
+  })
+  .catch(err => {
+    
+  })
+}
+
+function addNewUserRole(e) {
+	e.preventDefault()
+	e.stopPropagation()
+
+  let username = document.getElementById('usernameAssign');
+  let role = document.getElementById('roleAssign');
+
+	var myModalEl = document.getElementById('modal');
+	var modal = bootstrap.Modal.getInstance(myModalEl);
+
+  axiosAPI.post('/api/projects/{{projectId}}/members', {
+    user: username.value,
+    role: role.value,
+  })
+  .then(res => {
+		Toastify({
+			text: "Successfully assign user",
+			style: {
+			background: "linear-gradient(to right, #198754, #198754)",
+			},
+			onClick: function(){} // Callback after click
+		}).showToast();
+		modal.hide();
+
+    username.value = '';
+    role.value = '';
+
+    document.getElementById('userAssignForm').classList.remove('was-validated');
+	})
+	.catch(err => {
+		console.log(err);
+		Toastify({
+			text: "Failed to assign user: " + err?.response?.data?.message,
+			style: {
+			background: "linear-gradient(to right, #dc3545, #dc3545)",
+			},
+			onClick: function(){} // Callback after click
+		}).showToast();
+	})
+}
+</script>
+<script>
+let template_activity = Handlebars.compile(document.getElementById('template-activity').innerHTML);
+
+function loadActivity() {
+	axiosAPI.get('/api/projects/{{projectId}}/activity')
+	.then(res => {
+    let acts = {};
+		res.data.activities.forEach(pj => {
+      let month = dayjs(pj.updatedAt).startOf('month');
+      if (!acts[month]) acts[month] = [];
+      acts[month].push({
+        type: pj.type,
+        detail: pj.detail,
+        time: dayjs(pj.updatedAt).format('DD/MM/YYYY')
+      });
+		})
+
+    let tmpl = [];
+
+    for (const [key, value] of Object.entries(acts)) {
+      tmpl.push({
+        month: dayjs(key).format('MMMM YYYY'),
+        activities: value
+      })
+    }
+    let html = template_activity({
+			data: tmpl,
+		})
+		document.getElementById('activites').innerHTML += html;
+	})
+	.catch(err => {
+		console.log(err);
+	})
+}
+
+loadActivity();
+</script>
+
+<script>
+function loadSummary() {
+  axiosAPI.get('/api/projects/{{projectId}}/summary')
+	.then(res => {
+    let data = res.data;
+    document.getElementById('status-cases').innerHTML = data.casesCount;
+    document.getElementById('status-runs').innerHTML = data.runsCount;
+    document.getElementById('status-plans').innerHTML = data.plansCount;
+    document.getElementById('status-issues').innerHTML = data.issueCount;
+
+    if (data.ongoingRelease) {
+      let startTime = new Date(data.ongoingRelease.startDate).getTime();
+      let endTime = new Date(data.ongoingRelease.endDate).getTime();
+      let currentTime = new Date().getTime();
+
+      let pie_percent = Math.floor((currentTime - startTime) / (endTime - startTime) * 100);
+      document.getElementById('progress-pie-label').innerHTML = pie_percent + '%';
+      document.getElementById('progress-pie').classList.remove('d-none');
+
+      new Chart(document.getElementById('progress-pie-chart'), {
+        type: 'doughnut',
+        data: {
+          datasets: [{
+            data: [pie_percent, 100 - pie_percent],
+            backgroundColor: [
+              '#5D84E7',
+              '#C3CAD9',
+            ],
+            borderWidth: 0,
+            
+          }],
+        },
+        options: {
+          cutout: '80%',
+          events: [],
+          responsive: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+          }
+        }
+      });
+    }
+	})
+	.catch(err => {
+		console.log(err);
+	})
+}
+
+loadSummary();
+</script>
+
+<script>
+
+
+var ctx = document.getElementById('activity-chart');
+
+new Chart(ctx, {
+	data: {
+		datasets: [{
+			type: 'line',
+			label: 'FizzBuzz',
+			data: [],
+		}],
+		labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+	},
+	options: {
+		plugins: {
+			legend: {
+				display: false
+			},
+		}
+	}
+});
+
+//Form validation
+(() => {
+	'use strict'
+  
+	// Fetch all the forms we want to apply custom Bootstrap validation styles to
+	const forms = document.querySelectorAll('.needs-validation')
+  
+	// Loop over them and prevent submission
+	Array.from(forms).forEach(form => {
+	  form.addEventListener('submit', event => {
+		if (!form.checkValidity()) {
+		  event.preventDefault()
+		  event.stopPropagation()
+		}
+  
+		form.classList.add('was-validated')
+	  }, false)
+	})
+  })()  
+</script>

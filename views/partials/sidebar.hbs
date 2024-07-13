@@ -1,6 +1,11 @@
 {{#*inline "sidebarLink"}}
 	<a href="/project/{{projectId}}/{{href}}" class="{{#equal currentTab name}}bg-tinted-gray{{/equal}} text-decoration-none d-flex align-items-center rounded p-2" style="width: 80%;">
-		<img src="{{imgSrc}}" alt="#" height="30" class="">
+		{{#if imgSrc}}
+			<img src="{{imgSrc}}" alt="#" height="30" class="">
+		{{/if}}
+		{{#if icon}}
+			<i class="{{icon}} text-gray px-1"></i>
+		{{/if}}
 		<span class="align-middle text-gray fw-semibold px-1">
 			{{name}}
 		</span>
@@ -30,16 +35,21 @@
 	</a>
 	<div id="tabs" class="h-100 overflow-auto d-flex gap-4 py-4 flex-column align-items-center justify-content-center">
 
-		{{> sidebarLink href="dashboard" imgSrc="/assets/dashboard.png" name="Dashboard"}}
-		{{> sidebarLink href="requirement" imgSrc="/assets/requirements.png" name="Requirements"}}
-		{{> sidebarLink href="module" imgSrc="/assets/modules.png" name="Modules"}}
-		{{> sidebarLink href="release" imgSrc="/assets/releases.png" name="Releases"}}
+		{{#allowRoleFrom role 'admin'}}
+			{{> sidebarLink href="dashboard" imgSrc="/assets/dashboard.png" name="Dashboard"}}
+		{{/allowRoleFrom}}
+		{{#allowRoleFrom role 'tester'}}
+			{{> sidebarLink href="overview" icon="bi bi-house-door" name="Overview"}}
+			{{> sidebarLink href="requirement" imgSrc="/assets/requirements.png" name="Requirements"}}
+			{{> sidebarLink href="module" imgSrc="/assets/modules.png" name="Modules"}}
+			{{> sidebarLink href="release" imgSrc="/assets/releases.png" name="Releases"}}
+			<div class="bg-divisor-gray rounded-pill" style="height: 3px; width: 80%;"></div>
 
-		<div class="bg-divisor-gray rounded-pill" style="height: 3px; width: 80%;"></div>
+			{{> sidebarLink href="test_case" imgSrc="/assets/test_cases.png" name="Test Cases"}}
+			{{> sidebarLink href="test_plan" imgSrc="/assets/test_plans.png" name="Test Plans"}}
+			{{> sidebarLink href="test_run" imgSrc="/assets/test_runs.png" name="Test Runs"}}
+		{{/allowRoleFrom}}
 
-		{{> sidebarLink href="test_case" imgSrc="/assets/test_cases.png" name="Test Cases"}}
-		{{> sidebarLink href="test_plan" imgSrc="/assets/test_plans.png" name="Test Plans"}}
-		{{> sidebarLink href="test_run" imgSrc="/assets/test_runs.png" name="Test Runs"}}
 		{{> sidebarLink href="issue" imgSrc="/assets/issues.png" name="Issues"}}
 		
 	</div>

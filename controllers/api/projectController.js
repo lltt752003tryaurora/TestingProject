@@ -4,7 +4,6 @@ const activityHelper = require('../helpers/activityHelper')
 const queryHelper = require('../helpers/queryHelper');
 const PAGE_LIMIT = 10;
 
-const roleMiddleware = require('../../middlewares/roleMiddleware');
 const { responseData } = require('../../utils/response');
 
 const { extractUserRole } = require('../helpers/userRoleHelper')
@@ -153,7 +152,6 @@ const controller = {
     ],
 
     editProject: [
-        roleMiddleware.roleWhitelist(['manager', 'admin']),
         async (req, res) => {
             try {
                 const userId = req.user.id;
@@ -183,7 +181,6 @@ const controller = {
     ],
 
     deleteProject: [
-        roleMiddleware.roleWhitelist(['manager', 'admin']),
         async (req, res) => {
             try {
                 const userId = req.user.id;

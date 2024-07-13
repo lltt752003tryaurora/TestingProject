@@ -9,6 +9,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const auth = require("./middlewares/authMiddleware.js")
 const errorPage = require('./utils/errorPage.js')
+const {mapRole} = require("./entities/role.js")
 
 // config public static folder => express will return Free Template
 app.use(express.static(__dirname + '/public'))
@@ -27,6 +28,10 @@ app.engine("hbs", expressHandlebars.engine({
         },
         rawHelper: function(options) {
             return options.fn();
+        },
+        allowRoleFrom: function(a, b, options) {
+            if (a >= mapRole(b))
+                return options.fn(this);
         }
     }
 }))

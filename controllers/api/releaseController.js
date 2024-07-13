@@ -36,7 +36,6 @@ const getRelease = async (releaseId, userId) => {
     }
 }
 
-
 const controller = {
     getReleaseById: async (req, res) =>  {
         const userId = req.user.id;
@@ -65,6 +64,44 @@ const controller = {
             }
         } catch (error) {
             console.log(error);
+            res.status(500).send({
+                message: 'Internal server error.'
+            });
+        }
+    },
+
+    getReleaseDetails: async (req, res, next) => {
+        try {
+            const { projectId, releaseId } = req.params;
+            const release = await db.Release.findOne({
+                where: { id: releaseId },
+                include: [{
+                    model: db.Requirement,
+                    as: 'requirements',
+                    attributes: ['id'],
+                    include: [{
+                        model: db.TestCase,
+                        as: 'testCases',
+                        attributes: ['id'],
+                        include: [{
+                            model: db.TestRun,
+                            as: 'testRuns',
+                            attributes: ['id'],
+                        }]
+                    }]
+                }]
+            });
+            if (!release) {
+                release.status(404).send({
+                    message: 'Release does not exist.'
+                });
+                return;
+            }
+            res.status(200).send({
+                data: release,
+            });
+        } catch (err) {
+            console.log(err);
             res.status(500).send({
                 message: 'Internal server error.'
             });

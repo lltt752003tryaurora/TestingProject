@@ -111,6 +111,46 @@
   </div>
 </main>
 
+<script>
+  const handleDropdownButtonClick = (releaseId) => {
+    const releaseDetails = axiosAPI.get(`/api/projects/{{projectId}}/releases/${releaseId}/details`)
+      .then(res => res.data?.data)
+      .then(data => {
+        const container = document.getElementById(`releaseDetails-${releaseId}`);
+
+        const createdAtDiv = document.createElement('div');
+        createdAtDiv.innerHTML = `<strong>Start:</strong> ${data.startDate}`;
+        container.appendChild(createdAtDiv);
+
+        const endAtDiv = document.createElement('div');
+        endAtDiv.innerHTML = `<strong>End:</strong> ${data.endDate}`;
+        container.appendChild(endAtDiv);
+
+        const requirementCount = data.requirements.length;
+        let testCaseCount = 0;
+        let testRunCount = 0;
+
+        data.requirements.forEach((requirement) => {
+          testCaseCount += requirement.testCases.length;
+          requirement.testCases.forEach((testCase) => {
+            testRunCount += testCase.testRuns.length;
+          });
+        });
+
+        const testCaseCountDiv = document.createElement('div');
+        testCaseCountDiv.innerHTML = `<strong>Number of test cases:</strong> ${testCaseCount}`;
+        container.appendChild(testCaseCountDiv);
+
+        const testRunCountDiv = document.createElement('div');
+        testRunCountDiv.innerHTML = `<strong>Number of test runs:</strong> ${testCaseCount}`;
+        container.appendChild(testRunCountDiv);
+      })
+      .catch(err => {
+        console.error(err);
+      })
+  }
+</script>
+
 {{{{rawHelper}}}}
 <script id="template-release" type="text/x-handlebars-template">
 	{{#each data}}
@@ -131,7 +171,7 @@
             </div>
           </div>
           <button class="btn p-0" data-bs-toggle="collapse" data-bs-target="#collapsedDescription{{counter}}">
-            <img src="/assets/dropdown.png" height="30px" />
+            <img src="/assets/dropdown.png" height="30px" onclick="handleDropdownButtonClick({{id}})"/>
           </button>
         </div>
       </div>
@@ -141,8 +181,12 @@
             {{description}}
           </div>
           <button class="btn p-0" onclick="deleteRelease({{id}})">
-            <img src="/assets/trash.png" height="20px" />
+            <img src="/assets/trash.png" height="20px" /> 
           </button>
+        </div>
+
+        <div id="releaseDetails-{{id}}">
+
         </div>
       </div>
       

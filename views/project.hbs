@@ -109,9 +109,13 @@
 				{{!-- <button class="btn p-0" onclick="">
 					<img src="/assets/more_x.png" height="30px"/>
 				</button> --}}
-				<button class="btn p-0" onclick="deleteProject(event, {{id}})">
-					<i class="bi bi-trash3-fill text-gray"></i>
-				</button>
+				<div class="btn-group">
+					<button class="btn p-0 border-0" data-bs-toggle="dropdown">
+						<i class="bi bi-three-dots text-gray"></i>
+					</button>
+					<div class="dropdown-menu dropdown-menu-right" id="projectDropdown{{id}}">
+					</div>
+				</div>
 			</div>
 			<div class="d-flex align-items-center justify-content-between">
 				<div class="d-flex flex-column lh-1">
@@ -145,7 +149,7 @@
 						My Role
 					</div>
 					<div class="text-gray fw-bold">
-						{{role}}
+						{{roleName}}
 					</div>
 				</div>
 				<div class="d-flex flex-column lh-1">
@@ -172,6 +176,14 @@ currentPage = currentPage > 0 ? currentPage : 1;
 let currentFilter = ''
 let currentSearch = ''
 
+const rolePriority = {
+	"admin": 512,
+	"manager": 4,
+	"tester": 2,
+	"developer": 1,
+	"none": 0,
+}
+
 function clearProject() {
 	document.getElementById('projects').replaceChildren(document.getElementById('projects').firstElementChild)
 	document.getElementById('pagination').innerHTML = '';
@@ -181,6 +193,101 @@ function searchOnInput() {
 	let keyword = document.getElementById('search').value;
 	currentSearch = keyword;
 	loadProject(1);
+}
+
+function redirect(e, path) {
+	e.preventDefault();
+	e.stopPropagation();
+	window.location.replace(path);
+}
+
+function populateDropdown(id, role) {
+	const el = document.getElementById(`projectDropdown${id}`);
+	let showList = {};
+
+	showList[JSON.stringify({
+		name: 'Dashboard',
+		href: 'dashboard',
+		icon: 'bi bi-speedometer',
+		divider: 'after',
+	})] = rolePriority['admin'];
+
+
+	showList[JSON.stringify({
+		name: 'Overview',
+		href: 'overview',
+		icon: 'bi bi-house-fill'
+	})] = rolePriority['tester'];
+
+	showList[JSON.stringify({
+		name: 'Requirements',
+		href: 'requirement',
+		icon: 'bi bi-ui-checks'
+	})] = rolePriority['tester'];
+
+	showList[JSON.stringify({
+		name: 'Modules',
+		href: 'module',
+		icon: 'bi bi-box-seam-fill'
+	})] = rolePriority['tester'];
+
+	showList[JSON.stringify({
+		name: 'Releases',
+		href: 'release',
+		icon: 'bi bi-rocket-takeoff-fill',
+		divider: 'after',
+	})] = rolePriority['tester'];
+
+
+	showList[JSON.stringify({
+		name: 'Test Cases',
+		href: 'test_case',
+		icon: 'bi bi-clipboard-check-fill'
+	})] = rolePriority['tester'];
+
+	showList[JSON.stringify({
+		name: 'Test Plans',
+		href: 'test_plan',
+		icon: 'bi bi-kanban-fill'
+	})] = rolePriority['tester'];
+
+	showList[JSON.stringify({
+		name: 'Test Runs',
+		href: 'test_run',
+		icon: 'bi bi-clipboard-data-fill'
+	})] = rolePriority['tester'];
+
+
+	showList[JSON.stringify({
+		name: 'Issues',
+		href: 'issue',
+		icon: 'bi bi-chat-left-text-fill'
+	})] = rolePriority['developer'];
+
+	showList[JSON.stringify({
+		name: 'Settings',
+		href: 'setting',
+		icon: 'bi bi-gear-wide-connected',
+		divider: 'before'
+	})] = rolePriority['manager'];
+
+		
+	for (const [key, value] of Object.entries(showList)) {
+		if (role >= value) {
+			let data = JSON.parse(key);
+			if (data.divider == 'before') {
+				el.innerHTML += `<div class="dropdown-divider"></div>`;
+			}
+			el.innerHTML += `<div class="dropdown-item"
+								onclick="redirect(event, '/project/${id}/${data.href}')">
+									<i class="${data.icon} text-gray"><i>
+									<span class="text-gray fw-bold">${data.name}</span>
+							</div>`;
+			if (data.divider == 'after') {
+				el.innerHTML += `<div class="dropdown-divider"></div>`;
+			}
+		}
+	}
 }
 
 function makePagination(numPage, currentPage) {
@@ -233,29 +340,29 @@ function loadProject(page = 1, size = 7) {
 		setUrlQuery('page', page)
 		res.data.projects.forEach(pj => {
 			pj.time = dayjs(pj.updatedAt).format('DD/MM/YYYY');
-			let rolePriority = {
-				"manager": 10,
-				"tester": 5,
-				"developer": 1,
-				"none": 0,
-			}
-			pj.role = "none";
+			pj.roleName = "None";
+			pj.role = 0;
 			pj.members.forEach(mb => {
 				let newRole = mb.role;
-				let currentPriority = rolePriority[pj.role];
+				let currentPriority = pj.role;
 				let newPriority = rolePriority[newRole];
-				if (newPriority > currentPriority)
-					pj.role = newRole;
+				if (newPriority > currentPriority) {
+					pj.roleName = newRole;
+					pj.role = newPriority;
+				}
 			})
-			pj.role = pj.role.charAt(0).toUpperCase() + pj.role.slice(1);
+			pj.roleName = pj.roleName.charAt(0).toUpperCase() + pj.roleName.slice(1);
 			if (pj.members.length > 1)
-				pj.role += `, ${pj.members.length - 1}+`
+				pj.roleName += `, ${pj.members.length - 1}+`
 		})
 		let html = template_project({
 			name: 'test',
 			projects: res.data.projects
 		})
 		document.getElementById('projects').innerHTML += html;
+		res.data.projects.forEach(pj => {
+			populateDropdown(pj.id, pj.role);
+		})
 		makePagination(res.data.numPage, page);
 	})
 	.catch(err => {

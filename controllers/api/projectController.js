@@ -2,6 +2,7 @@ const { Op, where } = require('sequelize');
 const db = require('../../models/index');
 const activityHelper = require('../helpers/activityHelper')
 const queryHelper = require('../helpers/queryHelper');
+const adminHelper = require('../helpers/adminHelper');
 const PAGE_LIMIT = 10;
 
 const { responseData } = require('../../utils/response');
@@ -15,18 +16,23 @@ const controller = {
         queryHelper.pagination,
         queryHelper.filter,
         queryHelper.search,
+        adminHelper.isAdmin,
         async (req, res) => {
             try {
                 const options = {
                     where: {},
                     include: [{
                         model: db.ProjectMember,
-                        where: { userId: req.user.id },
-                        attributes: ['role'],
+                        where: {},
+                        attributes: [],
                         as: 'members'
                     }],
                     attributes: ['id', 'name', 'updatedAt'],
                     distinct: true
+                }
+                if (!req.user.isAdmin) {
+                    options.include[0].where = { userId: req.user.id };
+                    options.include[0].attributes = ['role'];
                 }
                 if (req.size && req.page) {
                     options.limit = req.size,
@@ -86,13 +92,19 @@ const controller = {
                         col: 'userId' 
                     })
 
-                    return {
+                    let res = {
                         ...project.get({ plain: true }),
                         casesCount,
                         runsCount,
                         issueCount,
-                        userCount
-                    };
+                        userCount,
+                    }
+
+                    if (req.user.isAdmin) {
+                        res['members'] = [{'role': 'admin'}]
+                    }
+
+                    return res;
                 }));
 
                 res.send({

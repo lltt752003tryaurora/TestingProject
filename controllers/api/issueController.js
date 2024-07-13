@@ -136,7 +136,7 @@ const controller = {
     deleteIssues: [
         async (req, res) => {
             try {
-                const { issueId } = req.params; 
+                const { issueId } = req.params;
 
                 const issue = await db.Issue.findByPk(issueId);
                 if (!issue) {
@@ -165,13 +165,23 @@ const controller = {
     ],
 
     changeStatus: [
-
+        async (req, res) => {
+            const { issueId, status } = req.body;
+            try {
+                const result = await db.Issue.update({ status }, {
+                    where: { id: issueId }
+                });
+                res.status(200).send({ message: 'Status updated successfully', count: result[0] });
+            } catch (error) {
+                res.status(500).send({ message: 'Internal server error' });
+            }
+        }
     ],
     changePriority: [
-        
+
     ],
     changeSeverity: [
-        
+
     ],
 };
 

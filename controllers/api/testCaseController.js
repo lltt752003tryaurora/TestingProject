@@ -171,15 +171,11 @@ const controller = {
                 options.where.name = { [Op.iLike]: `%${req.search}%` }
             }
             try {
-                const projectTestCases = await db.TestCase.findAll(options);
-                const projectTestCaseCount = await db.TestCase.count({
-                    where: options.where,
-                    include: options.include,
-                });
+                const projectTestCases = await db.TestCase.findAndCountAll(options);
                 return res.send({
-                    page: page,
-                    totalPages: Math.ceil(projectTestCaseCount / PAGE_LIMIT),
-                    testCases: projectTestCases.map(testCase => {
+                    numPage: req.size ? Math.ceil(projectTestCases.count / req.size) : 0,
+                    numTestCases: projectTestCases.count,
+                    testCases: projectTestCases.rows.map(testCase => {
                         return {
                             ...testCase.toJSON(),
                         };

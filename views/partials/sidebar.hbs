@@ -36,6 +36,7 @@
 	<div id="tabs" class="overflow-auto d-flex gap-3 py-4 flex-column align-items-center justify-content-center">
 		{{#allowRoleFrom role 'admin'}}
 			{{> sidebarLink href="dashboard" icon="bi bi-speedometer" name="Dashboard"}}
+			<div class="bg-divisor-gray rounded-pill" style="height: 3px; width: 80%;"></div>
 		{{/allowRoleFrom}}
 		{{#allowRoleFrom role 'tester'}}
 			{{> sidebarLink href="overview" icon="bi bi-house-fill" name="Overview"}}

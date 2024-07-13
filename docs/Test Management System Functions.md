@@ -47,8 +47,8 @@ The system has 4 access types:
 
 ## Modules
 
-- [ ] Add, Edit, Delete Module
-- [ ] View Module List
+- [x] Add, Edit, Delete Module
+- [x] View Module List
 
 ## Test Cases (TC) (\*)
 

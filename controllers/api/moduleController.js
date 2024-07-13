@@ -33,8 +33,6 @@ const controller = {
     },
     
     getModules: [
-        isUserProjectMember,
-        isUserManagerOrTester,
         async (req, res) => {
             const { projectId } = req.params;
             const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
@@ -82,8 +80,6 @@ const controller = {
     ],
 
     createModule: [
-        isUserProjectMember,
-        isUserManagerOrTester,
         async (req, res) => {
             try {
                 const userId = req.user.id;
@@ -114,8 +110,6 @@ const controller = {
     ],
 
     editModule: [
-        isUserProjectMember,
-        isUserManagerOrTester,
         async (req, res) => {
             try {
                 const userId = req.user.id;
@@ -153,8 +147,6 @@ const controller = {
     ],
 
     deleteModule: [
-        isUserProjectMember,
-        isUserManagerOrTester,
         async (req, res) => {
             try {
                 const userId = req.user.id;

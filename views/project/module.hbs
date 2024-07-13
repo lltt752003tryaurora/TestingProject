@@ -1,4 +1,4 @@
-{{#> modal }}
+{{#> modal id='createModule'}}
 <div class="d-flex flex-column p-4 gap-4">
   <div class="d-flex align-items-center justify-content-between">
     <div class="fw-semibold text-gray fs-3">
@@ -29,11 +29,61 @@
 </div>
 {{/modal}}
 
+{{#> modal id='renameModule'}}
+<div class="d-flex flex-column p-4 gap-4">
+  <div class="d-flex align-items-center justify-content-between">
+    <div class="fw-semibold text-gray fs-3">
+      Rename Module
+    </div>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  </div>
+
+  <form id="edit-module-form" class="needs-validation" onsubmit="return renameModule(event)" novalidate>
+    <div class="mb-3">
+      <label for="name" class="form-label text-gray">Module Name</label>
+      <input type="text" class="form-control" id="name" placeholder="Foobar" required>
+      <input type="text" class="form-control" id="id" hidden required>
+      <div class="invalid-feedback">
+        Please provide a valid name.
+      </div>
+    </div>
+    <div class="d-flex align-items-center justify-content-center gap-3">
+      <button type="submit" class="btn btn-primary">Rename</button>
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+    </div>
+  </form>
+  
+</div>
+{{/modal}}
+
+{{#> modal id='deleteModule'}}
+<div class="d-flex flex-column p-4 gap-4">
+  <div class="d-flex align-items-center justify-content-between">
+    <div class="fw-semibold text-gray fs-3">
+      Delete Module
+    </div>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  </div>
+
+  <form id="delete-module-form" class="needs-validation" onsubmit="return deleteModule(event)" novalidate>
+    <div class="mb-3">
+      <input type="text" class="form-control" id="id" hidden required>
+      Are you sure you want to delete this module?
+    </div>
+    <div class="d-flex align-items-center justify-content-center gap-3">
+      <button type="submit" class="btn btn-primary">Delete</button>
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+    </div>
+  </form>
+  
+</div>
+{{/modal}}
+
 <main class="d-flex h-100 overflow-hidden">
   {{>sidebar}}
   <div id="content" class="h-100 overflow-auto p-4" style="width: 80%; ">
-    <button type="button" class="btn btn-success d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modal">
-      <img src="/assets/add.png" alt="#" height="30px">
+    <button type="button" class="btn btn-success d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#createModule">
+      <i class="bi bi-plus-lg text-white h5 m-0"></i>
       <div>Add Modules</div>
     </button>
 
@@ -69,14 +119,44 @@
   </div>
 </main>
 
+{{{{rawHelper}}}}
+<script id="template-module" type="text/x-handlebars-template">
+	{{#with module}}
+    <div class="{{collapse}}" id="{{parentStr}}" onclick="toggleArrowShape(this);">
+      <div class="d-flex align-items-center justify-content-between gap-2" data-bs-toggle="collapse" data-bs-target="{{target}}">
+        <button class="btn p-0 d-flex align-items-center gap-2 w-100 minw-0 border-0">
+          {{#times level}}
+            <img src="/assets/arrow_none.png" height="20px" />
+          {{/times}}
+          <img class="arrow {{childless}}" src="{{arrowImg}}" height="20px" />
+          <img src="/assets/folder.png" height="30px" />
+          <div class="text-gray fw-semibold text-truncate">{{name}}</div>
+        </button>
+        <button class="btn p-0" onclick="openRenameModal(event, {{id}}, '{{name}}')" data-bs-toggle="modal" data-bs-target="#renameModule">
+          <i class="bi bi-pencil-fill text-gray"></i>
+        </button>
+        <button class="btn p-0" onclick="openDeleteModal(event, {{id}})" data-bs-toggle="modal" data-bs-target="#deleteModule">
+          <i class="bi bi-trash3-fill text-gray"></i>
+        </button>
+      </div>
+		</div>
+	{{/with}}
+</script>
+{{{{/rawHelper}}}}
+
+
 <script>
+let template_module = Handlebars.compile(document.getElementById('template-module').innerHTML);
+let toRenameId = 0;
+
 function resolveChild(modules, child) {
   let tree = [];
   child.forEach(ch => {
     let m = modules.filter(m => m.id == ch.id)[0];
     tree.push({
+      id: m.id,
       name: m.name,
-      child: resolveChild(modules, m.childModules)
+      child: resolveChild(modules, m.childModules),
     })
   })
   return tree;
@@ -124,10 +204,10 @@ function createModule(e) {
 	}
 	form.classList.remove('was-validated')
 
-	var myModalEl = document.getElementById('modal');
+	var myModalEl = document.getElementById('createModule');
 	var modal = bootstrap.Modal.getInstance(myModalEl);
 	
-	var name = document.getElementById('name');
+	var name = document.querySelector("#create-module-form #name");
 
 	axiosAPI.post('/api/projects/{{projectId}}/modules', {
 		name: name.value,
@@ -142,6 +222,9 @@ function createModule(e) {
 			onClick: function(){} // Callback after click
 		}).showToast();
 		modal.hide();
+
+    //Clear form
+    name.value = "";
 		setTimeout(() => {
 			window.location.reload();
 		}, 500);
@@ -156,25 +239,91 @@ function createModule(e) {
 			onClick: function(){} // Callback after click
 		}).showToast();
 	})
+}
 
-	//Clear form
-	name.value = "";
+function openRenameModal(e, id, name) {
+  e.preventDefault();
+  e.stopPropagation();
+  document.querySelector("#edit-module-form #name").value = name;
+  document.querySelector("#edit-module-form #id").value = id;
+}
+
+function openDeleteModal(e, id) {
+  e.preventDefault();
+  e.stopPropagation();
+  document.querySelector("#delete-module-form #id").value = id;
+}
+
+function renameModule(e, id) {
+  e.preventDefault()
+	e.stopPropagation()
+	var form = document.getElementById('edit-module-form');
+	if (!form.checkValidity()) {
+		form.classList.add('was-validated')
+		return;
+	}
+	form.classList.remove('was-validated')
+
+	var myModalEl = document.getElementById('renameModule');
+	var modal = bootstrap.Modal.getInstance(myModalEl);
+	
+	var name = document.querySelector("#edit-module-form #name");
+	var id = document.querySelector("#edit-module-form #id");
+
+	axiosAPI.put('/api/projects/{{projectId}}/modules/' + id.value, {
+		name: name.value,
+	})
+	.then(res => {
+		console.log(res);
+		Toastify({
+			text: "Module renamed",
+			style: {
+			background: "linear-gradient(to right, #198754, #198754)",
+			},
+			onClick: function(){} // Callback after click
+		}).showToast();
+		modal.hide();
+    
+    //Clear form
+    name.value = "";
+    id.value = "";
+		setTimeout(() => {
+			window.location.reload();
+		}, 500);
+	})
+	.catch(err => {
+		console.log(err);
+		Toastify({
+			text: "Failed to rename module",
+			style: {
+			background: "linear-gradient(to right, #dc3545, #dc3545)",
+			},
+			onClick: function(){} // Callback after click
+		}).showToast();
+	})
 }
 
 function deleteModule(e, id) {
   e.preventDefault()
   e.stopPropagation();
-  if (confirm("Do you want to delete this module?") == true) {
-    axiosAPI.delete('/api/projects/{{projectId}}/modules/' + id)
+
+  var myModalEl = document.getElementById('deleteModule');
+	var modal = bootstrap.Modal.getInstance(myModalEl);
+	
+	var id = document.querySelector("#delete-module-form #id");
+
+  axiosAPI.delete('/api/projects/{{projectId}}/modules/' + id.value)
     .then(res => {
       console.log(res);
       Toastify({
-        text: "Deleted",
+        text: "Deleted module",
         style: {
         background: "linear-gradient(to right, #198754, #198754)",
         },
         onClick: function(){} // Callback after click
       }).showToast();
+      modal.hide();
+      id.value = '';
       setTimeout(() => {
         window.location.reload();
       }, 500);
@@ -189,7 +338,6 @@ function deleteModule(e, id) {
         onClick: function(){} // Callback after click
       }).showToast();
     })
-  }
 }
 
 function isEmpty(obj) {
@@ -218,23 +366,20 @@ function toggleArrowShape(self) {
 
 function renderSubmodule(submodule, parentStr, rootElement, level) {
   submodule.forEach(sm => {
-    var hasNoChildren = !sm.child.length;// isEmpty(submodule[key]);
-		var newParent = parentStr + sm.name;
-		var newEl = `
-		<div class="${level > 0 ? 'collapse' : ''}" id="${parentStr}" onclick="toggleArrowShape(this);">
-      <div class="d-flex align-items-center justify-content-between" data-bs-toggle="collapse" data-bs-target="${hasNoChildren ? '' : '#' + newParent}">
-        <button class="btn p-0 d-flex align-items-center gap-2 w-100">
-          ${'<img src="/assets/arrow_none.png" height="20px" />'.repeat(level)}
-          <img class="arrow ${hasNoChildren ? 'childless' : ''}" src="${hasNoChildren ? '/assets/arrow_none.png' : '/assets/arrow_down.png'}" height="20px" />
-          <img src="/assets/folder.png" height="30px" />
-          <div class="text-gray fw-semibold">${sm.name}</div>
-        </button>
-        <button class="btn p-0" onclick="deleteModule(event, ${sm.id})">
-          <img src="/assets/trash.png" height="20px" />
-        </button>
-      </div>
-		</div>
-		`
+    const hasNoChildren = !sm.child.length;// isEmpty(submodule[key]);
+		const newParent = parentStr + sm.name;
+    const module = {};
+    module.collapse = level > 0 ? 'collapse' : '';
+    module.parentStr = parentStr;
+    module.target = hasNoChildren ? '' : '#' + newParent;
+    module.level = level;
+    module.childless = hasNoChildren ? 'childless' : '';
+    module.arrowImg = hasNoChildren ? '/assets/arrow_none.png' : '/assets/arrow_down.png';
+    module.name = sm.name;
+    module.id = sm.id;
+    let newEl = template_module({
+        module: module,
+    })
 		rootElement.innerHTML += newEl;
 
 		if (!hasNoChildren) {

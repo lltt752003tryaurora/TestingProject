@@ -7,7 +7,9 @@ const port = process.env.PORT || 5000;
 const expressHandlebars = require('express-handlebars');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const isLoggedIn = require("./middlewares/auth.js")
+const auth = require("./middlewares/authMiddleware.js")
+const errorPage = require('./utils/errorPage.js')
+const {mapRole} = require("./entities/role.js")
 
 // config public static folder => express will return Free Template
 app.use(express.static(__dirname + '/public'))
@@ -26,6 +28,10 @@ app.engine("hbs", expressHandlebars.engine({
         },
         rawHelper: function(options) {
             return options.fn();
+        },
+        allowRoleFrom: function(a, b, options) {
+            if (a >= mapRole(b))
+                return options.fn(this);
         }
     }
 }))
@@ -34,7 +40,6 @@ app.set("view engine", "hbs");
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(isLoggedIn)
 
 
 // routes
@@ -46,18 +51,22 @@ app.get('/createTables', (req, res) => {
     })
 })
 
-app.use('/api', require('./routes/apiRouter.js'));
 
-app.use('/project', require('./routes/app/homeRouter.js'));
+app.use('/api', (req, res, next) => {
+        req.environment = 'api';
+        next();
+    }, require('./routes/apiRouter.js'));
+
+app.use('/project', (req, res, next) => {
+        req.environment = 'app';
+        next();
+    }, require('./routes/app/homeRouter.js'));
 
 app.use('/', require('./routes/app/entryRouter.js'))
 
 //This must be last, for 404
 app.use(function(req, res, next) {
-    res.status(404).render('errors/not_found', {
-        hideHeader: true,
-        title: "Page not found"
-    });
+    errorPage.show404(res);
 });
 
 // Init web server

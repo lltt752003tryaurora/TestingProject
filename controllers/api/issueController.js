@@ -191,7 +191,17 @@ const controller = {
         }
     ],
     changeSeverity: [
-
+        async (req, res) => {
+            const { issueIds, severity } = req.body;
+            try {
+                const result = await db.Issue.update({ detail: severity }, {
+                    where: { id: issueIds }
+                });
+                res.status(200).send({ message: 'Severity updated successfully', count: result[0] });
+            } catch (error) {
+                res.status(500).send({ message: 'Internal server error' });
+            }
+        }
     ],
 };
 

@@ -4,7 +4,7 @@ const projectController = require("../../controllers/app/projectController")
 
 
 router.use('/', (req, res, next) => {
-	res.locals.projectId = req.params.project_id;
+	res.locals.projectId = req.params.projectId;
 	next();
 })
 

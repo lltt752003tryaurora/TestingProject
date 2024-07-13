@@ -16,11 +16,13 @@ const controller = {
         queryHelper.pagination,
         queryHelper.filter,
         queryHelper.search,
+        queryHelper.sort,
         adminHelper.isAdmin,
         async (req, res) => {
             try {
                 const options = {
                     where: {},
+                    order: [['id', 'ASC']],
                     include: [{
                         model: db.ProjectMember,
                         where: {},
@@ -37,6 +39,11 @@ const controller = {
                 if (req.size && req.page) {
                     options.limit = req.size,
                     options.offset = (req.page - 1) * req.size;
+                }
+                if (req.sortBy && req.sortOrder) {
+                    const sortField = req.sortBy === 'updatedAt' ? 'updatedAt' : 'id';
+                    const sortOrder = req.sortOrder === 'asc' ? 'ASC' : 'DESC';
+                    options.order = [[sortField, sortOrder]];
                 }
                 if (req.filter) {
                     options.include[0].where.role = {
@@ -327,7 +334,7 @@ const controller = {
                     where: { '$release.projectId$': projectId }
                 });
 
-                const ongoingRelease = await db.Release.findOne({
+                const ongoingRelease = await db.Release.findAndCountAll({
                     where: {
                         projectId: projectId,
                         startDate: { [Op.lte]: currentDate },
@@ -358,7 +365,8 @@ const controller = {
                     runsCount,
                     plansCount,
                     issueCount,
-                    ongoingRelease,
+                    openRelease: ongoingRelease.count,
+                    ongoingRelease: ongoingRelease.rows.map(release => release.toJSON())
                 });
             } catch (error) {
                 console.error('Error retrieving Summary:', error);

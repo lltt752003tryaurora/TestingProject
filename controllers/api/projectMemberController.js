@@ -8,6 +8,7 @@ const controller = {
     getProjectMembers: [
         queryHelper.pagination,
         queryHelper.search,
+        queryHelper.sort,
         async (req, res) => {
             const { projectId } = req.params;
             try {
@@ -21,7 +22,8 @@ const controller = {
                     where: {
                         projectId: projectId
                     },
-                    attributes: ['role']
+                    attributes: ['role'],
+                    order: [['id', 'ASC']]
                 }
                 if (req.search) {
                     options.include[0].where.username = {

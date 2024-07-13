@@ -22,9 +22,18 @@ const getUserOfProject = async (req, res, next) => {
 	}
 
 	const projectId = req.params.projectId;
-	const projectMember = await db.ProjectMember.findOne({ where: { projectId: projectId, userId: userId } });
+	const projectMember = await db.Project.findOne({
+		include: [{
+			model: db.ProjectMember,
+			as: 'members',
+			where: {
+				userId: userId
+			}
+		}],
+		where: { id: projectId }
+	});
 	if (projectMember)
-		req.user.role = getRoleSpecificity(projectMember.role);
+		req.user.role = getRoleSpecificity(projectMember.members[0].role);
 	
 	else req.user.role = ProjectRole.NONE;
 

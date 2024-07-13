@@ -24,7 +24,7 @@ The system has 4 access types:
 - [x] *[Release 2]* Add, Edit, Delete Project
 - [x] *[Release 2]* View Project List with Pagination, Search, Filter
 - [x] *[Release 2]* View Project Overview (number of Releases, number of TCs, number of TRs, number of Issues, Open Releases Status)
-- [ ] Assign User with role (Manager/Tester/Developer), Remove User
+- [x] Assign User with role (Manager/Tester/Developer), Remove User
 
 ## Requirements (\*)
 

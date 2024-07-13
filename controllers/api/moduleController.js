@@ -166,12 +166,18 @@ const controller = {
                 const userId = req.user.id;
                 const { projectId, moduleId } = req.params;
 
-                const module = await db.Module.findByPk(moduleId);
+                const module = await db.Module.findOne({
+                    where: {
+                        id: moduleId,
+                        projectId: projectId
+                    }
+                });
 
                 if (!module) {
                     res.status(400).send({
                         message: "Module not found"
                     })
+                    return;
                 }
 
                 await module.destroy()

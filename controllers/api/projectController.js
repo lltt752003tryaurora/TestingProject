@@ -133,6 +133,14 @@ const controller = {
             try {
                 const userId = req.user.id;
                 const { name } = req.body;
+                
+                if (name.trim() == '') {
+                    res.status(400).send({
+                        message: "Name can't be empty"
+                    });
+                    return;
+                }
+
                 const newProject = await db.Project.create({
                     name
                 })

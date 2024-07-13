@@ -1,12 +1,17 @@
 const express = require('express');
+const db = require('../../models/index')
 const router = express.Router({mergeParams: true});
-const {ProjectRole} = require("../../entities/role")
+const {ProjectRole, mapRoleToString} = require("../../entities/role")
 const projectController = require("../../controllers/app/projectController")
 const {roleWhitelist, roleBlacklist} = require("../../middlewares/roleMiddleware")
 
-router.use('/', (req, res, next) => {
+router.use('/', async (req, res, next) => {
 	res.locals.projectId = req.params.projectId;
 	res.locals.role = req.user.role;
+	res.locals.roleName = mapRoleToString(res.locals.role);
+	const project = await db.Project.findByPk(res.locals.projectId);
+	if (project)
+		res.locals.projectName = project.name;
 	next();
 })
 

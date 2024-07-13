@@ -167,6 +167,7 @@
 let template_project = Handlebars.compile(document.getElementById('template-project').innerHTML);
 let template_pagination = Handlebars.compile(document.getElementById('template-pagination').innerHTML);
 let currentPage = parseInt(getUrlQuery('page')) || 1;
+currentPage = currentPage > 0 ? currentPage : 1;
 
 let currentFilter = ''
 let currentSearch = ''

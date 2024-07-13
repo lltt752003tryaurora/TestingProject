@@ -47,9 +47,15 @@ app.get('/createTables', (req, res) => {
 })
 
 
-app.use('/api', require('./routes/apiRouter.js'));
+app.use('/api', (req, res, next) => {
+        req.environment = 'api';
+        next();
+    }, require('./routes/apiRouter.js'));
 
-app.use('/project', require('./routes/app/homeRouter.js'));
+app.use('/project', (req, res, next) => {
+        req.environment = 'app';
+        next();
+    }, require('./routes/app/homeRouter.js'));
 
 app.use('/', require('./routes/app/entryRouter.js'))
 

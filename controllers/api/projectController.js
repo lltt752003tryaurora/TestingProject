@@ -4,6 +4,9 @@ const activityHelper = require('../helpers/activityHelper')
 const queryHelper = require('../helpers/queryHelper');
 const PAGE_LIMIT = 10;
 
+const roleMiddleware = require('../../middlewares/roleMiddleware');
+const { responseData } = require('../../utils/response');
+
 const { extractUserRole } = require('../helpers/userRoleHelper')
 
 const { isUserProjectMember, isUserManager, isUserManagerOrTester, filterRoleOr } = require('../filters/projectRoleFilters');
@@ -150,17 +153,12 @@ const controller = {
     ],
 
     editProject: [
+        roleMiddleware.roleWhitelist(['manager', 'admin']),
         async (req, res) => {
             try {
                 const userId = req.user.id;
                 const { projectId } = req.params;
                 const { name } = req.body;
-                const userRole = await extractUserRole(projectId, userId);
-                if (userRole?.role != 'manager') {
-                    return res.status(403).send({
-                        message: 'Access denied.'
-                    })
-                }
                 await db.Project.update({
                     name
                 }, {
@@ -175,30 +173,21 @@ const controller = {
                     name: name,
                 }));
 
-                res.status(200).send({
-                    message: "Succesfully editted project"
-                });
+                responseData(res, "Succesfully editted project", "", 200);
             }
             catch (error) {
                 console.error(error);
-                res.status(500).send({
-                    message: "Error editting project"
-                });
+                responseData(res, "Error editting project", "", 500);
             }
         }
     ],
 
     deleteProject: [
+        roleMiddleware.roleWhitelist(['manager', 'admin']),
         async (req, res) => {
             try {
                 const userId = req.user.id;
                 const { projectId } = req.params;
-                const userRole = await extractUserRole(projectId, userId);
-                if (userRole?.role != 'manager') {
-                    return res.status(403).send({
-                        message: 'Access denied.'
-                    })
-                }
 
                 const project = await db.Project.findByPk(projectId);
                 if (!project) {
@@ -212,22 +201,17 @@ const controller = {
                     user: userId,
                 }));
 
-                res.status(200).send({
-                    message: "Succesfully deleted project"
-                });
+                responseData(res, "Succesfully deleted project", "", 200);
             }
             catch (error) {
                 console.error(error);
-                res.status(500).send({
-                    message: "Error deleting project"
-                });
+                responseData(res, "Error deleting project", "", 500);
             }
         }
     ],
     
 
     getProjectById: [
-        filterRoleOr(['developer', 'tester', 'manager']),
         async (req, res) => {
             const { projectId } = req.params;
             try {
@@ -284,16 +268,14 @@ const controller = {
                     };
                 }));
                 activitiesDetails = activitiesDetails.filter(n => n);
-                res.status(202).send({
+                res.status(200).send({
                     numActivities: activitiesDetails.length,
                     numPage: req.size ? Math.ceil(activitiesDetails.length / req.size) : 0,
                     activities: activitiesDetails
                 });
             } catch (error) {
                 console.error('Error retrieving activities:', error);
-                res.status(500).send({
-                    message: 'Internal server error.'
-                });
+                responseData(res, "Failed to get project activities", "", 500);
             }
         }
     ],
@@ -371,9 +353,7 @@ const controller = {
                 });
             } catch (error) {
                 console.error('Error retrieving Summary:', error);
-                res.status(500).send({
-                    message: 'Internal server error.'
-                });
+                responseData(res, "Failed to get project summary", "", 500);
             }
         }
     ],

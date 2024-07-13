@@ -27,8 +27,21 @@ const search = async (req, res, next) => {
 	next();
 }
 
+const sort = async (req, res, next) => {
+	req.sortBy = null;
+	req.sortOrder = null;
+
+	let { sortBy, sortOrder } = req.query;
+	if (sortBy && sortOrder) {
+		req.sortBy = sortBy;
+		req.sortOrder = sortOrder;
+	}
+	next();
+}
+
 module.exports = {
     pagination,
 	filter,
 	search,
+	sort,
 };

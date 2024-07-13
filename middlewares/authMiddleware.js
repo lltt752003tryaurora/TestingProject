@@ -18,8 +18,19 @@ const isUserAuthenticated = (callback = null) => {
 			req.JWTerror = isJWTValid.error;
 			if (callback)
 				callback(false, req, res, next);
-			else
-				next();
+			else {
+				if (req.environment === 'api') {
+					if (req.JWTerror == "Token expired") {
+						responseData(res, "Token expired", "", 401);
+					} else if (req.JWTerror == "Invalid token") {
+						responseData(res, "Invalid token", "", 201);
+					}
+				}
+				else if (req.environment === 'app') {
+					res.redirect('/login');
+					res.end();
+				}
+			}
 		}
 	}
 };
@@ -35,8 +46,14 @@ const isUserAuthorized = (callback = null) => {
 		else {
 			if (callback)
 				callback(false, req, res, next);
-			else
-				next();
+			else {
+				if (req.environment === 'api') {
+					responseData(res, 'You do not have permission for this action', '', 403);
+				}
+				else if (req.environment === 'app') {
+					errorPage.show403(res);
+				}
+			}
 		}
 	}
 }

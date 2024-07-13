@@ -5,29 +5,14 @@ const userMiddleware = require('../../middlewares/userMiddleware.js');
 const errorPage = require('../../utils/errorPage.js');
 
 router.get('/',
-			authMiddleware.isUserAuthenticated((authenticated, req, res, next) => {
-				if (!authenticated) {
-					res.redirect('/login');
-					res.end();
-				}
-				else
-					next();
-			}),
+			authMiddleware.isUserAuthenticated(),
 			(req, res, next) => {
 				res.render('project', {title: 'My Project'});
 			}
 );
 
 router.use('/:projectId',
-			authMiddleware.isUserAuthenticated((authenticated, req, res, next) => {
-				if (!authenticated) {
-					res.redirect('/login');
-					res.end();
-				}
-				else
-					next();
-				
-			}),
+			authMiddleware.isUserAuthenticated(),
 			userMiddleware.getUserOfProject,
 			authMiddleware.isUserAuthorized((authorized, req, res, next) => {
 				if (!authorized)

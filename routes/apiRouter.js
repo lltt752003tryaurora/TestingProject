@@ -8,17 +8,7 @@ const userMiddleware = require("../middlewares/userMiddleware.js");
 router.use('/auth', require('./api/authRouter.js'));
 
 router.use('/projects',
-			authMiddleware.isUserAuthenticated((authenticated, req, res, next) => {
-				if (!authenticated) {
-					if (req.JWTerror == "Token expired") {
-						responseData(res, "Token expired", "", 401);
-					} else if (req.JWTerror == "Invalid token") {
-						responseData(res, "Invalid token", "", 201);
-					}
-				}
-				else
-					next();
-			}),
+			authMiddleware.isUserAuthenticated(),
 			userMiddleware.getUserInfo,
 			require('./api/projectRouter.js'));
 // router.use('/projects', auth, require('./api/projectRouter.js'));

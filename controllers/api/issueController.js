@@ -95,21 +95,71 @@ const controller = {
     ],
 
     editIssues: [
-        async (req, res, next) => {
+        async (req, res) => {
             try {
+                const { issueId } = req.params;
+                const { name, description, priority, status, detail, assignedUserId } = req.body;
 
+                const issue = await db.Issue.findByPk(issueId);
+                if (!issue) {
+                    return res.status(404).send({
+                        message: "Issue not found"
+                    });
+                }
+
+                if (name) issue.name = name.trim() ? name : issue.name;
+                if (description) issue.description = description;
+                if (priority) issue.priority = priority;
+                if (status) issue.status = status;
+                if (detail) issue.detail = detail;
+                if (assignedUserId) issue.assignedUserId = assignedUserId;
+
+                await issue.save();
+
+                activityHelper.createActivity(issue.testRunId, req.user.id, 'EditIssue', JSON.stringify({
+                    issueId: issue.id,
+                    user: req.user.id
+                }));
+
+                return res.status(200).send({
+                    message: 'Issue edited successfully.'
+                });
             } catch (err) {
-
+                console.error(err);
+                return res.status(500).send({
+                    message: 'Internal server error.'
+                });
             }
         }
     ],
 
     deleteIssues: [
-        async (req, res, next) => {
+        async (req, res) => {
             try {
+                const { issueId } = req.params; 
 
+                const issue = await db.Issue.findByPk(issueId);
+                if (!issue) {
+                    return res.status(404).send({
+                        message: "Issue not found."
+                    });
+                }
+
+                await issue.destroy();
+
+                activityHelper.createActivity(issue.testRunId, req.user.id, 'DeleteIssue', JSON.stringify({
+                    issueId: issue.id,
+                    user: req.user.id
+                }));
+
+                res.status(200).send({
+                    message: 'Issue successfully deleted.'
+                });
             } catch (err) {
-
+                console.error(err);
+                res.status(500).send({
+                    message: 'Internal server error.'
+                });
             }
         }
     ],

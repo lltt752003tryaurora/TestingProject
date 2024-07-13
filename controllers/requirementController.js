@@ -139,6 +139,7 @@ const controller = {
         async (req, res, next) => {
             try {
                 const userId = req.user.id;
+                const projectId = req.project?.id;
                 const {requirementId} = req.params;
                 let {name, description} = req.body;
 
@@ -164,6 +165,7 @@ const controller = {
                 })
 
             } catch (err) {
+                console.error(err);
                 return res.status(500).send({
                     message: 'Internal server error.'
                 });

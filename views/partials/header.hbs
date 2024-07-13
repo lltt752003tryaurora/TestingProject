@@ -36,8 +36,12 @@
 
 <script>
 function logout() {
-  axiosAuth.post('/api/auth/logout').then(res => {
-    window.location.replace("/login");
-  });
+  axiosAuth.post('/api/auth/logout')
+    .then(res => {
+      window.location.replace("/login");
+    })
+    {{!-- .finally(() => {
+      document.cookie = '';
+    }); --}}
 }
 </script>

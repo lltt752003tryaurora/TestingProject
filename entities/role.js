@@ -23,6 +23,20 @@ const mapRole = (roleString) => {
 	return ProjectRole.NONE;
 }
 
+const mapRoleToString = (role) => {
+	const map = {};
+	map[ProjectRole.MEMBER] = 'Member';
+	map[ProjectRole.DEVELOPER] = 'Developer';
+	map[ProjectRole.TESTER] = 'Tester';
+	map[ProjectRole.MANAGER] = 'Manager';
+	map[ProjectRole.ADMIN] = 'Admin';
+
+	if (role in map)
+		return map[role];
+
+	return "None";
+}
+
 const getRoleSpecificity = (roleString) => {
 	roleString = roleString.toLowerCase().trim();
 	return mapRole(roleString);
@@ -31,5 +45,6 @@ const getRoleSpecificity = (roleString) => {
 module.exports = {
 	ProjectRole,
 	mapRole,
+	mapRoleToString,
 	getRoleSpecificity,
 }

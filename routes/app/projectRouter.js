@@ -23,7 +23,7 @@ router.get('/', (req, res, next) => {
     res.end();
 });
 
-router.get('/dashboard', roleWhitelist(['admin']), projectController.dashboard);
+router.get('/dashboard', roleWhitelist([]), projectController.dashboard);
 router.get('/overview', roleBlacklist(['developer']), projectController.overview);
 router.get('/requirement', roleBlacklist(['developer']), projectController.requirement);
 router.get('/module', roleBlacklist(['developer']), projectController.module);
@@ -33,5 +33,8 @@ router.get('/test_case', roleBlacklist(['developer']), projectController.testCas
 router.get('/test_plan', roleBlacklist(['developer']), projectController.testPlan);
 router.get('/test_run', roleBlacklist(['developer']), projectController.testRun);
 router.use('/issue', require('./issueRouter'));
+
+router.get('/setting', roleWhitelist(['manager']), projectController.setting);
+
 
 module.exports = router;

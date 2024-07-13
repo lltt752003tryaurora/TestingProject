@@ -36,4 +36,8 @@ controller.issue = async (req, res, next) => {
 	res.render('project/issue', {title: 'Issues', currentTab: 'Issues'});
 }
 
+controller.setting = async (req, res, next) => {
+	res.render('project/setting', {title: 'Settings', currentTab: 'Settings'});
+}
+
 module.exports = controller;

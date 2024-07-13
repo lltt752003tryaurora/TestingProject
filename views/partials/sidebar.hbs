@@ -50,6 +50,11 @@
 		{{/allowRoleFrom}}
 
 		{{> sidebarLink href="issue" icon="bi bi-chat-left-text-fill" name="Issues"}}
+
+		{{#allowRoleFrom role 'manager'}}
+			<div class="bg-divisor-gray rounded-pill" style="height: 3px; width: 80%;"></div>
+			{{> sidebarLink href="setting" icon="bi bi-gear-wide-connected" name="Settings"}}
+		{{/allowRoleFrom}}
 		
 	</div>
 </div>

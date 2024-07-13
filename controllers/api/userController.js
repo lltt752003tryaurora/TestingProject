@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const db = require('../../models/index');
 
 const controller = {
@@ -15,6 +16,23 @@ const controller = {
                 });
             }
         } catch (error) {
+            console.error(error);
+            res.status(500).send({
+                message: 'Internal server error.'
+            });
+        }
+    },
+
+    getUsersByUsername: async (req, res) => {
+        try {
+            const keyword = req.query.username?.toLowerCase().trim();
+            const users = await db.User.findAll({
+                where: { username: { [Op.iLike]: `%${keyword}%` } }
+            });
+            res.send({
+                data: users.map(item => item.toJSON())
+            });
+        } catch (err) {
             console.error(error);
             res.status(500).send({
                 message: 'Internal server error.'

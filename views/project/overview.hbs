@@ -5,9 +5,9 @@
       <button class="nav-link active" id="nav-assign-tab" data-bs-toggle="tab" data-bs-target="#nav-assign" type="button" role="tab">
         Assign User
       </button>
-      {{!-- <button class="nav-link" id="nav-modify-tab" data-bs-toggle="tab" data-bs-target="#nav-modify" type="button" role="tab">
-        Modify User
-      </button> --}}
+      <button class="nav-link" id="nav-modify-tab" data-bs-toggle="tab" data-bs-target="#nav-modify" type="button" role="tab">
+        User List
+      </button>
     </div>
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
   </div>
@@ -19,32 +19,48 @@
       B
     </div>
   </div> --}}
-  <form class="needs-validation" novalidate id="userAssignForm" onsubmit="return addNewUserRole(event)">
-    <div class="mb-3">
-      <label for="usernameAssign" class="form-label text-gray">Select User</label>
-      <input type="text" class="form-control" id="usernameAssign" placeholder="Username" required oninput="assignUser()">
-      <div class="invalid-feedback">
-        Please provide a valid username.
+  <div class="tab-content">
+    <div class="tab-pane fade show active" id="nav-assign" role="tabpanel">
+      <form class="needs-validation" novalidate id="userAssignForm" onsubmit="return addNewUserRole(event)">
+        <div class="mb-3">
+          <label for="usernameAssign" class="form-label text-gray">Select User</label>
+          <input type="text" class="form-control" id="usernameAssign" placeholder="Username" required oninput="assignUser()">
+          <ul class="list-group position-absolute w-100 mt-1" id="suggestions" style="z-index: 1000;"></ul>
+          <div class="invalid-feedback">
+            Please provide a valid username.
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="roleAssign" class="form-label text-gray">Select Role</label>
+          <select id="roleAssign" class="form-select" required>
+            <option value="" disabled selected>Role...</option>
+            <option value="manager">Manager</option>
+            <option value="tester">Tester</option>
+            <option value="developer">Developer</option>
+          </select>
+          <div class="invalid-feedback">
+            Please select a valid role.
+          </div>
+        </div>
+        <div class="d-flex align-items-center justify-content-center gap-3">
+          <button type="submit" class="btn btn-primary">Assign</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="tab-pane fade" id="nav-modify" role="tabpanel">
+      <table class="table table-striped" id="userTable">
+        <tbody>
+
+        </tbody>
+      </table>
+      <div class="modal-body">
+
       </div>
     </div>
-    <div class="mb-3">
-      <label for="roleAssign" class="form-label text-gray">Select Role</label>
-      <select id="roleAssign" class="form-select" required>
-        <option value="" disabled selected>Role...</option>
-        <option value="manager">Manager</option>
-        <option value="tester">Tester</option>
-        <option value="developer">Developer</option>
-      </select>
-      <div class="invalid-feedback">
-        Please select a valid role.
-      </div>
-    </div>
-    <div class="d-flex align-items-center justify-content-center gap-3">
-      <button type="submit" class="btn btn-primary">Assign</button>
-      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-    </div>
-  </form>
-  
+
+  </div>
 </div>
 {{/modal}}
 
@@ -166,22 +182,174 @@
 {{{{/rawHelper}}}}
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-function assignUser() {
-  return;//skip temporarily
-  let el = document.getElementById('usernameAssign');
-  let username = el.value;
-  axiosAPI.get('/projects/{{projectId}}/nonmembers', {
-    params: {
-      search: username
-    }
-  })
-  .then(res => {
 
-  })
-  .catch(err => {
+<script>
+async function assignUser() {
+  const input = document.getElementById('usernameAssign');
+  let el = document.getElementById('usernameAssign');
+  const suggestions = document.getElementById('suggestions');
+  suggestions.innerHTML = '';
+
+  let username = el.value.trim();
+  if (username.length < 2) {
+    return;
+  }
+
+  try {
+    const res = await axiosAPI.get('/api/users', {
+      params: {
+        username: username
+      }
+    });
+    const users = res.data?.data;
+    if (users && users.length > 0) {
+      users.forEach(user => {
+        const li = document.createElement('li');
+        li.textContent = user.username;
+        li.classList.add('list-group-item');
+        li.onclick = () => {
+          input.value = user.username;
+          suggestions.innerHTML = '';
+        };
+        suggestions.appendChild(li);
+      });
+    }
+  } catch (err) {
+    console.error('Error fetching users: ', err);
+  }
+}
+
+const getProjectMembers = async () => {
+  try {
+    const res = await axiosAPI.get('/api/projects/{{projectId}}/members');
+    return res.data;
+  } catch (err) {
+    console.log(err);
+    return [];
+  }
+};
+
+const updateRole = (user, role) => {
+  axiosAPI.put(`/api/projects/{{projectId}}/members/${user._id}`, {
     
   })
+}
+
+const handleModifyUser = (user) => {
+  const modalBody = document.querySelector('#nav-modify .modal-body');
+  modalBody.innerHTML = '';
+
+  const form = document.createElement('form');
+  form.classList.add('needs-validation');
+  form.setAttribute('novalidate', '');
+  form.id = 'modifyUserForm';
+
+  const usernameDisplay = document.createElement('div');
+  usernameDisplay.textContent = `Username: ${user.username}`;
+  usernameDisplay.classList.add('mb-3');
+  form.appendChild(usernameDisplay);
+
+  const roleLabel = document.createElement('label');
+  roleLabel.setAttribute('for', 'roleModify');
+  roleLabel.textContent = 'Select Role';
+  roleLabel.classList.add('form-label', 'text-gray');
+  form.appendChild(roleLabel);
+
+  const roleSelect = document.createElement('select');
+  roleSelect.id = 'roleModify';
+  roleSelect.classList.add('form-select');
+  roleSelect.setAttribute('required', '');
+
+  const roles = ['manager', 'tester', 'developer'];
+  roles.forEach(role => {
+    const option = document.createElement('option');
+    option.value = role;
+    option.textContent = role.charAt(0).toUpperCase() + role.slice(1);
+    roleSelect.appendChild(option);
+  });
+  form.appendChild(roleSelect);
+
+  const submitButton = document.createElement('button');
+  submitButton.type = 'button';
+  submitButton.classList.add('btn', 'btn-primary', 'me-2');
+  submitButton.textContent = 'Update';
+  submitButton.addEventListener('click', function() {
+    updateRole(user, roleSelect.value);
+  });
+  form.appendChild(submitButton);
+
+  const deleteButton = document.createElement('button');
+  deleteButton.type = 'button';
+  deleteButton.classList.add('btn', 'btn-danger');
+  deleteButton.textContent = 'Delete';
+  deleteButton.addEventListener('click', function() {
+    handleDeleteUser(user);
+  });
+  form.appendChild(deleteButton);
+
+  modalBody.appendChild(form);
+
+  const myModal = new bootstrap.Modal(document.getElementById('modal'));
+  myModal.show();
+}
+
+const handleDeleteUser = (user) => {
+  const modalBody = document.querySelector('#nav-modify .modal-body');
+  modalBody.innerHTML = '';
+
+  const confirmMessage = document.createElement('p');
+  confirmMessage.textContent = `Are you sure you want to delete user '${user.username}'?`;
+  modalBody.appendChild(confirmMessage);
+
+  const deleteButton = document.createElement('button');
+  deleteButton.type = 'button';
+  deleteButton.classList.add('btn', 'btn-danger', 'me-2');
+  deleteButton.textContent = 'Delete';
+  deleteButton.addEventListener('click', function() {
+    deleteUser(user);
+  });
+  modalBody.appendChild(deleteButton);
+
+  const cancelButton = document.createElement('button');
+  cancelButton.type = 'button';
+  cancelButton.classList.add('btn', 'btn-secondary');
+  cancelButton.textContent = 'Cancel';
+  cancelButton.setAttribute('data-bs-dismiss', 'modal');
+  modalBody.appendChild(cancelButton);
+
+  const myModal = new bootstrap.Modal(document.getElementById('modal'));
+  myModal.show();
+}
+
+const populateProjectMemberList = async () => {
+  const userTableBody = document.getElementById('userTable').querySelector('tbody');
+  userTableBody.innerHTML = '';
+  const projectMembers = await getProjectMembers();
+  projectMembers.forEach(projectMember => {
+    const row = document.createElement('tr');
+
+    const { user, role } = projectMember;
+
+    const usernameCell = document.createElement('td');
+    usernameCell.textContent = user.username;
+    row.appendChild(usernameCell);
+
+    const roleCell = document.createElement('td');
+    roleCell.textContent = role;
+    row.appendChild(roleCell);
+
+    const actionCell = document.createElement('td');
+    const modifyIcon = document.createElement('i');
+    modifyIcon.className = 'bi bi-pencil-fill';
+    modifyIcon.style.cursor = 'pointer';
+    modifyIcon.addEventListener('click', () => {
+      handleModifyUser(user);
+    });
+    actionCell.appendChild(modifyIcon);
+    row.appendChild(actionCell);
+
+    userTableBody.appendChild(row);
+  });
 }
 
 function addNewUserRole(e) {
@@ -224,6 +392,11 @@ function addNewUserRole(e) {
 		}).showToast();
 	})
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  populateProjectMemberList();
+});
+
 </script>
 <script>
 let template_activity = Handlebars.compile(document.getElementById('template-activity').innerHTML);

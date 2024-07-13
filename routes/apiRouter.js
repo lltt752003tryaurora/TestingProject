@@ -11,6 +11,11 @@ router.use('/projects',
 			authMiddleware.isUserAuthenticated(),
 			userMiddleware.getUserInfo,
 			require('./api/projectRouter.js'));
+
+router.use('/users',
+			authMiddleware.isUserAuthenticated(),
+			userMiddleware.getUserInfo,
+			require('./api/userRouter.js'));
 // router.use('/projects', auth, require('./api/projectRouter.js'));
 // router.use('/users/', auth, require('./api/userRouter.js'));
 // router.use('/modules', auth, require('./api/moduleRouter.js'));

@@ -157,6 +157,56 @@ const controller = {
             }
         }
     ],
+
+    setProjectMember: async (req, res, next) => {
+        try {
+            const userId = req.user.id;
+            const { projectId } = req.params;
+            const { user, role } = req.body;
+
+            const targetUser = await db.User.findByPk(user);
+            if (!targetUser) {
+                res.status(404).send({
+                    message: 'User does not exist.'
+                });
+            }
+
+            const projectMember = await db.ProjectMember.findOne({
+                where: { projectId, userId: user }
+            });
+            if (!projectMember) {
+                const newProjectMember = await db.ProjectMember.create({
+                    projectId,
+                    userId: user,
+                    role: role
+                });
+                activityHelper.createActivity(projectId, userId, 'AddProjectMember', JSON.stringify({
+                    project: projectId,
+                    user: userId,
+                    target: user.id,
+                    role: role
+                }));
+            } else {
+                projectMember.role = role;
+                await projectMember.save();
+                activityHelper.createActivity(projectId, userId, 'EditProjectMember', JSON.stringify({
+                    project: projectId,
+                    user: userId,
+                    target: user.id,
+                    role: role
+                }));
+            }
+            
+            res.status(200).send({
+                message: 'User role assigned successfully.'
+            });
+        } catch (err) {
+            console.error(err);
+            res.status(500).send({
+                message: 'Internal server error.'
+            });
+        }
+    }
 };
 
 module.exports = controller;

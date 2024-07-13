@@ -2,8 +2,12 @@ const { getUserFromToken } = require('../utils/jwt.js');
 const { ProjectRole, getRoleSpecificity } = require('../entities/role.js');
 const db = require('../models/index');
 
-const getUserInfo = (req, res, next) => {
+const getUserInfo = async (req, res, next) => {
 	req.user = getUserFromToken(req.cookies.accessToken);
+	const user = await db.User.findByPk(req.user.id);
+	if (user && user.isAdmin) {
+		req.user.role = ProjectRole.ADMIN;
+	}
 	next();
 }
 
@@ -14,7 +18,7 @@ const getUserOfProject = async (req, res, next) => {
 	const user = await db.User.findByPk(userId);
 	if (user && user.isAdmin) {
 		req.user.role = ProjectRole.ADMIN;
-		next();
+		return next();
 	}
 
 	const projectId = req.params.projectId;

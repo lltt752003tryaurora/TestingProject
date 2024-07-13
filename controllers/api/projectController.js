@@ -249,20 +249,20 @@ const controller = {
                 let activitiesDetails = await Promise.all(activities.rows.map(async (act) => {
                     try {
                         let details = JSON.parse(act.detail);
+
+                        let explains = {};
+                        await Promise.all(Object.keys(details).map(async function(key) {
+                            let tmp = await activityHelper.activityExplainer(key, details[key]);
+                            explains[key] = tmp;
+                        }))
+
+                        return {
+                            ...act.get({ plain: true }),
+                            explains: explains
+                        };
                     } catch (e) {
                         return;
                     }
-                    
-                    let explains = {};
-                    await Promise.all(Object.keys(details).map(async function(key) {
-                        let tmp = await activityHelper.activityExplainer(key, details[key]);
-                        explains[key] = tmp;
-                    }))
-
-                    return {
-                        ...act.get({ plain: true }),
-                        explains: explains
-                    };
                 }));
                 activitiesDetails = activitiesDetails.filter(n => n);
                 res.status(200).send({

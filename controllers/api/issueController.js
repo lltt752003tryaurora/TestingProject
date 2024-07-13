@@ -178,7 +178,17 @@ const controller = {
         }
     ],
     changePriority: [
-
+        async (req, res) => {
+            const { issueId, priority } = req.body;
+            try {
+                const result = await db.Issue.update({ priority }, {
+                    where: { id: issueId }
+                });
+                res.status(200).send({ message: 'Priority updated successfully', count: result[0] });
+            } catch (error) {
+                res.status(500).send({ message: 'Internal server error' });
+            }
+        }
     ],
     changeSeverity: [
 

@@ -86,6 +86,7 @@ const controller = {
     changeProjectMembers: [
         async (req, res) => {
             try {
+                console.log(req.body);
                 const userId = req.user.id;
                 const { projectId } = req.params;
                 const { role, username } = req.body;
@@ -135,6 +136,45 @@ const controller = {
             }
         }
     ],
+
+    deleteProjectMember: async (req, res, next) => {
+        try {
+            console.log(req.body);
+            const userId = req.user.id;
+            const { projectId } = req.params;
+            const { username } = req.body;
+
+            const targetUser = await db.User.findOne({
+                where: { username },
+            });
+
+            if (!targetUser) {
+                res.status(404).send({
+                    message: 'User not found.'
+                });
+                return;
+            }
+
+            await db.ProjectMember.destroy({
+                where: { userId: targetUser.id },
+            });
+
+            activityHelper.createActivity(projectId, userId, 'DeleteProjectMember', JSON.stringify({
+                project: projectId,
+                user: userId,
+                target: targetUser.id,
+            }));
+
+            res.status(200).send({
+                message: 'Project member deleted successfully.'
+            });
+        } catch (err) {
+            console.error(err);
+            res.status(500).send({
+                message: 'Internal server error.'
+            });
+        }
+    },
 
     setProjectMember: async (req, res, next) => {
         try {

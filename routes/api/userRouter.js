@@ -4,6 +4,7 @@ const userController = require('../../controllers/api/userController');
 const {roleWhitelist} = require("../../middlewares/roleMiddleware")
 
 router.get('/', userController.getUserSelf);
+router.get('/search', userController.getUsersByUsername);
 router.put('/', userController.editUserSelf);
 router.delete('/', userController.deleteUserSelf);
 

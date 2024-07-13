@@ -196,7 +196,7 @@ async function assignUser() {
   }
 
   try {
-    const res = await axiosAPI.get('/api/users', {
+    const res = await axiosAPI.get('/api/users/search', {
       params: {
         username: username
       }
@@ -230,9 +230,25 @@ const getProjectMembers = async () => {
 };
 
 const updateRole = (user, role) => {
-  axiosAPI.put(`/api/projects/{{projectId}}/members/${user._id}`, {
-    
-  })
+  axiosAPI.put(`/api/projects/{{projectId}}/members`, {
+    username: user.username,
+    role: role,
+  }).then(res => {
+    populateProjectMemberList();
+  }).catch(err => {
+    console.error(err);
+  });
+}
+
+const deleteUser = (user) => {
+  console.log(user.username);
+  axiosAPI.delete(`/api/projects/{{projectId}}/members`, {
+    data: { username: user.username },
+  }).then(res => {
+    populateProjectMemberList();
+  }).catch(err => {
+    console.log(err);
+  });
 }
 
 const handleModifyUser = (user) => {
@@ -363,7 +379,7 @@ function addNewUserRole(e) {
 	var modal = bootstrap.Modal.getInstance(myModalEl);
 
   axiosAPI.post('/api/projects/{{projectId}}/members', {
-    user: username.value,
+    username: username.value,
     role: role.value,
   })
   .then(res => {
@@ -374,7 +390,8 @@ function addNewUserRole(e) {
 			},
 			onClick: function(){} // Callback after click
 		}).showToast();
-		modal.hide();
+		{{!-- modal.hide(); --}}
+    populateProjectMemberList();
 
     username.value = '';
     role.value = '';

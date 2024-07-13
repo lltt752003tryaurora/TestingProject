@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router({mergeParams: true});
+const {ProjectRole} = require("../../entities/role")
 const projectController = require("../../controllers/app/projectController")
 const {roleWhitelist, roleBlacklist} = require("../../middlewares/roleMiddleware")
 
@@ -10,7 +11,10 @@ router.use('/', (req, res, next) => {
 })
 
 router.get('/', (req, res, next) => {
-	res.redirect('./overview');
+	if (res.locals.role == ProjectRole.DEVELOPER)
+		res.redirect('./issue');
+	else
+		res.redirect('./overview');
     res.end();
 });
 

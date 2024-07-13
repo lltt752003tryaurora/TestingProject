@@ -1,19 +1,16 @@
 const db = require('../../models/index');
-const Sequelize = require('sequelize');
+const { Op, where } = require('sequelize');
 const activityHelper = require('../helpers/activityHelper');
-
+const queryHelper = require('../helpers/queryHelper')
 const { extractUserRole } = require('../helpers/userRoleHelper')
-
-const { isUserProjectMember, isUserManager, isUserManagerOrTester, filterRoleOr } = require('../filters/projectRoleFilters');
-
+const {responseData} = require("../../utils/response")
 const controller = {
     getProjectMembers: [
-        // isUserProjectMember,
-        // isUserManagerOrTester,
+        queryHelper.pagination,
+        queryHelper.search,
         async (req, res) => {
             const { projectId } = req.params;
             try {
-                let { page, size, search } = req.query;
                 const options = {
                     include: [{
                         model: db.User,
@@ -26,18 +23,16 @@ const controller = {
                     },
                     attributes: ['role']
                 }
-                if (search) {
+                if (req.search) {
                     options.include[0].where.username = {
-                        [Op.iLike]: `%${search}%`
+                        [Op.iLike]: `%${req.search}%`
                     }
                 }
                 const projectMembers = await db.ProjectMember.findAll(options);
                 res.send(projectMembers);
             } catch (error) {
                 console.error(error);
-                res.status(500).send({
-                    message: 'Internal server error.'
-                });
+                responseData(res, "Failed to get project members", "", 500);
             }
         }
     ],
@@ -88,48 +83,35 @@ const controller = {
         }
     ],
 
-    addProjectMembers: [
+    changeProjectMembers: [
         async (req, res) => {
             try {
                 const userId = req.user.id;
                 const { projectId } = req.params;
-                const { role, user } = req.body;
-                const userRole = await extractUserRole(projectId, userId);
-                if (userRole?.role != 'manager') {
-                    return res.status(403).send({
-                        message: 'Access denied.'
-                    })
-                }
-                if (!role in ['manager', 'tester', 'developer']) {
-                    return res.status(400).send({
-                        message: 'invalid role'
-                    })
-                }
+                const { role, username } = req.body;
 
                 let targetUser = await db.User.findOne({
                     where: {
-                        username: user
+                        username: username
                     }
                 });
 
                 if (!targetUser) {
-                    return res.status(400).send({
-                        message: `User doesn't exist`
-                    })
+                    return responseData(res, "User doesn't exist", "", 400);
                 }
 
                 let checkExist = await db.ProjectMember.findOne({
                     where: {
                         userId: targetUser.id,
-                        role: role,
                         projectId: projectId
                     }
                 })
 
                 if (checkExist) {
-                    return res.status(400).send({
-                        message: 'Role already exists'
-                    })
+                    await checkExist.update({
+                        role: role
+                    });
+                    return responseData(res, "Succesfully changed user role", "", 200);
                 }
 
                 await db.ProjectMember.create({
@@ -145,15 +127,11 @@ const controller = {
                     role: role
                 }));
 
-                res.status(200).send({
-                    message: "Succesfully added user role"
-                });
+                responseData(res, "Succesfully changed user role", "", 200);
             }
             catch (error) {
                 console.error(error);
-                res.status(500).send({
-                    message: "Error adding user role"
-                });
+                responseData(res, "Failed to change user role", "", 200);
             }
         }
     ],

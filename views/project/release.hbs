@@ -1,4 +1,4 @@
-{{#> modal id='modal'}}
+{{#> modal id='createModal'}}
 <div class="d-flex flex-column p-4 gap-4">
   <div class="d-flex align-items-center justify-content-between">
     <div class="fw-semibold text-gray fs-3">
@@ -8,7 +8,7 @@
   </div>
 
   
-  <form id="create-release-form" class="needs-validation" onsubmit="return createReleases(event)" novalidate>
+  <form id="create-release-form" class="needs-validation" onsubmit="return createRelease(event)" novalidate>
     <div class="mb-3">
       <label for="name" class="form-label text-gray">Release Name</label>
       <input type="text" class="form-control" id="name" placeholder="Foobar" required>
@@ -19,22 +19,18 @@
     <div class="mb-3 d-flex gap-2">
       <div class="w-50">
         <label for="start-date" class="form-label text-gray">Start Date</label>
-        <input type="date" class="form-control" id="start-date" required>
+        <input type="date" class="form-control" id="startDate" required>
         <div class="invalid-feedback">
           Please provide a valid date.
         </div>
       </div>
       <div class="w-50">
         <label for="end-date" class="form-label text-gray">End Date</label>
-        <input type="date" class="form-control" id="end-date" required>
+        <input type="date" class="form-control" id="endDate" required>
         <div class="invalid-feedback">
           Please provide a valid date.
         </div>
       </div>
-    </div>
-    <div class="mb-3">
-      <label for="description" class="form-label text-gray">Release Description</label>
-      <textarea class="form-control" id="description" rows="5" placeholder="Something about this requirement..."></textarea>
     </div>
     <div class="d-flex align-items-center justify-content-center gap-3">
       <button type="submit" class="btn btn-primary">Create</button>
@@ -45,67 +41,90 @@
 </div>
 {{/modal}}
 
+{{#> modal id='editModal'}}
+<div class="d-flex flex-column p-4 gap-4">
+  <div class="d-flex align-items-center justify-content-between">
+    <div class="fw-semibold text-gray fs-3">
+      Edit Release
+    </div>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  </div>
+
+  
+  <form id="edit-release-form" class="needs-validation" onsubmit="return editRelease(event)" novalidate>
+    <div class="mb-3">
+      <label for="name" class="form-label text-gray">Release Name</label>
+      <input type="text" class="form-control" id="name" placeholder="Foobar" required>
+      <div class="invalid-feedback">
+        Please provide a valid name.
+      </div>
+    </div>
+    <div class="mb-3 d-flex gap-2">
+      <div class="w-50">
+        <label for="start-date" class="form-label text-gray">Start Date</label>
+        <input type="date" class="form-control" id="startDate" required>
+        <div class="invalid-feedback">
+          Please provide a valid date.
+        </div>
+      </div>
+      <div class="w-50">
+        <label for="end-date" class="form-label text-gray">End Date</label>
+        <input type="date" class="form-control" id="endDate" required>
+        <div class="invalid-feedback">
+          Please provide a valid date.
+        </div>
+      </div>
+    </div>
+    <div class="mb-3">
+      <input type="text" class="form-control" id="id" hidden required>
+    </div>
+    <div class="d-flex align-items-center justify-content-center gap-3">
+      <button type="submit" class="btn btn-primary">Edit</button>
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+    </div>
+  </form>
+  
+</div>
+{{/modal}}
+
+{{#> modal id='deleteModal'}}
+<div class="d-flex flex-column p-4 gap-4">
+  <div class="d-flex align-items-center justify-content-between">
+    <div class="fw-semibold text-gray fs-3">
+      Delete Release
+    </div>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  </div>
+
+  
+  <form id="delete-release-form" class="needs-validation" onsubmit="return deleteRelease(event)" novalidate>
+    <div class="mb-3">
+      <input type="text" class="form-control" id="id" hidden required>
+      Are you sure you want to delete this release?
+    </div>
+    <div class="d-flex align-items-center justify-content-center gap-3">
+      <button type="submit" class="btn btn-primary">Delete</button>
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+    </div>
+  </form>
+  
+</div>
+{{/modal}}
+
 <main class="d-flex h-100 overflow-hidden">
   {{>sidebar}}
   <div id="content" class="h-100 overflow-auto p-4" style="width: 80%; ">
-    <button type="button" class="btn btn-success d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modal">
-      <img src="/assets/add.png" alt="#" height="30px">
+    <button type="button" class="btn btn-success d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#createModal">
+      <i class="bi bi-plus-lg text-white h5 m-0"></i>
       <div>Add Releases</div>
     </button>
 
     <div class="d-flex justify-content-between py-3">
-      {{!-- <div class="d-flex gap-1">
-        <button class="btn p-0">
-          <img src="/assets/view_grid.png" height="30px" />
-        </button>
-        <button class="btn p-0">
-          <img src="/assets/view_details.png" height="30px" />
-        </button>
-      </div>
-      <div class="d-flex gap-1">
-        <div class="input-group">
-          <input type="text" class="rounded-pill form-control" id="search" placeholder="Search"/>
-          <label for="search" class="position-absolute end-0 pe-2 me-0 d-flex align-items-center h-100" style="z-index: 1000;">
-            <img src="/assets/search.png" height="20px"/>
-          </label>
-        </div>
-        <button class="btn p-0">
-          <img src="/assets/filter.png" height="30px" />
-        </button>
-        <button class="btn p-0">
-          <img src="/assets/sort.png" height="30px" />
-        </button>
-      </div> --}}
     </div>
 
     
 
     <div id="releases" class="d-flex flex-column gap-2">
-      <!-- <div class="d-flex flex-column bg-white rounded bottom-shadow px-3 py-3">
-        <div class="d-flex justify-content-between gap-5 align-items-center pb-2">
-          <div class="d-flex align-items-center gap-2">
-            <div>
-              <img src="/assets/releases.png" height="30px" />
-            </div>
-            <div class="text-gray fw-semibold">
-              Release #1
-            </div>
-          </div>
-          <div class="d-flex gap-3 align-items-center w-75">
-            <div class="flex-grow-1">
-              <div class="progress rounded-pill">
-                <div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-              </div>
-            </div>
-            <button class="btn p-0" data-bs-toggle="collapse" data-bs-target="#collapseExample">
-              <img src="/assets/dropdown.png" height="30px" />
-            </button>
-          </div>
-        </div>
-        <div class="text-secondary collapse" id="collapseExample">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolores a, rerum aliquam ex obcaecati beatae sed voluptas delectus quod optio perferendis. Nisi unde dolore quo architecto dignissimos molestiae perspiciatis suscipit!
-        </div>
-      </div> -->
     </div>
 
   </div>
@@ -113,17 +132,18 @@
 
 <script>
   const handleDropdownButtonClick = (releaseId) => {
+    const container = document.getElementById(`releaseDetails-${releaseId}`);
+    if (container.innerHTML.trim() !== '') return;
     const releaseDetails = axiosAPI.get(`/api/projects/{{projectId}}/releases/${releaseId}/details`)
       .then(res => res.data?.data)
       .then(data => {
-        const container = document.getElementById(`releaseDetails-${releaseId}`);
 
         const createdAtDiv = document.createElement('div');
-        createdAtDiv.innerHTML = `<strong>Start:</strong> ${data.startDate}`;
+        createdAtDiv.innerHTML = `<strong>Start:</strong> ` + dayjs(data.startDate).format('DD/MM/YYYY');
         container.appendChild(createdAtDiv);
 
         const endAtDiv = document.createElement('div');
-        endAtDiv.innerHTML = `<strong>End:</strong> ${data.endDate}`;
+        endAtDiv.innerHTML = `<strong>End:</strong> ` + dayjs(data.endDate).format('DD/MM/YYYY');
         container.appendChild(endAtDiv);
 
         const requirementCount = data.requirements.length;
@@ -155,10 +175,10 @@
 <script id="template-release" type="text/x-handlebars-template">
 	{{#each data}}
     <div class="d-flex flex-column bg-white rounded bottom-shadow px-3 py-3">
-      <div class="d-flex justify-content-between gap-5 align-items-center pb-2">
+      <div class="d-flex justify-content-between gap-5 align-items-center">
         <div class="d-flex align-items-center gap-2">
           <div>
-            <img src="/assets/releases.png" height="30px" />
+            <i class="bi bi-rocket-takeoff text-gray"></i>
           </div>
           <div class="text-gray fw-semibold">
             {{name}}
@@ -170,19 +190,24 @@
               <div class="progress-bar" role="progressbar" style="width: {{value}}%;" aria-valuenow="{{value}}" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
           </div>
-          <button class="btn p-0" data-bs-toggle="collapse" data-bs-target="#collapsedDescription{{counter}}">
-            <img src="/assets/dropdown.png" height="30px" onclick="handleDropdownButtonClick({{id}})"/>
+          <div class="text-gray fw-bold">
+            {{value}}%
+          </div>
+          <button class="btn p-0" data-bs-toggle="collapse" data-bs-target="#collapsedDescription{{id}}">
+            <i class="bi bi-chevron-down text-gray" onclick="handleDropdownButtonClick({{id}})"></i>
           </button>
         </div>
       </div>
-      <div class="text-secondary collapse" id="collapsedDescription{{counter}}">
-        <div class="d-flex justify-content-between">
-          <div>
-            {{description}}
+      <div class="text-secondary collapse pt-2" id="collapsedDescription{{id}}">
+        <div class="d-flex justify-content-end">
+          <div class="d-flex gap-1">
+            <button class="btn p-0" onclick="openEditModal(event, {{id}}, '{{name}}', '{{startDate}}', '{{endDate}}')" data-bs-toggle="modal" data-bs-target="#editModal">
+              <i class="bi bi-pencil-fill text-gray"></i>
+            </button>
+            <button class="btn p-0" onclick="openDeleteModal(event, {{id}})" data-bs-toggle="modal" data-bs-target="#deleteModal">
+              <i class="bi bi-trash3-fill text-gray"></i>
+            </button>
           </div>
-          <button class="btn p-0" onclick="deleteRelease({{id}})">
-            <img src="/assets/trash.png" height="20px" /> 
-          </button>
         </div>
 
         <div id="releaseDetails-{{id}}">
@@ -246,8 +271,6 @@ function loadReleases() {
 
       percentage = Math.min(Math.max(percentage, 0), 100);;
       re.value = percentage;
-      re.description = re.description || 'Trống';
-      re.counter = i;
     })
     let html = template({
 			data: res.data.releases,
@@ -261,9 +284,7 @@ function loadReleases() {
 
 loadReleases();
 
-var idCounter = 100;
-
-function createReleases(e) {
+function createRelease(e) {
 	e.preventDefault()
 	e.stopPropagation()
 	var form = document.getElementById('create-release-form');
@@ -273,18 +294,16 @@ function createReleases(e) {
 	}
 	form.classList.remove('was-validated')
 
-	var myModalEl = document.getElementById('modal');
+	var myModalEl = document.getElementById('createModal');
 	var modal = bootstrap.Modal.getInstance(myModalEl);
 
-	var name = document.getElementById('name');
-	var description = document.getElementById('description');
-	var startDate = document.getElementById('start-date');
-	var endDate = document.getElementById('end-date');
+	var name = document.querySelector("#create-release-form #name");
+	var startDate = document.querySelector("#create-release-form #startDate");
+	var endDate = document.querySelector("#create-release-form #endDate");
 	var progress = Math.floor(Math.random() * 80) + 20;
 
   axios.post('/api/projects/{{projectId}}/releases', {
     name: name.value,
-    description: description.value,
     startDate: startDate.value,
     endDate: endDate.value,
   })
@@ -297,6 +316,11 @@ function createReleases(e) {
 			onClick: function(){} // Callback after click
 		}).showToast();
 		modal.hide();
+    
+    //Clear form
+    name.value = "";
+    startDate.value = "";
+    endDate.value = "";
 		setTimeout(() => {
 			window.location.reload();
 		}, 500);
@@ -311,11 +335,111 @@ function createReleases(e) {
 			onClick: function(){} // Callback after click
 		}).showToast();
 	})
-
-	//Clear form
-	name.value = "";
-	description.value = "";
-	startDate.value = "";
-	endDate.value = "";
 }
+
+function openEditModal(e, id, name, startDate, endDate) {
+  e.preventDefault();
+  e.stopPropagation();
+  document.querySelector("#edit-release-form #name").value = name;
+  document.querySelector("#edit-release-form #id").value = id;
+  document.querySelector("#edit-release-form #startDate").value = startDate;
+  document.querySelector("#edit-release-form #endDate").value = endDate;
+}
+
+function openDeleteModal(e, id) {
+  e.preventDefault();
+  e.stopPropagation();
+  document.querySelector("#delete-release-form #id").value = id;
+}
+
+function editRelease(e) {
+  e.preventDefault()
+	e.stopPropagation()
+	var form = document.getElementById('edit-release-form');
+	if (!form.checkValidity()) {
+		form.classList.add('was-validated')
+		return;
+	}
+	form.classList.remove('was-validated')
+
+	var myModalEl = document.getElementById('editModal');
+	var modal = bootstrap.Modal.getInstance(myModalEl);
+	
+	var name = document.querySelector("#edit-release-form #name");
+	var id = document.querySelector("#edit-release-form #id");
+	var startDate = document.querySelector("#edit-release-form #startDate");
+	var endDate = document.querySelector("#edit-release-form #endDate");
+
+	axiosAPI.put('/api/projects/{{projectId}}/releases/' + id.value, {
+		name: name.value,
+    startDate: startDate.value,
+    endDate: endDate.value,
+	})
+	.then(res => {
+		console.log(res);
+		Toastify({
+			text: "Succesfully edited release",
+			style: {
+			background: "linear-gradient(to right, #198754, #198754)",
+			},
+			onClick: function(){} // Callback after click
+		}).showToast();
+		modal.hide();
+    
+    //Clear form
+    name.value = "";
+    id.value = "";
+    startDate.value = "";
+    endDate.value = "";
+		setTimeout(() => {
+			window.location.reload();
+		}, 500);
+	})
+	.catch(err => {
+		console.log(err);
+		Toastify({
+			text: "Failed to change requirement",
+			style: {
+			background: "linear-gradient(to right, #dc3545, #dc3545)",
+			},
+			onClick: function(){} // Callback after click
+		}).showToast();
+	})
+}
+
+function deleteRelease(e) {
+  e.preventDefault()
+  e.stopPropagation();
+
+  var myModalEl = document.getElementById('deleteModal');
+	var modal = bootstrap.Modal.getInstance(myModalEl);
+	
+	var id = document.querySelector("#delete-release-form #id");
+
+  axiosAPI.delete('/api/projects/{{projectId}}/releases/' + id.value)
+    .then(res => {
+      console.log(res);
+      Toastify({
+        text: "Successfully deleted release",
+        style: {
+        background: "linear-gradient(to right, #198754, #198754)",
+        },
+        onClick: function(){} // Callback after click
+      }).showToast();
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    })
+    .catch(err => {
+      console.log(err);
+      Toastify({
+        text: "Failed to delete release",
+        style: {
+        background: "linear-gradient(to right, #dc3545, #dc3545)",
+        },
+        onClick: function(){} // Callback after click
+      }).showToast();
+    })
+}
+
 </script>

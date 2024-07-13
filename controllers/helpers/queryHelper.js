@@ -23,7 +23,8 @@ const filter = async (req, res, next) => {
 
 const search = async (req, res, next) => {
     let { search } = req.query;
-	req.search = search;
+	if (search && search.trim() !== '')
+		req.search = search;
 	next();
 }
 

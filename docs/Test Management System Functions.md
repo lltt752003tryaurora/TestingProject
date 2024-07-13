@@ -28,10 +28,10 @@ The system has 4 access types:
 
 ## Requirements (\*)
 
-- [ ] Add, Edit, Delete Requirement
+- [x] Add, Edit, Delete Requirement
 - [ ] Import, Export Requirements
 - [x] View Requirement List with Pagination, Search, Filter
-- [ ] View Requirement Details with linked TCs
+- [x] View Requirement Details with linked TCs
 
 ## Test Plans
 

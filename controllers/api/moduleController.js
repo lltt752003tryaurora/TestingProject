@@ -1,6 +1,7 @@
 const db = require('../../models/index');
 
 const activityHelper = require('../helpers/activityHelper');
+const queryHelper = require('../helpers/queryHelper');
 
 const { isUserProjectMember, isUserManager, isUserManagerOrTester, filterRoleOr } = require('../filters/projectRoleFilters');
 
@@ -33,38 +34,43 @@ const controller = {
     },
     
     getModules: [
+        queryHelper.pagination,
+        queryHelper.search,
+        queryHelper.sort,
         async (req, res) => {
             const { projectId } = req.params;
-            const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
-            const sortField = req.query.sort === 'updatedAt' ? 'updatedAt' : 'id';
-            const sortOrder = req.query.order === 'asc' ? 'ASC' : 'DESC';
             const options = {
                 where: {
                     projectId: projectId,
                 },
-                offset: PAGE_LIMIT * (page - 1),
-                limit: PAGE_LIMIT,
-                order: [[sortField, sortOrder]],
                 include: [{
                     model: db.Module,
                     as: 'childModules',
                     attributes: ['id'],
                     required: false
-                }]
+                }],
+                order: [['id', 'ASC']],
+                distinct: true,
             };
-            const keyword = req.query.keyword || '';
-            if (keyword.trim() !== '') {
-                options.where.name = { [Op.iLike]: `%${keyword}%` }
+
+            if (req.size && req.page) {
+                options.limit = req.size,
+                options.offset = (req.page - 1) * req.size;
+            }
+            if (req.sortBy && req.sortOrder) {
+                const sortField = req.sortBy === 'updatedAt' ? 'updatedAt' : 'id';
+                const sortOrder = req.sortOrder === 'asc' ? 'ASC' : 'DESC';
+                options.order = [[sortField, sortOrder]];
+            }
+            if (req.search) {
+                options.where.name = { [Op.iLike]: `%${req.search}%` }
             }
             try {
-                const projectFirstLevelModules = await db.Module.findAll(options);
-                const projectModuleCount = await db.Module.count({
-                    where: options.where
-                });
+                const projectFirstLevelModules = await db.Module.findAndCountAll(options);
                 return res.send({
-                    page: page,
-                    totalPages: Math.ceil(projectModuleCount / PAGE_LIMIT),
-                    modules: projectFirstLevelModules.map(module => {
+                    numPage: req.size ? Math.ceil(projectFirstLevelModules.count / req.size) : 0,
+                    numModules: projectFirstLevelModules.count,
+                    modules: projectFirstLevelModules.rows.map(module => {
                         return {
                             ...module.toJSON(),
                         };

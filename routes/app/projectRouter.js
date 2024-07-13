@@ -26,6 +26,7 @@ router.get('/', (req, res, next) => {
 router.get('/dashboard', roleWhitelist([]), projectController.dashboard);
 router.get('/overview', roleBlacklist(['developer']), projectController.overview);
 router.get('/requirement', roleBlacklist(['developer']), projectController.requirement);
+router.get('/requirement/:requirementId', roleBlacklist(['developer']), projectController.requirement);
 router.get('/module', roleBlacklist(['developer']), projectController.module);
 router.get('/release', roleBlacklist(['developer']), projectController.release);
 

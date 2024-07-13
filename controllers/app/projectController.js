@@ -9,6 +9,9 @@ controller.overview = async (req, res, next) => {
 }
 
 controller.requirement = async (req, res, next) => {
+	if (req.params.requirementId) {
+		res.locals.requirementId = req.params.requirementId;
+	}
 	res.render('project/requirement', {title: 'Requirements', currentTab: 'Requirements'});
 }
 

@@ -1,8 +1,10 @@
 const db = require('../../models/index');
-const Sequelize = require('sequelize');
+const {Op} = require('sequelize');
 const {extractUserRole} = require('../helpers/userRoleHelper');
 const activityHelper = require('../helpers/activityHelper');
+const queryHelper = require("../helpers/queryHelper");
 const { extractProjectIdFromRelease, isUserProjectMember, isUserManager, isUserManagerOrTester, filterRoleOr } = require('../filters/projectRoleFilters');
+const { query } = require('express');
 
 const getRelease = async (releaseId, userId) => {
     const release = await db.Release.findOne({
@@ -109,11 +111,11 @@ const controller = {
     },
 
     getReleases: [
+        queryHelper.pagination,
+        queryHelper.search,
+        queryHelper.sort,
         async (req, res) => {
             const { projectId } = req.params;
-            const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
-            const sortField = req.query.sort === 'startDate' ? 'startDate' : 'id';
-            const sortOrder = req.query.order === 'asc' ? 'ASC' : 'DESC';
             const startDate = req.query.startDate ? new Date(req.query.startDate) : null;
             const endDate = req.query.endDate ? new Date(req.query.endDate) : null;
 
@@ -130,23 +132,29 @@ const controller = {
                     projectId: projectId,
                     ...((startDate || endDate) ? { createdAt: dateFilter } : {})
                 },
-                offset: PAGE_LIMIT * (page - 1),
-                limit: PAGE_LIMIT,
-                order: [[sortField, sortOrder]]
+                order: [['id', 'ASC']],
+                distinct: true,
             }
 
-            const keyword = req.query.keyword || '';
-            if (keyword.trim() !== '') {
-                options.where.name = { [Op.iLike]: `%${keyword}%` }
+            if (req.size && req.page) {
+                options.limit = req.size,
+                options.offset = (req.page - 1) * req.size;
+            }
+            if (req.sortBy && req.sortOrder) {
+                const sortField = req.sortBy === 'startDate' ? 'startDate' : 'id';
+                const sortOrder = req.sortOrder === 'asc' ? 'ASC' : 'DESC';
+                options.order = [[sortField, sortOrder]];
+            }
+            if (req.search) {
+                options.where.name = { [Op.iLike]: `%${req.search}%` }
             }
 
             try {
-                const projectReleases = await db.Release.findAll(options);
-                const projectReleaseCount = await db.Release.count({ where: options.where });
+                const projectReleases = await db.Release.findAndCountAll(options);
                 return res.send({
-                    page: page,
-                    totalPages: Math.ceil(projectReleaseCount / PAGE_LIMIT),
-                    releases: projectReleases.map(release => release.toJSON())
+                    numPage: req.size ? Math.ceil(projectReleases.count / req.size) : 0,
+                    numReleases: projectReleases.count,
+                    releases: projectReleases.rows.map(release => release.toJSON())
                 });
             } catch (error) {
                 console.error(error);

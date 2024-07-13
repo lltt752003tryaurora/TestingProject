@@ -3,6 +3,7 @@ const Sequelize = require('sequelize');
 const { extractUserRole } = require('../helpers/userRoleHelper');
 const { isValidDate } = require('../validation/validation');
 const activityHelper = require('../helpers/activityHelper');
+const queryHelper = require('../helpers/queryHelper');
 const { extractProjectFromTestCase, isUserProjectMember, isUserManager, isUserManagerOrTester, filterRoleOr } = require('../filters/projectRoleFilters');
 
 const TEST_CASE_PRIORITIES = ['low', 'medium', 'high'];
@@ -128,18 +129,14 @@ const controller = {
     // },
 
     getTestCases: [
-        isUserProjectMember,
-        isUserManagerOrTester,
+        queryHelper.pagination,
+        queryHelper.search,
+        queryHelper.sort,
         async (req, res) => {
             const { projectId } = req.params;
-            const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
-            const sortField = req.query.sort === 'updatedAt' ? 'updatedAt' : 'id';
-            const sortOrder = req.query.order === 'asc' ? 'ASC' : 'DESC';
             const options = {
                 where: {},
-                offset: PAGE_LIMIT * (page - 1),
-                limit: PAGE_LIMIT,
-                order: [[sortField, sortOrder]],
+                order: [['id', 'ASC']],
                 include: [{
                     model: db.TestPlan,
                     as: 'testPlan',
@@ -160,9 +157,18 @@ const controller = {
                     }]
                 }],
             };
-            const keyword = req.query.keyword || '';
-            if (keyword.trim() !== '') {
-                options.where.name = { [Op.iLike]: `%${keyword}%` }
+
+            if (req.size && req.page) {
+                options.limit = req.size,
+                options.offset = (req.page - 1) * req.size;
+            }
+            if (req.sortBy && req.sortOrder) {
+                const sortField = req.sortBy === 'updatedAt' ? 'updatedAt' : 'id';
+                const sortOrder = req.sortOrder === 'asc' ? 'ASC' : 'DESC';
+                options.order = [[sortField, sortOrder]];
+            }
+            if (req.search) {
+                options.where.name = { [Op.iLike]: `%${req.search}%` }
             }
             try {
                 const projectTestCases = await db.TestCase.findAll(options);
@@ -189,7 +195,6 @@ const controller = {
     ],
 
     createTestCase: [
-        filterRoleOr(['manager']),
         async (req, res, next) => {
             try {
                 const userId = req.user.id;
@@ -257,13 +262,10 @@ const controller = {
     ],
 
     editTestCase: [
-        extractProjectFromTestCase,
-        filterRoleOr(['manager']),
         async (req, res, next) => {
             try {
                 const userId = req.user.id;
-                const projectId = req.project.id;
-                const { testCaseId } = req.params;
+                const { projectId, testCaseId } = req.params;
                 const { name, description, detail, type, priority } = req.body;
                 if (!testCaseId) {
                     return res.status(400).send('Missing test case ID.');
@@ -309,13 +311,10 @@ const controller = {
     ],
 
     deleteTestCase: [
-        extractProjectFromTestCase,
-        filterRoleOr(['manager']),
         async (req, res, next) => {
             try {
                 const userId = req.user.id;
-                const projectId = req.project.id;
-                const { testCaseId } = req.params;
+                const { projectId, testCaseId } = req.params;
 
                 const testCase = await db.TestCase.findByPk(testCaseId);
                 if (!testCase) {

@@ -254,7 +254,7 @@ function openDeleteModal(e, id) {
   document.querySelector("#delete-module-form #id").value = id;
 }
 
-function renameModule(e, id) {
+function renameModule(e) {
   e.preventDefault()
 	e.stopPropagation()
 	var form = document.getElementById('edit-module-form');
@@ -303,7 +303,7 @@ function renameModule(e, id) {
 	})
 }
 
-function deleteModule(e, id) {
+function deleteModule(e) {
   e.preventDefault()
   e.stopPropagation();
 

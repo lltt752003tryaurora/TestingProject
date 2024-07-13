@@ -252,14 +252,23 @@ const controller = {
     deleteRequirement: [
         async (req, res, next) => {
             try {
-                const {requirementId} = req.params;
+                const {projectId, requirementId} = req.params;
 
-                const requmnt = await db.Requirement.findByPk(requirementId);
+                const requmnt = await db.Requirement.findByPk(requirementId, {
+                    include: [{
+                        model: db.Release,
+                        as: 'release',
+                        where: {
+                            projectId: projectId
+                        }
+                    }]
+                });
 
                 if (!requmnt) {
                     res.status(404).send({
                         message: "Requirement not found"
                     })
+                    return;
                 }
 
                 await requmnt.destroy();

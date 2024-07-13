@@ -271,9 +271,11 @@ const controller = {
                 const { projectId, releaseId } = req.params;
 
                 const release = await db.Release.findByPk(releaseId);
-                if (!release) {
+                if (!release || release.projectId != projectId) {
                     return res.status(400).send({message: 'Release does not exist.'});
                 }
+
+
 
                 await release.destroy();
 

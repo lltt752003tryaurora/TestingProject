@@ -52,7 +52,7 @@ const allowRoleTo = (role, ifNotCallback = null) => {
 }
 
 const roleWhitelist = (role, ifNotCallback = null) => {
-	roleArr = role.map(x => getRoleSpecificity(x));
+	const roleArr = role.map(x => getRoleSpecificity(x));
 	return (req, res, next) => {
 		if (roleArr.includes(req.user.role) || isAdmin(req)) {
 			next();
@@ -67,7 +67,7 @@ const roleWhitelist = (role, ifNotCallback = null) => {
 }
 
 const roleBlacklist = (role, ifNotCallback = null) => {
-	roleArr = role.map(x => getRoleSpecificity(x));
+	const roleArr = role.map(x => getRoleSpecificity(x));
 	return (req, res, next) => {
 		if (!roleArr.includes(req.user.role) || isAdmin(req)) {
 			next();

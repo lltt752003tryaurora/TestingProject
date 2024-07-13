@@ -135,11 +135,11 @@ controller = {
     ],
 
     createTestPlan: [
-        filterRoleOr(['manager']),
+        // filterRoleOr(['manager']),
         async (req, res, next) => {
             try {
                 const userId = req.user.id;
-                const projectId = req.project.id;
+                const {projectId} = req.params;
                 const { releaseId } =  req.body;
                 if (!releaseId) {
                     return res.status(400).send('Missing release ID.');
@@ -177,6 +177,7 @@ controller = {
                     testPlanId: testPlanId,
                 });
             } catch (err) {
+                console.error(err);
                 if (err.name === 'SequelizeValidationError') {
                     return res.status(400).send({ message: 'Validation error.', details: err.errors });
                 } else {
@@ -250,13 +251,15 @@ controller = {
     ],
 
     deleteTestPlan: [
-        extractProjectFromTestPlan,
-        filterRoleOr(['manager']),
+        // extractProjectFromTestPlan,
+        // filterRoleOr(['manager']),
         async (req, res, next) => {
             try {
                 const userId = req.user.id;
-                const projectId = req.project.id;
+                const {projectId} = req.params;
                 const { testPlanId } = req.params;
+
+                console.log(req.user);
 
                 const testPlan = await db.TestPlan.findByPk(testPlanId);
                 if (!testPlan) {
@@ -274,6 +277,7 @@ controller = {
                     message: 'Test plan deleted successfully.'
                 });
             } catch (err) {
+                console.error(err);
                 return res.status(500).send({
                     message: 'Internal server error.'
                 });

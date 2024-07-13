@@ -136,7 +136,7 @@ const controller = {
     deleteIssues: [
         async (req, res) => {
             try {
-                const { issueId } = req.params; 
+                const { issueId } = req.params;
 
                 const issue = await db.Issue.findByPk(issueId);
                 if (!issue) {
@@ -164,6 +164,73 @@ const controller = {
         }
     ],
 
+    changeStatus: [
+        async (req, res) => {
+            const { issueId, status } = req.body;
+            try {
+                const result = await db.Issue.update({ status }, {
+                    where: { id: issueId }
+                });
+                res.status(200).send({ message: 'Status updated successfully', count: result[0] });
+            } catch (error) {
+                res.status(500).send({ message: 'Internal server error' });
+            }
+        }
+    ],
+
+    changePriority: [
+        async (req, res) => {
+            const { issueId, priority } = req.body;
+            try {
+                const result = await db.Issue.update({ priority }, {
+                    where: { id: issueId }
+                });
+                res.status(200).send({ message: 'Priority updated successfully', count: result[0] });
+            } catch (error) {
+                res.status(500).send({ message: 'Internal server error' });
+            }
+        }
+    ],
+
+    changeSeverity: [
+        async (req, res) => {
+            const { issueIds, severity } = req.body;
+            try {
+                const result = await db.Issue.update({ detail: severity }, {
+                    where: { id: issueIds }
+                });
+                res.status(200).send({ message: 'Severity updated successfully', count: result[0] });
+            } catch (error) {
+                res.status(500).send({ message: 'Internal server error' });
+            }
+        }
+    ],
+
+    assignUserToIssues: [
+        async (req, res) => {
+            const { issueIds, userId } = req.body; 
+
+            try {
+                if (!userId) {
+                    return res.status(400).send({ message: "Invalid user ID provided." });
+                }
+
+                const result = await db.Issue.update({ assignedUserId: userId }, {
+                    where: {
+                        id: issueIds
+                    }
+                });
+
+                res.status(200).send({
+                    message: 'User assigned successfully to issues.',
+                    updatedCount: result[0]  
+                });
+            } catch (error) {
+                console.error('Error while assigning user to issues:', error);
+                res.status(500).send({ message: 'Internal server error' });
+            }
+        }
+    ]
 
 };
 

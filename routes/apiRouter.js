@@ -12,7 +12,7 @@ router.use('/projects',
 			userMiddleware.getUserInfo,
 			require('./api/projectRouter.js'));
 
-router.use('/user',
+router.use('/users',
 			authMiddleware.isUserAuthenticated(),
 			userMiddleware.getUserInfo,
 			require('./api/userRouter.js'));

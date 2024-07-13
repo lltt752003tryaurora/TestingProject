@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const db = require('../../models/index');
 const { responseData } = require("../../utils/response")
 
@@ -123,6 +124,23 @@ const controller = {
             responseData(res, "Failed to delete user", "", 500);
         }
     },
+
+    getUsersByUsername: async (req, res) => {
+        try {
+            const keyword = req.query.username?.toLowerCase().trim();
+            const users = await db.User.findAll({
+                where: { username: { [Op.iLike]: `%${keyword}%` } }
+            });
+            res.send({
+                data: users.map(item => item.toJSON())
+            });
+        } catch (err) {
+            console.error(error);
+            res.status(500).send({
+                message: 'Internal server error.'
+            });
+        }
+    }
 }
 
 module.exports = controller;

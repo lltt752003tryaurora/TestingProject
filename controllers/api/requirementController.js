@@ -104,12 +104,20 @@ const controller = {
     ],
 
     createRequirement: [
-        filterRoleOr(['manager', 'developer']),
+        // filterRoleOr(['manager', 'developer']),
         async (req, res, next) => {
             try {
                 const userId = req.user.id;
                 const { projectId } = req.params;
                 let { releaseId, name, description } = req.body;
+
+                const release = await db.Release.findByPk(releaseId);
+                if (!release) {
+                    res.status(404).send({
+                        message: 'Release does not exist.'
+                    });
+                    return;
+                }
 
                 const newRequirement = await db.Requirement.create({
                     releaseId,
@@ -135,10 +143,11 @@ const controller = {
     ],
 
     editRequirement: [
-        filterRoleOr(['manager', 'developer']),
+        // filterRoleOr(['manager', 'developer']),
         async (req, res, next) => {
             try {
                 const userId = req.user.id;
+                const projectId = req.project?.id;
                 const {requirementId} = req.params;
                 let {name, description} = req.body;
 
@@ -164,6 +173,7 @@ const controller = {
                 })
 
             } catch (err) {
+                console.error(err);
                 return res.status(500).send({
                     message: 'Internal server error.'
                 });
@@ -172,7 +182,7 @@ const controller = {
     ],
 
     deleteRequirement: [
-        filterRoleOr(['manager', 'developer']),
+        // filterRoleOr(['manager', 'developer']),
         async (req, res, next) => {
             try {
                 const {requirementId} = req.params;

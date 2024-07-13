@@ -6,6 +6,7 @@ const {roleWhitelist} = require("../../middlewares/roleMiddleware")
 router.get('/', projectMemberController.getProjectMembers);
 router.post('/', roleWhitelist(['manager']), projectMemberController.changeProjectMembers);
 router.put('/', roleWhitelist(['manager']), projectMemberController.changeProjectMembers);
+router.delete('/', roleWhitelist(['manager']), projectMemberController.deleteProjectMember);
 
 router.get('/nonmembers', projectMemberController.getProjectNonMembers);
 

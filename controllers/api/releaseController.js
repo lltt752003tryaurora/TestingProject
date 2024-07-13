@@ -109,8 +109,6 @@ const controller = {
     },
 
     getReleases: [
-        isUserProjectMember,
-        isUserManagerOrTester,
         async (req, res) => {
             const { projectId } = req.params;
             const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
@@ -160,7 +158,6 @@ const controller = {
     ],
 
     createRelease: [
-        filterRoleOr(['manager']),
         async (req, res, next) => {
             try {
                 const userId = req.user.id;
@@ -205,7 +202,6 @@ const controller = {
     ],
 
     editRelease: [
-        filterRoleOr(['manager']),
         async (req, res, next) => {
             try {
                 const userId = req.user.id;
@@ -261,7 +257,6 @@ const controller = {
     ],
 
     deleteRelease: [
-        filterRoleOr(['manager']),
         async (req, res, next) => {
             try {
                 const userId = req.user.id;

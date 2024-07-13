@@ -87,6 +87,13 @@ const controller = {
 
                 let { name, parentModule } = req.body;
 
+                if (!name) {
+                    res.status(400).send({
+                        message: "Failed to create module, name can't be empty!"
+                    })
+                    return;
+                }
+
                 const newModule = await db.Module.create({
                     name: name,
                     projectId: projectId,

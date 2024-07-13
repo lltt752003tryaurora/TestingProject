@@ -10,7 +10,6 @@ PAGE_LIMIT = 10
 
 const controller = {
     getRequirementById: [
-        filterRoleOr(['manager']),
         async (req, res) => {
             try {
                 const { requirementId } = req.params;
@@ -41,9 +40,6 @@ const controller = {
     ],
 
     getRequirements: [
-        // isUserProjectMember,
-        // isUserManager,
-        filterRoleOr(['manager', 'developer']),
         async (req, res) => {
         const { projectId } = req.params;
         const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
@@ -104,7 +100,6 @@ const controller = {
     ],
 
     createRequirement: [
-        // filterRoleOr(['manager', 'developer']),
         async (req, res, next) => {
             try {
                 const userId = req.user.id;
@@ -143,7 +138,6 @@ const controller = {
     ],
 
     editRequirement: [
-        // filterRoleOr(['manager', 'developer']),
         async (req, res, next) => {
             try {
                 const userId = req.user.id;
@@ -182,7 +176,6 @@ const controller = {
     ],
 
     deleteRequirement: [
-        // filterRoleOr(['manager', 'developer']),
         async (req, res, next) => {
             try {
                 const {requirementId} = req.params;

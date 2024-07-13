@@ -3,14 +3,76 @@ const Sequelize = require('sequelize');
 const { extractUserRole } = require('../filters/projectRoleFilters');
 
 const controller = {
+    getComments: [
+        async (req, res) => {
+            const userId = req.user.id;
+            const { projectId, issueId } = req.params;
+            try {
+                const comments = await db.IssueComment.findAll({
+                    where: {
+                        issueId: issueId
+                    },
+                    sort: [['id', 'ASC']],
+                    include: [{
+                        model: db.Issue,
+                        as: "issue",
+                        attributes: [],
+                        required: true,
+                        include: [{
+                            model: db.TestRun,
+                            as: 'testRun',
+                            attributes: [],
+                            required: true,
+                            include: [{
+                                model: db.TestCase,
+                                as: 'testCase',
+                                attributes: [],
+                                required: true,
+                                include: [{
+                                    model: db.TestPlan,
+                                    as: 'testPlan',
+                                    attributes: [],
+                                    required: true,
+                                    include: [{
+                                        model: db.Release,
+                                        as: 'release',
+                                        attributes: [],
+                                        required: true,
+                                        include: [{
+                                            model: db.Project,
+                                            as: 'project',
+                                            attributes: [],
+                                            required: true,
+                                            where: { id: projectId }
+                                        }]
+                                    }]
+                                }]
+                            }]
+                        }],
+                    }],
+                    order: [['createdAt', 'ASC']]
+                });
+                return res.send({
+                    comments: comments.map(comment => comment.toJSON())
+                });
+                
+            } catch (error) {
+                console.log(error);
+                res.status(500).send({
+                    message: 'Internal server error.'
+                });
+            } 
+        }
+    ],
     addComment: [
         async (req, res) => {
             try {
+                const userId = req.user.id;
                 const { issueId } = req.params;
-                const { userId, comment } = req.body; // Giả sử userId được lấy từ đâu đó, ví dụ: req.user.id nếu đã xác thực
+                const { comment } = req.body;
                 const newComment = await db.IssueComment.create({
-                    issue_id: issueId,
-                    user_id: userId,
+                    issueId: issueId,
+                    userId: userId,
                     comment: comment
                 });
                 res.status(201).send({
@@ -26,6 +88,7 @@ const controller = {
     deleteComment: [
         async (req, res) => {
             try {
+                const userId = req.user.id;
                 const { commentId } = req.params;
                 const comment = await db.IssueComment.findByPk(commentId);
                 if (!comment) {

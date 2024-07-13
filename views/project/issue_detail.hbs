@@ -1,4 +1,25 @@
-{{#> modal id='modal'}}
+{{#> modal id='deleteComment'}}
+<div class="d-flex flex-column p-4 gap-4">
+  <div class="d-flex align-items-center justify-content-between">
+    <div class="fw-semibold text-gray fs-3">
+      Delete Comment
+    </div>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  </div>
+
+  
+  <form id="delete-comment-form" class="needs-validation" onsubmit="return deleteComment(event)" novalidate>
+    <div class="mb-3">
+      <input type="text" class="form-control" id="id" hidden required>
+      Are you sure you want to delete this comment?
+    </div>
+    <div class="d-flex align-items-center justify-content-center gap-3">
+      <button type="submit" class="btn btn-danger">Delete</button>
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+    </div>
+  </form>
+  
+</div>
 {{/modal}}
 
 <main class="d-flex h-100 overflow-hidden">
@@ -85,7 +106,7 @@
       // Fetch comment's owner info
       const userId = comment.userId;
       const userResponse = await axiosAPI.get(`/api/users/${userId}`);
-      const {user} = userResponse.data;
+      const user = userResponse.data;
       console.log(user);
 
       // Comment container = header + content
@@ -105,21 +126,28 @@
 
       // Comment header left avatar
       const userAvatar = document.createElement("img");
-      userAvatar.src = user.avatar;
+      userAvatar.src = "/assets/avatar.png";
       userAvatar.style = "max-height: 40px;";
       userAvatar.classList.add("rounded-circle", "mx-2");
       cmtHeaderLeft.appendChild(userAvatar);
 
       // Comment header left info
       const cmtInfo = document.createElement("div");
-      const username = user.username;
-      const createAt = new Date(comment.createdAt);
+      const username = user.fullName;
+      const createAt = dayjs(comment.createdAt).format("HH:mm DD/MM/YYYY");
       cmtInfo.innerHTML = `<div>${username}</div><div>${createAt}</div>`;
       cmtHeaderLeft.appendChild(cmtInfo);
 
       // Comment header right
       const cmtHeaderRight = document.createElement("div");
       cmtHeaderRight.classList.add("d-flex", "flex-row");
+      {{#allowRoleFrom role 'manager'}}
+      cmtHeaderRight.innerHTML += `
+        <button class="btn p-0" onclick="openDeleteModal(event, ${comment.id})" data-bs-toggle="modal" data-bs-target="#deleteComment">
+          <i class="bi bi-trash3-fill text-gray"></i>
+        </button>
+      `
+      {{/allowRoleFrom}}
       cmtHeader.appendChild(cmtHeaderRight);
 
       // Comment body
@@ -135,22 +163,66 @@
   }
 
   const issueId = {{ issueId }};
-  axiosAPI.get(`/api/issues/${issueId}/comments`)
+  axiosAPI.get(`/api/projects/{{projectId}}/issues/${issueId}/comments`)
     .then((response) => {
       const { comments } = response.data;
       console.log(comments);
       displayComments(comments);
     })
     .catch((err) => {
-      console.log(error);
+      console.log(err);
     });
+</script>
+
+<script>
+function openDeleteModal(e, id) {
+  e.preventDefault();
+  e.stopPropagation();
+  document.querySelector("#delete-comment-form #id").value = id;
+}
+
+function deleteComment(e) {
+  e.preventDefault()
+  e.stopPropagation();
+
+  var myModalEl = document.getElementById('deleteComment');
+	var modal = bootstrap.Modal.getInstance(myModalEl);
+	
+	var id = document.querySelector("#delete-comment-form #id");
+
+  axiosAPI.delete('/api/projects/{{projectId}}/issues/${issueId}/comments/' + id.value)
+    .then(res => {
+      console.log(res);
+      Toastify({
+        text: "Successfully deleted comment",
+        style: {
+        background: "linear-gradient(to right, #198754, #198754)",
+        },
+        onClick: function(){} // Callback after click
+      }).showToast();
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    })
+    .catch(err => {
+      console.log(err);
+      Toastify({
+        text: "Failed to delete comment",
+        style: {
+        background: "linear-gradient(to right, #dc3545, #dc3545)",
+        },
+        onClick: function(){} // Callback after click
+      }).showToast();
+    })
+}
+
 </script>
 
 {{!-- <script src="/js/comment/comments.js"></script>
 <script>
   displayComments("{{issueId}}");
 </script>
-
+ --}}
 <!-- Post comment scripts -->
 <script>
   document.getElementById("comment-form").addEventListener("submit", function(event) {
@@ -162,10 +234,35 @@
       showMessage("Comment must not be empty.", "text-danger");
       return;
     }
+    else showMessage("", "");
 
     clearCommentField();
-    addComment(comment);
-    showMessage("Comment submitted successfully.", "text-success");
+    axiosAPI.post(`/api/projects/{{projectId}}/issues/${issueId}/comments`, {
+      comment: comment
+    })
+    .then(res => {
+      console.log(res);
+      Toastify({
+        text: "Comment submitted successfully.",
+        style: {
+        background: "linear-gradient(to right, #198754, #198754)",
+        },
+        onClick: function(){} // Callback after click
+      }).showToast();
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    })
+    .catch(err => {
+      console.log(err);
+      Toastify({
+        text: "Failed to comment",
+        style: {
+        background: "linear-gradient(to right, #dc3545, #dc3545)",
+        },
+        onClick: function(){} // Callback after click
+      }).showToast();
+    })
   });
 
   const showMessage = (message, className) => {
@@ -177,4 +274,4 @@
   const clearCommentField = () => {
     document.getElementById("comment").value = "";
   }
-</script> --}}
+</script>

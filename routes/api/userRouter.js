@@ -8,7 +8,7 @@ router.get('/search', userController.getUsersByUsername);
 router.put('/', userController.editUserSelf);
 router.delete('/', userController.deleteUserSelf);
 
-router.get('/:userId', roleWhitelist(['admin']), userController.getUserById);
+router.get('/:userId', userController.getUserById);
 router.post('/', roleWhitelist(['admin']), userController.createUser);
 router.put('/:userId', roleWhitelist(['admin']), userController.editUser);
 router.delete('/:userId', roleWhitelist(['admin']), userController.deleteUser);

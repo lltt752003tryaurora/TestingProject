@@ -74,7 +74,7 @@ The system has 4 access types:
 - [x] *[Release 2]* View Issue List with Pagination, Search, Sort, Filter
 - [x] *[Release 2]* View Issue Details (ID, Title, Description, Steps to reproduce, Environment, Module, Release, Priority, Severity, Attachments, Status, Assign to, Linked TCs)
 - [ ] Bulk action: Change Status, Change Priority, Change Severity, Asssigned User (Developer) for one or many Issues
-- [ ] Add, Delete Comment
+- [x] Add, Delete Comment
 
 ## Reports (\*\*)
 

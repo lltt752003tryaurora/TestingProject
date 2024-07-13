@@ -16,12 +16,33 @@ const controller = {
                 order: [['id', 'ASC']],
                 include: [{
                     model: db.TestRun,
-                    as: 'testRun', // Tên bí danh này phải phù hợp với khai báo trong mô hình của bạn
+                    as: 'testRun',
+                    attributes: [],
+                    required: true,
                     include: [{
-                        model: db.Module, // Hoặc một bảng khác nếu Module không phù hợp
-                        as: 'module',
-                        where: { project_id: projectId },
-                        required: true
+                        model: db.TestCase,
+                        as: 'testCase',
+                        attributes: [],
+                        required: true,
+                        include: [{
+                            model: db.TestPlan,
+                            as: 'testPlan',
+                            attributes: [],
+                            required: true,
+                            include: [{
+                                model: db.Release,
+                                as: 'release',
+                                attributes: [],
+                                required: true,
+                                include: [{
+                                    model: db.Project,
+                                    as: 'project',
+                                    attributes: [],
+                                    required: true,
+                                    where: { id: projectId }
+                                }]
+                            }]
+                        }]
                     }]
                 }],
                 distinct: true
@@ -41,16 +62,33 @@ const controller = {
 
             try {
                 const issues = await db.Issue.findAndCountAll(options);
+                const issuesDetails = await Promise.all(issues.rows.map(async (is) => {
+                    const assigned = await db.User.findByPk(is.assignedUserId, {
+                        attributes: ['id', 'username', 'fullName', 'avatar']
+                    });
+                    const creator = await db.User.findByPk(is.creatorUserId, {
+                        attributes: ['id', 'username', 'fullName', 'avatar']
+                    });
 
+                    let res = {
+                        ...is.get({ plain: true }),
+                        assigned,
+                        creator
+                    };
+
+                    return res;
+                }));
+                issues.rows.forEach(async is => {
+                })
                 res.send({
                     numPage: req.size ? Math.ceil(issues.count / req.size) : 0,
                     numIssues: issues.count,
-                    issues: issues.rows.map(issue => issue.toJSON())
+                    issues: issuesDetails
                 });
             } catch (error) {
-                console.error('Lỗi khi lấy thông tin Issues:', error);
+                console.error('Failed to get issues:', error);
                 res.status(500).send({
-                    message: 'Lỗi server nội bộ.'
+                    message: 'Internal server error.'
                 });
             }
         }

@@ -94,7 +94,7 @@
       titleCell.textContent = data.name;
       statusCell.textContent = data.status;
       priorityCell.textContent = data.priority;
-      createdDateCell.textContent = data.createdAt;
+      createdDateCell.textContent = dayjs(data.createdAt).format('DD/MM/YYYY');
 
       // ID
       idCell.style.textAlign = "center";
@@ -105,7 +105,7 @@
 
       // Created by
       createdByCell.style.textAlign = "center";
-      createdByCell.innerText = data.creatorUserId;
+      createdByCell.innerText = data?.creator?.fullName;
 
       {{!-- const createdByAvatar = document.createElement("img");
       createdByAvatar.src = users[data.createdBy].avatar;
@@ -115,7 +115,7 @@
 
       // Assigned to
       assignedToCell.style.textAlign = "center";
-      assignedToCell.innerText = data.assignedUserId;
+      assignedToCell.innerText = data?.assigned?.fullName ?? 'Unassigned';
 
       {{!-- const assignedToAvatar = document.createElement("img");
       assignedToAvatar.src = users[data.assignedTo].avatar;

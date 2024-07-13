@@ -179,6 +179,13 @@ const controller = {
                     return;
                 }
 
+                if (release.projectId != projectId) {
+                    res.status(404).send({
+                        message: 'Release does not belong to this project.'
+                    });
+                    return;
+                }
+
                 const newRequirement = await db.Requirement.create({
                     releaseId,
                     name,

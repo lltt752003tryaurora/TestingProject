@@ -1,20 +1,19 @@
 const db = require('../../models/index');
 const Sequelize = require('sequelize');
 const { extractUserRole } = require('../filters/projectRoleFilters');
+const queryHelper = require('../helpers/queryHelper')
 
 const controller = {
     getIssues: [
+        queryHelper.pagination,
+        queryHelper.search,
+        queryHelper.sort,
         async (req, res) => {
             const { projectId } = req.params;
-            const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
-            const sortField = req.query.sort === 'updatedAt' ? 'updatedAt' : 'id';
-            const sortOrder = req.query.order === 'asc' ? 'ASC' : 'DESC';
 
             const options = {
                 where: {},
-                offset: PAGE_LIMIT * (page - 1),
-                limit: PAGE_LIMIT,
-                order: [[sortField, sortOrder]],
+                order: [['id', 'ASC']],
                 include: [{
                     model: db.TestRun,
                     as: 'testRun', // Tên bí danh này phải phù hợp với khai báo trong mô hình của bạn
@@ -24,25 +23,29 @@ const controller = {
                         where: { project_id: projectId },
                         required: true
                     }]
-                }]
+                }],
+                distinct: true
             };
-
-            const keyword = req.query.keyword || '';
-            if (keyword.trim() !== '') {
-                options.where.name = { [Op.iLike]: `%${keyword}%` };
+            if (req.size && req.page) {
+                options.limit = req.size,
+                options.offset = (req.page - 1) * req.size;
+            }
+            if (req.sortBy && req.sortOrder) {
+                const sortField = req.sortBy === 'updatedAt' ? 'updatedAt' : 'id';
+                const sortOrder = req.sortOrder === 'asc' ? 'ASC' : 'DESC';
+                options.order = [[sortField, sortOrder]];
+            }
+            if (req.search) {
+                options.where.name = { [Op.iLike]: `%${req.search}%` }
             }
 
             try {
-                const issues = await db.Issue.findAll(options);
-                const issueCount = await db.Issue.count({
-                    where: options.where,
-                    include: options.include
-                });
+                const issues = await db.Issue.findAndCountAll(options);
 
                 res.send({
-                    page: page,
-                    totalPages: Math.ceil(issueCount / PAGE_LIMIT),
-                    issues: issues.map(issue => issue.toJSON())
+                    numPage: req.size ? Math.ceil(issues.count / req.size) : 0,
+                    numIssues: issues.count,
+                    issues: issues.rows.map(issue => issue.toJSON())
                 });
             } catch (error) {
                 console.error('Lỗi khi lấy thông tin Issues:', error);

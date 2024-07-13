@@ -2,6 +2,7 @@ const db = require('../../models/index');
 const Sequelize = require('sequelize');
 const {extractUserRole} = require('../helpers/userRoleHelper');
 const activityHelper = require('../helpers/activityHelper');
+const queryHelper = require('../helpers/queryHelper')
 const { extractProjectFromTestPlan, isUserProjectMember, isUserManager, isUserManagerOrTester, filterRoleOr } = require('../filters/projectRoleFilters');
 
 
@@ -86,17 +87,13 @@ controller = {
     },
 
     getTestPlans: [
-        isUserProjectMember,
-        isUserManagerOrTester,
+        queryHelper.pagination,
+        queryHelper.search,
+        queryHelper.sort,
         async (req, res) => {
             const { projectId } = req.params;
-            const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
-            const sortField = req.query.sort === 'updatedAt' ? 'updatedAt' : 'id';
-            const sortOrder = req.query.order === 'asc' ? 'ASC' : 'DESC';
             const options = {
-                offset: PAGE_LIMIT * (page - 1),
-                limit: PAGE_LIMIT,
-                order: [[sortField, sortOrder]],
+                order: [['id', 'ASC']],
                 include: [
                     {
                         model: db.Release,
@@ -109,21 +106,27 @@ controller = {
                         as: 'components',
                         attributes: ['id', 'name']
                     }
-                ]
+                ],
+                distinct: true
             };
-            const keyword = req.query.keyword || '';
-            if (keyword.trim() !== '') {
-                options.where.name = { [Op.iLike]: `%${keyword}%` }
+            if (req.size && req.page) {
+                options.limit = req.size,
+                options.offset = (req.page - 1) * req.size;
+            }
+            if (req.sortBy && req.sortOrder) {
+                const sortField = req.sortBy === 'updatedAt' ? 'updatedAt' : 'id';
+                const sortOrder = req.sortOrder === 'asc' ? 'ASC' : 'DESC';
+                options.order = [[sortField, sortOrder]];
+            }
+            if (req.search) {
+                options.where.name = { [Op.iLike]: `%${req.search}%` }
             }
             try {
-                const projectTestPlans = await db.TestPlan.findAll(options);
-                const projectTestPlanCount = await db.TestPlan.count({ 
-                    include: options.include
-                });
+                const projectTestPlans = await db.TestPlan.findAndCountAll(options);
                 return res.send({
-                    page: page,
-                    totalPages: Math.ceil(projectTestPlanCount / PAGE_LIMIT),
-                    testPlans: projectTestPlans.map(testPlan => testPlan.toJSON())
+                    numPage: req.size ? Math.ceil(projectTestPlans.count / req.size) : 0,
+                    numPlans: projectTestPlans.count,
+                    testPlans: projectTestPlans.rows.map(testPlan => testPlan.toJSON())
                 });
             } catch (error) {
                 console.log(error);
@@ -135,7 +138,6 @@ controller = {
     ],
 
     createTestPlan: [
-        // filterRoleOr(['manager']),
         async (req, res, next) => {
             try {
                 const userId = req.user.id;
@@ -188,13 +190,10 @@ controller = {
     ],
 
     editTestPlan: [
-        extractProjectFromTestPlan,
-        filterRoleOr(['manager']),
         async (req, res, next) => {
             try {
                 const userId = req.user.id;
-                const projectId = req.project.id;
-                const { testPlanId } = req.params;
+                const { projectId, testPlanId } = req.params;
                 const { name, description, startDate, endDate, releaseId } = req.body;
                 if (!releaseId) {
                     return res.status(400).send('Missing release ID.');
@@ -251,8 +250,6 @@ controller = {
     ],
 
     deleteTestPlan: [
-        // extractProjectFromTestPlan,
-        // filterRoleOr(['manager']),
         async (req, res, next) => {
             try {
                 const userId = req.user.id;

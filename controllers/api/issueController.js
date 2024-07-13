@@ -163,6 +163,16 @@ const controller = {
             }
         }
     ],
+
+    changeStatus: [
+
+    ],
+    changePriority: [
+        
+    ],
+    changeSeverity: [
+        
+    ],
 };
 
 module.exports = controller;

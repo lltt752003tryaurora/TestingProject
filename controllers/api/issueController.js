@@ -1,12 +1,14 @@
 const db = require('../../models/index');
-const Sequelize = require('sequelize');
+const {Op} = require('sequelize');
 const { extractUserRole } = require('../filters/projectRoleFilters');
+const activityHelper = require('../helpers/activityHelper')
 const queryHelper = require('../helpers/queryHelper')
 
 const controller = {
     getIssues: [
         queryHelper.pagination,
         queryHelper.search,
+        queryHelper.filter,
         queryHelper.sort,
         async (req, res) => {
             const { projectId } = req.params;
@@ -56,6 +58,17 @@ const controller = {
                 const sortOrder = req.sortOrder === 'asc' ? 'ASC' : 'DESC';
                 options.order = [[sortField, sortOrder]];
             }
+            if (req.filter) {
+                if (req.filter == 'open' || req.filter == 'closed') {
+                    options.where.status = {
+                        [Op.eq]: req.filter
+                    }
+                } else {
+                    options.where.priority = {
+                        [Op.eq]: req.filter
+                    }
+                }
+            }
             if (req.search) {
                 options.where.name = { [Op.iLike]: `%${req.search}%` }
             }
@@ -98,7 +111,7 @@ const controller = {
         async (req, res, next) => {
             try {
                 const userId = req.user.id;
-                const projectId = req.project.id;
+                const {projectId} = req.params;
 
                 let { name, description, priority, status, assignedUserId, testRunId } = req.body;
 

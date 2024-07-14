@@ -2,6 +2,7 @@ const db = require('../../models/index');
 const Sequelize = require('sequelize');
 const { extractUserRole } = require('../helpers/userRoleHelper');
 const activityHelper = require('../helpers/activityHelper');
+const queryHelper = require('../helpers/queryHelper');
 const { extractProjectFromTestCase, isUserProjectMember, isUserManager, isUserManagerOrTester, filterRoleOr } = require('../filters/projectRoleFilters');
 
 const getTestRun = async (testRunId, userId) => {
@@ -111,18 +112,14 @@ const controller = {
     },
 
     getTestRun: [
-        isUserProjectMember,
-        isUserManagerOrTester,
+        queryHelper.pagination,
+        queryHelper.search,
+        queryHelper.sort,
         async (req, res) => {
             const { projectId } = req.params;
-            const page = isNaN(req.query.page) ? 1 : Math.max(1, parseInt(req.query.page));
-            const sortField = req.query.sort === 'updatedAt' ? 'updatedAt' : 'id';
-            const sortOrder = req.query.order === 'asc' ? 'ASC' : 'DESC';
             const options = {
                 where: {},
-                offset: PAGE_LIMIT * (page - 1),
-                limit: PAGE_LIMIT,
-                order: [[sortField, sortOrder]],
+                order: [['id', 'ASC']],
                 include: [{
                     model: db.TestCase,
                     as: 'testCase',
@@ -149,20 +146,25 @@ const controller = {
                     }]
                 }],
             };
-            const keyword = req.query.keyword || '';
-            if (keyword.trim() !== '') {
-                options.where.name = { [Op.iLike]: `%${keyword}%` }
+
+            if (req.size && req.page) {
+                options.limit = req.size,
+                options.offset = (req.page - 1) * req.size;
+            }
+            if (req.sortBy && req.sortOrder) {
+                const sortField = req.sortBy === 'updatedAt' ? 'updatedAt' : 'id';
+                const sortOrder = req.sortOrder === 'asc' ? 'ASC' : 'DESC';
+                options.order = [[sortField, sortOrder]];
+            }
+            if (req.search) {
+                options.where.name = { [Op.iLike]: `%${req.search}%` }
             }
             try {
-                const projectTestRuns = await db.TestRun.findAll(options);
-                const projectTestRunCount = await db.TestRun.count({
-                    where: options.where,
-                    include: options.include,
-                });
+                const projectTestRuns = await db.TestRun.findAndCountAll(options);
                 return res.send({
-                    page: page,
-                    totalPages: Math.ceil(projectTestRunCount / PAGE_LIMIT),
-                    testRuns: projectTestRuns.map(testRun => {
+                    numPage: req.size ? Math.ceil(projectTestRuns.count / req.size) : 0,
+                    numTestRuns: projectTestRuns.count,
+                    testRuns: projectTestRuns.rows.map(testRun => {
                         return {
                             ...testRun.toJSON(),
                         };

@@ -35,7 +35,8 @@ The system has 4 access types:
 
 ## Test Plans
 
-- [ ] Add, Edit, Delete Test Plan
+- [x] Add Test Plan
+- [ ] Edit, Delete Test Plan
 - [x] *[Release 1]* View Test Plan List
 - [x] *[Release 1]* View Test Plan Details
 
@@ -69,7 +70,7 @@ The system has 4 access types:
 
 ## Issues/Bugs (\*)
 
-- [ ] Add, Edit, Delete Issue
+- [x] Add, Edit, Delete Issue
 - [ ] Import, Export Issues
 - [x] *[Release 2]* View Issue List with Pagination, Search, Sort, Filter
 - [x] *[Release 2]* View Issue Details (ID, Title, Description, Steps to reproduce, Environment, Module, Release, Priority, Severity, Attachments, Status, Assign to, Linked TCs)

@@ -182,13 +182,11 @@ const controller = {
     createTestRun: [
         async (req, res, next) => {
             try {
+                const {projectId} = req.params;
                 const userId = req.user.id;
                 const { testCaseId, assignedUserId, name } = req.body;
                 if (!testCaseId) {
                     return res.status(400).send('Missing test case ID.');
-                }
-                if (!assignedUserId) {
-                    return res.status(400).send('Missing assigned user ID.');
                 }
                 if (!name || name.trim() === '') {
                     return res.status(400).send({
@@ -221,11 +219,10 @@ const controller = {
     ],
 
     editTestRun: [
-        extractProjectFromTestCase,
-        filterRoleOr(['manager']),
         async (req, res) => {
             try {
-                const { testRunId } = req.params;
+                const userId = req.user.id;
+                const { projectId, testRunId } = req.params;
                 const { name, assignedUserId } = req.body;
                 if (!testRunId) {
                     return res.status(400).send('Missing test run ID.');
@@ -259,15 +256,16 @@ const controller = {
     ],
 
     deleteTestRun: [
-        extractProjectFromTestCase, // Adjust accordingly if necessary
-        filterRoleOr(['manager']),
         async (req, res) => {
             try {
-                const { testRunId } = req.params;
+                const userId = req.user.id;
+                const { projectId, testRunId } = req.params;
 
                 const testRun = await db.TestRun.findByPk(testRunId);
                 if (!testRun) {
-                    return res.status(400).send('Test run does not exist.');
+                    return res.status(400).send({
+                        message:'Test run does not exist.'
+                    });
                 }
 
                 await testRun.destroy();

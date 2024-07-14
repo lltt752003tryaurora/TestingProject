@@ -61,7 +61,7 @@ The system has 4 access types:
 
 ## Test Runs (TR) (\*)
 
-- [ ] Add, Edit, Delete TR
+- [x] Add, Edit, Delete TR
 - [x] *[Release 2]* View TR List
 - [x] *[Release 1]* View TR Details (Project Status, Issue Status, Release, TCs with Test Results)
 - [ ] Add, Remove TCs to TR

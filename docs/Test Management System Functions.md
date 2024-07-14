@@ -38,7 +38,7 @@ The system has 4 access types:
 - [x] Add Test Plan
 - [ ] Edit, Delete Test Plan
 - [x] *[Release 1]* View Test Plan List
-- [x] *[Release 1]* View Test Plan Details
+- [ ] View Test Plan Details
 
 ## Releases (\*)
 
@@ -57,13 +57,13 @@ The system has 4 access types:
 - [ ] Link TC to Requirements
 - [ ] Import, Export TCs
 - [ ] View TC List with Pagination, Search, Sort, Filter
-- [x] View TC Details (Id, Name/Objective, Module, Description, Pre-condition, Steps, Created At, Created By, Updated At, Linked Requirements, Linked Issues)
+- [ ] View TC Details (Id, Name/Objective, Module, Description, Pre-condition, Steps, Created At, Created By, Updated At, Linked Requirements, Linked Issues)
 
 ## Test Runs (TR) (\*)
 
 - [x] Add, Edit, Delete TR
 - [x] *[Release 2]* View TR List
-- [x] *[Release 1]* View TR Details (Project Status, Issue Status, Release, TCs with Test Results)
+- [ ] View TR Details (Project Status, Issue Status, Release, TCs with Test Results)
 - [ ] Add, Remove TCs to TR
 - [ ] Add Issue to TC
 - [ ] Bulk Action: Change Status, Assigned to for one or many TCs in TR
